@@ -6,6 +6,8 @@
 #ifndef SCRIPTBINDINGS_H
 #define SCRIPTBINDINGS_H
 
+#include <sc_cb_vm.h>
+
 namespace ScriptBindings
 {
     void RegisterBindings();

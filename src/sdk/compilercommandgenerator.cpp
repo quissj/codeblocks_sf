@@ -24,8 +24,9 @@
 #include "scriptingmanager.h"
 #include "filefilters.h"
 
+// FIXME (bluehazzard#1#): sqrat
 #include "scripting/bindings/sc_base_types.h"
-#include "scripting/sqplus/sqplus.h"
+#include "sc_cb_vm.h"
 
 // move this to globals if needed
 inline wxString UnquoteStringIfNeeded(const wxString& str)
@@ -527,14 +528,22 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             continue;
         }
 
-        try
+        Sqrat::Function func(Sqrat::RootTable(),funcName.ToUTF8());
+        if(func.IsNull())
         {
-            SqPlus::SquirrelFunction<void> f(cbU2C(funcName));
-            f(target);
+            //Could not find the function
+            wxString msg;
+            msg << _("Function ") << funcName << _("could not be found in:\n ") << script_nomacro;
+            Manager::Get()->GetScriptingManager()->DisplayErrors(msg);
+            m_ScriptsWithErrors.Add(script_nomacro);
         }
-        catch (SquirrelError& e)
+        func(target);
+        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
+        if(sa.HasError())
         {
-            Manager::Get()->GetScriptingManager()->DisplayErrors(&e);
+            wxString msg;
+            msg << _("In Script ") << script_nomacro << _(" occurred this error: ") << sa.GetError();
+            Manager::Get()->GetScriptingManager()->DisplayErrors(msg);
             m_ScriptsWithErrors.Add(script_nomacro);
         }
     }

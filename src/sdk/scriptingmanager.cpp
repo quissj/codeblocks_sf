@@ -29,10 +29,13 @@
 #include "crc32.h"
 #include "menuitemsmanager.h"
 #include "genericmultilinenotesdlg.h"
-#include "sqplus.h"
+// FIXME (bluehazzard#1#): remove if not needed
+//#include "sqplus.h"
+#include "sqrat.h"
 #include "scriptbindings.h"
 #include "sc_plugin.h"
 #include "sqstdstring.h"
+//#include <sc_cb_vm.h>
 
 template<> ScriptingManager* Mgr<ScriptingManager>::instance = nullptr;
 template<> bool  Mgr<ScriptingManager>::isShutdown = false;
@@ -40,14 +43,34 @@ template<> bool  Mgr<ScriptingManager>::isShutdown = false;
 static wxString s_ScriptErrors;
 static wxString capture;
 
+
+void PrintSquirrelToWxString(wxString &msg,const SQChar * s, va_list& vl)
+{
+    int buffer_size = 2048;
+    SQChar *tmp_buffer;
+    for(;;buffer_size*=2)
+    {
+        // TODO (bluehazzard#1#): Check if this is UNICODE UTF8 safe
+        tmp_buffer = new SQChar [buffer_size];
+        int retvalue = vsnprintf(tmp_buffer,buffer_size,s,vl);
+        if(retvalue < buffer_size)
+        {
+            // Buffersize was large enough
+            msg = cbC2U(tmp_buffer);
+            delete[] tmp_buffer;
+            break;
+        }
+        // Buffer size was not enough
+        delete[] tmp_buffer;
+    }
+}
+
 static void ScriptsPrintFunc(HSQUIRRELVM /*v*/, const SQChar * s, ...)
 {
-    static SQChar temp[2048];
     va_list vl;
     va_start(vl,s);
-    scvsprintf( temp,s,vl);
-    wxString msg = cbC2U(temp);
-    Manager::Get()->GetLogManager()->DebugLog(msg);
+    wxString msg;
+    PrintSquirrelToWxString(msg,s,vl);
     va_end(vl);
 
     s_ScriptErrors << msg;
@@ -55,11 +78,11 @@ static void ScriptsPrintFunc(HSQUIRRELVM /*v*/, const SQChar * s, ...)
 
 static void CaptureScriptOutput(HSQUIRRELVM /*v*/, const SQChar * s, ...)
 {
-    static SQChar temp[2048];
     va_list vl;
     va_start(vl,s);
-    scvsprintf(temp,s,vl);
-    ::capture.append(cbC2U(temp));
+    wxString msg;
+    PrintSquirrelToWxString(msg,s,vl);
+    ::capture.append(msg);
     va_end(vl);
 }
 
@@ -74,14 +97,15 @@ ScriptingManager::ScriptingManager()
     //ctor
 
     // initialize but don't load the IO lib
-    SquirrelVM::Init((SquirrelInitFlags)(sqifAll & ~sqifIO));
+    //SquirrelVM::Init((SquirrelInitFlags)(sqifAll & ~sqifIO));
+    vm = new ScriptBindings::CBsquirrelVM(1024,(ScriptBindings::VM_LIB_ALL & ~ScriptBindings::VM_LIB_IO));
 
-    if (!SquirrelVM::GetVMPtr())
+    if (!vm->GetVM())
         cbThrow(_T("Can't create scripting engine!"));
 
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
-    sqstd_register_stringlib(SquirrelVM::GetVMPtr());
-
+    // TODO (bluehazzard#1#): Errors should not be passed to the std output...
+    vm->SetPrintFunc(ScriptsPrintFunc,ScriptsPrintFunc);
+    vm->SetMeDefault();
     RefreshTrusts();
 
     // register types
@@ -105,7 +129,7 @@ ScriptingManager::~ScriptingManager()
     }
     Manager::Get()->GetConfigManager(_T("security"))->Write(_T("/trusted_scripts"), myMap);
 
-    SquirrelVM::Shutdown();
+    //SquirrelVM::Shutdown();
 }
 
 void ScriptingManager::RegisterScriptFunctions()
@@ -168,30 +192,30 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
 
     s_ScriptErrors.Clear();
 
+    // TODO (bluehazzard#1#): THIS IS FUCKING UGLY
+    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+
     // compile script
-    SquirrelObject script;
-    try
+
+    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = sq_vm->doString(buffer);
+    if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
     {
-        script = SquirrelVM::CompileBuffer(cbU2C(buffer), cbU2C(debugName));
-    }
-    catch (SquirrelError e)
+        // A compiling error occurred
+        wxString err_msg;
+        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        cbMessageBox(err_msg, _("Script compile error"), wxICON_ERROR);
+        m_IncludeSet.erase(incName);
+        return false;
+    } else if(ret == ScriptBindings::CBsquirrelVM::SC_RUNTIME_ERROR)
     {
-        cbMessageBox(wxString::Format(_T("Filename: %s\nError: %s\nDetails: %s"), debugName.c_str(), cbC2U(e.desc).c_str(), s_ScriptErrors.c_str()), _("Script compile error"), wxICON_ERROR);
+        // A runtime Error occurred
+        wxString err_msg;
+        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        cbMessageBox(err_msg, _("Script run error"), wxICON_ERROR);
         m_IncludeSet.erase(incName);
         return false;
     }
 
-    // run script
-    try
-    {
-        SquirrelVM::RunScript(script);
-    }
-    catch (SquirrelError e)
-    {
-        cbMessageBox(wxString::Format(_T("Filename: %s\nError: %s\nDetails: %s"), debugName.c_str(), cbC2U(e.desc).c_str(), s_ScriptErrors.c_str()), _("Script run error"), wxICON_ERROR);
-        m_IncludeSet.erase(incName);
-        return false;
-    }
     m_IncludeSet.erase(incName);
     return true;
 }
@@ -204,30 +228,45 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
     s_ScriptErrors.Clear();
     ::capture.Clear();
 
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
+    // FIXME (bluehazzard#1#): Here is a absolute mess with the error handling...
+
+    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+
+    sq_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptOutput);
+
+    //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
     bool res = LoadBuffer(buffer);
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
+    //sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
 }
 
-wxString ScriptingManager::GetErrorString(SquirrelError* exception, bool clearErrors)
+/*wxString ScriptingManager::GetErrorString(Sqrat::Exception* exception, bool clearErrors)
 {
     wxString msg;
     if (exception)
-        msg << cbC2U(exception->desc);
+        msg.FromUTF8("%s",exception.Message());
     msg << s_ScriptErrors;
 
     if (clearErrors)
         s_ScriptErrors.Clear();
 
     return msg;
+}*/
+
+wxString ScriptingManager::GetErrorString(HSQUIRRELVM vm , bool clearErrors)
+{
+    ScriptBindings::StackHandler sa(vm);
+    return sa.GetError(clearErrors);
 }
 
-void ScriptingManager::DisplayErrors(SquirrelError* exception, bool clearErrors)
+bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
 {
-    wxString msg = GetErrorString(exception, clearErrors);
-    if (!msg.IsEmpty())
+
+    if(error_msg == wxEmptyString)
+        error_msg = GetErrorString(Sqrat::DefaultVM::Get(), clearErrors);
+
+    if (!error_msg.IsEmpty())
     {
         if (cbMessageBox(_("Script errors have occured...\nPress 'Yes' to see the exact errors."),
                             _("Script errors"),
@@ -235,11 +274,13 @@ void ScriptingManager::DisplayErrors(SquirrelError* exception, bool clearErrors)
         {
             GenericMultiLineNotesDlg dlg(Manager::Get()->GetAppWindow(),
                                         _("Script errors"),
-                                        msg,
+                                        error_msg,
                                         true);
             dlg.ShowModal();
         }
+        return true;
     }
+    return false;
 }
 
 void ScriptingManager::InjectScriptOutput(const wxString& output)
@@ -417,14 +458,16 @@ void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
     // is it a function?
     if (mbs.isFunc)
     {
-        try
+
+        Sqrat::Function call_back(Sqrat::RootTable(),mbs.scriptOrFunc.ToUTF8());
+        if (call_back.IsNull())
+            return;
+        call_back();
+        // FIXME (bluehazzard#1#): Check the vm...
+        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
+        if(sa.HasError())
         {
-            SqPlus::SquirrelFunction<void> f(cbU2C(mbs.scriptOrFunc));
-            f();
-        }
-        catch (SquirrelError exception)
-        {
-            DisplayErrors(&exception);
+            DisplayErrors(sa.GetError());
         }
         return;
     }
@@ -438,16 +481,17 @@ void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
         return;
     }
 
+
     // run script
-    try
-    {
+    //try
+    //{
         if (!LoadScript(mbs.scriptOrFunc))
             cbMessageBox(_("Could not run script: ") + mbs.scriptOrFunc, _("Error"), wxICON_ERROR);
-    }
-    catch (SquirrelError exception)
-    {
-        DisplayErrors(&exception);
-    }
+    //}
+    //catch (SquirrelError exception)
+    //{
+    //    DisplayErrors(&exception);
+    //}
 }
 
 void ScriptingManager::OnScriptPluginMenu(wxCommandEvent& event)
