@@ -18,8 +18,11 @@
 #include "manager.h"
 #include "menuitemsmanager.h"
 #include <wx/intl.h>
+#include <sc_cb_vm.h>
+#include <sqrat/sqratUtil.h>
 
-struct SquirrelError;
+
+void PrintSquirrelToWxString(wxString &msg,const SQChar *s, va_list& vl);
 
 /** @brief Provides scripting in Code::Blocks.
   *
@@ -31,6 +34,7 @@ struct SquirrelError;
   * Manager::Get()->GetScriptingManager()->LoadScript(_T("some.script"));
   * @endcode
   *
+  * The following is outdated ;) soon:
   * And here's an example to call a script function:
   *
   * @code
@@ -85,28 +89,30 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           */
         wxString LoadBufferRedirectOutput(const wxString& buffer);
 
+        // TODO (bluehazzard#1#): Delete this if the Sqrat API doesn't change
         /** @brief Returns an accumulated error string.
           *
-          * Returns an error string for the passed exception (if any) plus
+          * Returns an error string for the passed vm (if any) plus
           * any accumulated script engine errors (e.g. from failed function calls).
-          * @param exception A pointer to the exception object containing the error. Can be NULL (default).
+          * @param The vm from which the error should come
           * @param clearErrors If true (default), when this function returns all
           *        accumulated error messages are cleared.
           * @return The error string. If empty, it means "no errors".
           */
-        wxString GetErrorString(SquirrelError* exception = nullptr, bool clearErrors = true);
+        //wxString GetErrorString(Sqrat::Exception* exception = nullptr, bool clearErrors = true);
+        wxString GetErrorString(HSQUIRRELVM vm = Sqrat::DefaultVM::Get(), bool clearErrors = true);
 
         /** @brief Display error dialog.
           *
           * Displays an error dialog containing exception info and any other
-          * script errors. Calls GetErrorString() internally.
-          * You should normally call this function inside your catch handler for
-          * SquirrelFunction<>() calls.
-          * @param exception A pointer to the exception object containing the error. Can be NULL (default).
+          * script errors. If error_msg isempty the GetErrorString String is called
+          * internally and if no error is found no error is displayed and the function returns _false_
+          * @param error_msg The error message displayed with the error dialog
           * @param clearErrors If true (default), when this function returns all
           *        accumulated error messages are cleared.
+          * @return _true_ if a error occurred, _false_ otherwise
           */
-        void DisplayErrors(SquirrelError* exception = nullptr, bool clearErrors = true);
+        bool DisplayErrors(wxString error_msg = wxEmptyString, bool clearErrors = true);
 
         /** @brief Injects script output.
           *
@@ -251,6 +257,8 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         IncludeSet m_IncludeSet;
 
         MenuItemsManager m_MenuItemsManager;
+
+        ScriptBindings::CBsquirrelVM* vm;
 
         DECLARE_EVENT_TABLE()
 };

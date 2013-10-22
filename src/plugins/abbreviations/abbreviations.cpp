@@ -18,7 +18,7 @@
 #include "abbreviations.h"
 #include "abbreviationsconfigpanel.h"
 
-#include <sqplus.h>
+#include <sqrat.h>
 #include <sc_base_types.h>
 #include <editor_hooks.h>
 
@@ -130,14 +130,14 @@ void Abbreviations::OnRelease(cb_unused bool appShutDown)
 void Abbreviations::RegisterScripting()
 {
     Manager::Get()->GetScriptingManager();
-    if (SquirrelVM::GetVMPtr())
-        SqPlus::RegisterGlobal(&Abbreviations::AutoComplete, "AutoComplete");
+    if (Sqrat::DefaultVM::Get())
+        Sqrat::RootTable(Sqrat::DefaultVM::Get()).Func("AutoComplete",&Abbreviations::AutoComplete);
 }
 
 void Abbreviations::UnregisterScripting()
 {
     Manager::Get()->GetScriptingManager();
-    HSQUIRRELVM v = SquirrelVM::GetVMPtr();
+    HSQUIRRELVM v = Sqrat::DefaultVM::Get();
     if (v)
     {
         sq_pushstring(v, "AutoComplete", -1);

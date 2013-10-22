@@ -43,7 +43,7 @@
 
 #include "projectmanagerui.h"
 
-#include <sqplus.h>
+#include <sqrat.h>
 
 #ifndef __WXMSW__
     #include "prefix.h" // binreloc
@@ -705,15 +705,13 @@ bool CodeBlocksApp::OnInit()
         CheckVersion();
 
         // run startup script
-        try
+        // FIXME (bluehazzard#1#): Right squirrel error handling
+
+        wxString startup = ConfigManager::LocateDataFile(_T("startup.script"), sdScriptsUser | sdScriptsGlobal);
+
+        if (!startup.IsEmpty())
         {
-            wxString startup = ConfigManager::LocateDataFile(_T("startup.script"), sdScriptsUser | sdScriptsGlobal);
-            if (!startup.IsEmpty())
-                Manager::Get()->GetScriptingManager()->LoadScript(startup);
-        }
-        catch (SquirrelError& exception)
-        {
-            Manager::Get()->GetScriptingManager()->DisplayErrors(&exception);
+            bool ret =  Manager::Get()->GetScriptingManager()->LoadScript(startup);
         }
         Manager::ProcessPendingEvents();
 
@@ -746,10 +744,11 @@ bool CodeBlocksApp::OnInit()
     {
         exception.ShowErrorMessage();
     }
-    catch (SquirrelError& exception)
+    /*catch (SquirrelError& exception)
+// FIXME (bluehazzard#1#): squirrel error
     {
         Manager::Get()->GetScriptingManager()->DisplayErrors(&exception);
-    }
+    }*/
     catch (const char* message)
     {
         wxSafeShowMessage(_T("Exception"), cbC2U(message));
@@ -823,10 +822,11 @@ int CodeBlocksApp::OnRun()
     {
         exception.ShowErrorMessage();
     }
-    catch (SquirrelError& exception)
+   /* catch (SquirrelError& exception)
+// FIXME (bluehazzard#1#): squirrel error
     {
         Manager::Get()->GetScriptingManager()->DisplayErrors(&exception);
-    }
+    }*/
     catch (const char* message)
     {
         wxSafeShowMessage(_("Exception"), cbC2U(message));

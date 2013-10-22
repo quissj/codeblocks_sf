@@ -15,18 +15,20 @@
 #endif
 
 #include <filefilters.h>
-#include "sc_base_types.h"
+#include <sqrat.h>
+//#include "sc_base_types.h"
 
 // helper macros to bind constants
-#define BIND_INT_CONSTANT(a) SqPlus::BindConstant<SQInteger>(a, #a);
-#define BIND_INT_CONSTANT_NAMED(a,n) SqPlus::BindConstant<SQInteger>(a, n);
-#define BIND_WXSTR_CONSTANT_NAMED(a,n) BindVariable(const_cast<wxString*>(&a), n, SqPlus::VAR_ACCESS_CONSTANT);
+#define BIND_INT_CONSTANT(a) Sqrat::ConstTable(vm).Const(_SC(#a), a)
+#define BIND_INT_CONSTANT_NAMED(a,n) Sqrat::ConstTable(vm).Const(_SC(n), a)
+// NOTE (bluehazzard#1#): This can break the API, but the old API was wrong, because constants should be constants and don't get modified...
+#define BIND_WXSTR_CONSTANT_NAMED(a,n) Sqrat::ConstTable(vm).Const(_SC(n),a.ToUTF8())
 
 namespace ScriptBindings
 {
     wxString s_PathSep = wxFILE_SEP_PATH;
 
-    void Register_Constants()
+    void Register_Constants(HSQUIRRELVM vm)
     {
         // platform constants
         BIND_INT_CONSTANT_NAMED(0,  "PLATFORM_MSW");

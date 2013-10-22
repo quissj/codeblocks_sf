@@ -21,14 +21,14 @@ namespace ScriptPluginWrapper {
 // struct and map for mapping script plugins to menu callbacks
 struct MenuCallback
 {
-    SquirrelObject object;
+    Sqrat::Object object;
     int menuIndex;
 };
 typedef std::map<int, MenuCallback> ModuleMenuCallbacks;
 ModuleMenuCallbacks s_MenuCallbacks;
 
 // master list of registered script plugins
-typedef std::map<wxString, SquirrelObject> ScriptPlugins;
+typedef std::map<wxString, Sqrat::Object> ScriptPlugins;
 ScriptPlugins s_ScriptPlugins;
 
 // list of registered script plugins menubar items
@@ -42,11 +42,12 @@ ScriptPluginsMenus s_ScriptPluginsMenus;
 wxArrayInt CreateMenu(const wxString& name)
 {
     wxArrayInt ret;
+    StackHandler sa(Sqrat::DefaultVM::Get());
 
     ScriptPlugins::iterator it = s_ScriptPlugins.find(name);
     if (it == s_ScriptPlugins.end())
         return ret;
-    SquirrelObject& o = it->second;
+    Sqrat::Object& o = it->second;
 
     ScriptPluginsMenus::iterator itm = s_ScriptPluginsMenus.find(name);
     if (itm == s_ScriptPluginsMenus.end())
@@ -55,18 +56,17 @@ wxArrayInt CreateMenu(const wxString& name)
     }
     MenuItemsManager& mi = itm->second;
 
-    SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetMenu");
-    if (f.func.IsNull())
+    //SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetMenu");
+    Sqrat::Function func(o,"GetMenu");
+    if (func.IsNull())
         return ret;
 
     wxArrayString arr;
-    try
+    arr = func.Evaluate<wxArrayString>();
+    if(sa.HasError())
     {
-        arr = f();
-    }
-    catch (SquirrelError e)
-    {
-        cbMessageBox(cbC2U(e.desc), _("Script error"), wxICON_ERROR);
+        // TODO (bluehazzard#1#): Add a possibility to tedeckt which script has an error...
+        cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
         return ret;
     }
 
@@ -104,25 +104,25 @@ wxArrayInt CreateMenu(const wxString& name)
 wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeData* data)
 {
     wxArrayInt ret;
+    StackHandler sa(Sqrat::DefaultVM::Get());
 
     ScriptPlugins::iterator it;
     for (it = s_ScriptPlugins.begin(); it != s_ScriptPlugins.end(); ++it)
     {
-        SquirrelObject& o = it->second;
-        SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetModuleMenu");
-        if (f.func.IsNull())
+        Sqrat::Object& o = it->second;
+        Sqrat::Function func(o,"GetModuleMenu");
+        //SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetModuleMenu");
+        if (func.IsNull())
             continue;
 
         wxArrayString arr;
-        try
+        arr = func.Evaluate<wxArrayString>(typ, data);
+        if(sa.HasError())
         {
-            arr = f(typ, data);
-        }
-        catch (SquirrelError e)
-        {
-            cbMessageBox(cbC2U(e.desc), _("Script error"), wxICON_ERROR);
+            cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             continue;
         }
+
 
         if (arr.GetCount()==1) // exactly one menu entry
         {
@@ -162,20 +162,22 @@ wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeDa
 void OnScriptMenu(int id)
 {
     ModuleMenuCallbacks::iterator it;
+    StackHandler sa(Sqrat::DefaultVM::Get());
+
     it = s_MenuCallbacks.find(id);
+
     if (it != s_MenuCallbacks.end())
     {
         MenuCallback& callback = it->second;
-        SqPlus::SquirrelFunction<void> f(callback.object, "OnMenuClicked");
-        if (!f.func.IsNull())
+        Sqrat::Function func(callback.object,"GetModuleMenu");
+        //qPlus::SquirrelFunction<void> f(callback.object, "OnMenuClicked");
+
+        if (!func.IsNull())
         {
-            try
+            func(callback.menuIndex);
+            if(sa.HasError())
             {
-                f(callback.menuIndex);
-            }
-            catch (SquirrelError e)
-            {
-                cbMessageBox(cbC2U(e.desc), _("Script error"), wxICON_ERROR);
+                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -186,21 +188,21 @@ void OnScriptMenu(int id)
 ////////////////////////////////////////////////////////////////////////////////
 void OnScriptModuleMenu(int id)
 {
+    StackHandler sa(Sqrat::DefaultVM::Get());
     ModuleMenuCallbacks::iterator it;
     it = s_MenuCallbacks.find(id);
     if (it != s_MenuCallbacks.end())
     {
         MenuCallback& callback = it->second;
-        SqPlus::SquirrelFunction<void> f(callback.object, "OnModuleMenuClicked");
-        if (!f.func.IsNull())
+        //SqPlus::SquirrelFunction<void> f(callback.object, "OnModuleMenuClicked");
+        Sqrat::Function func(callback.object,"OnModuleMenuClicked");
+        if (!func.IsNull())
         {
-            try
+
+            func(callback.menuIndex);
+            if(sa.HasError())
             {
-                f(callback.menuIndex);
-            }
-            catch (SquirrelError e)
-            {
-                cbMessageBox(cbC2U(e.desc), _("Script error"), wxICON_ERROR);
+                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -209,19 +211,22 @@ void OnScriptModuleMenu(int id)
 ////////////////////////////////////////////////////////////////////////////////
 // register a script plugin (script-bound function)
 ////////////////////////////////////////////////////////////////////////////////
-SQInteger RegisterPlugin(HSQUIRRELVM v)
+SQInteger RegisterPlugin(HSQUIRRELVM vm)
 {
     // get squirrel object to register from stack
-    SquirrelObject o;
-    o.AttachToStackObject(2);
+    HSQOBJECT obj;
+    sq_getstackobj(vm,2,&obj);
+    Sqrat::Object o(obj,vm);
+    //o.AttachToStackObject(2);
+
+    Sqrat::Function func(o,"GetPluginInfo");
 
     // first verify that there is a member function to retrieve the plugin info
-    if (!o.Exists("GetPluginInfo"))
-        return sq_throwerror(v, "Not a script plugin!");
+    if (func.IsNull())
+        return sq_throwerror(vm, "Not a script plugin!");
 
     // ask for its registration name
-    SqPlus::SquirrelFunction<PluginInfo&> f(o, "GetPluginInfo");
-    PluginInfo& info = f();
+    PluginInfo info = func.Evaluate<PluginInfo>();
     wxString s = info.name;
 
     // look if a script plugin with the same name already exists
@@ -251,18 +256,20 @@ SQInteger GetPlugin(HSQUIRRELVM v)
     StackHandler sa(v);
 
     // get the script plugin's name
-    const wxString& name = *SqPlus::GetInstance<wxString,false>(v, 2);
+    //const wxString& name = *SqPlus::GetInstance<wxString,false>(v, 2);
+    const wxString& name = *sa.GetInstance<wxString>(2);
 
     // search for it in the registered script plugins list
     ScriptPlugins::iterator it = s_ScriptPlugins.find(name);
     if (it != s_ScriptPlugins.end())
     {
         // found; return the squirrel object
-        return sa.Return(it->second);
+        sa.PushValue<HSQOBJECT>(it->second.GetObject());
+        return SC_RETURN_VALUE;
     }
 
     // not found; return nothing
-    return sa.Return();
+    return SC_RETURN_OK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,22 +277,21 @@ SQInteger GetPlugin(HSQUIRRELVM v)
 ////////////////////////////////////////////////////////////////////////////////
 int ExecutePlugin(const wxString& name)
 {
+    StackHandler sa(Sqrat::DefaultVM::Get());
     // look for script plugin
     ScriptPlugins::iterator it = s_ScriptPlugins.find(name);
     if (it != s_ScriptPlugins.end())
     {
         // found; execute it
-        SquirrelObject& o = it->second;
-        SqPlus::SquirrelFunction<int> f(o, "Execute");
-        if (!f.func.IsNull())
+        Sqrat::Object& o = it->second;
+        //SqPlus::SquirrelFunction<int> f(o, "Execute");
+        Sqrat::Function func(o,"Execute");
+        if (!func.IsNull())
         {
-            try
+            func();
+            if(sa.HasError())
             {
-                f();
-            }
-            catch (SquirrelError e)
-            {
-                cbMessageBox(cbC2U(e.desc), _("Script error"), wxICON_ERROR);
+                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -336,11 +342,11 @@ const char* s_cbScriptPlugin =
 ////////////////////////////////////////////////////////////////////////////////
 // register the script plugin framework
 ////////////////////////////////////////////////////////////////////////////////
-void Register_ScriptPlugin()
+void Register_ScriptPlugin(HSQUIRRELVM vm)
 {
-    SqPlus::RegisterGlobal(&ScriptPluginWrapper::ExecutePlugin, "ExecutePlugin");
-    SquirrelVM::CreateFunctionGlobal(&ScriptPluginWrapper::GetPlugin, "GetPlugin", "*");
-    SquirrelVM::CreateFunctionGlobal(&ScriptPluginWrapper::RegisterPlugin, "RegisterPlugin", "*");
+    Sqrat::RootTable(vm).Func("ExecutePlugin",&ScriptPluginWrapper::ExecutePlugin);
+    Sqrat::RootTable(vm).SquirrelFunc("GetPlugin",&ScriptPluginWrapper::GetPlugin);
+    Sqrat::RootTable(vm).SquirrelFunc("RegisterPlugin",&ScriptPluginWrapper::RegisterPlugin);
 
     // load base script plugin
 
@@ -349,25 +355,29 @@ void Register_ScriptPlugin()
     // loop and the app would die with a stack overflow. We got to load the script manually...
     // we also have to disable the printfunc for a while
 
-    SQPRINTFUNCTION oldPrintFunc = sq_getprintfunc(SquirrelVM::GetVMPtr());
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), 0);
+    SQPRINTFUNCTION oldPrintFunc = sq_getprintfunc(vm);
+    SQPRINTFUNCTION oldErrorFunc = sq_geterrorfunc(vm);
+    sq_setprintfunc(vm, 0,0);
 
     // compile and run script
-    SquirrelObject script;
-    try
+    //Sqrat::Object script;
+    StackHandler sa(vm);
+
+    Sqrat::Script script(vm);
+
+
+    //cript = SquirrelVM::CompileBuffer(s_cbScriptPlugin, "cbScriptPlugin");
+    //SquirrelVM::RunScript(script);
+    script.CompileString(s_cbScriptPlugin);
+    if(sa.HasError())
     {
-        script = SquirrelVM::CompileBuffer(s_cbScriptPlugin, "cbScriptPlugin");
-        SquirrelVM::RunScript(script);
-    }
-    catch (SquirrelError e)
-    {
-        cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n%s"),
-                                        cbC2U(e.desc).c_str()),
-                    _("Script compile error"), wxICON_ERROR);
+        cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n")) + sa.GetError(),
+                    _("Script compile error"),
+                    wxICON_ERROR);
     }
 
     // restore the printfunc
-    sq_setprintfunc(SquirrelVM::GetVMPtr(), oldPrintFunc);
+    sq_setprintfunc(vm, oldPrintFunc,oldErrorFunc);
 }
 
 }; // namespace ScriptBindings
