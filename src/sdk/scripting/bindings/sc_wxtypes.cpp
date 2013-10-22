@@ -26,15 +26,16 @@ namespace ScriptBindings
     {
         CompileTimeAssertion<wxMinimumVersion<2,8>::eval>::Assert();
         StackHandler sa(v);
-        wxArrayString& self = *SqPlus::GetInstance<wxArrayString,false>(v, 1);
-        wxString inpstr = *SqPlus::GetInstance<wxString,false>(v, 2);
+        wxArrayString& self = *sa.GetInstance<wxArrayString>(1);
+        wxString inpstr = *sa.GetInstance<wxString>(2);
         bool chkCase = true;
         bool frmEnd = false;
         if (sa.GetParamCount() >= 3)
-            chkCase = sa.GetBool(3);
+            chkCase = sa.GetValue<bool>(3);
         if (sa.GetParamCount() == 4)
-            frmEnd = sa.GetBool(4);
-        return sa.Return((SQInteger)self.Index(inpstr.c_str(), chkCase, frmEnd));
+            frmEnd = sa.GetValue<bool>(4);
+        sa.PushValue<SQInteger>(self.Index(inpstr.c_str(), chkCase, frmEnd));
+        return SC_RETURN_VALUE;
     }
 
     //////////////
@@ -43,19 +44,21 @@ namespace ScriptBindings
     SQInteger wxColour_OpToString(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        wxColour& self = *SqPlus::GetInstance<wxColour,false>(v, 1);
+        wxColour& self = *sa.GetInstance<wxColour>(1);
         wxString str = wxString::Format(_T("[r=%d, g=%d, b=%d]"), self.Red(), self.Green(), self.Blue());
-        return sa.Return((const SQChar*)str.mb_str(wxConvUTF8));
+        sa.PushValue<const SQChar*>(str.mb_str(wxConvUTF8).data());
+        return SC_RETURN_VALUE;
     }
 
     ////////////////
     // wxFileName //
     ////////////////
-    SQInteger wxFileName_OpToString(HSQUIRRELVM v)
+    SQInteger wxFileName_OpToString(HSQUIRRELVM vm)
     {
-        StackHandler sa(v);
-        wxFileName& self = *SqPlus::GetInstance<wxFileName,false>(v, 1);
-        return sa.Return((const SQChar*)self.GetFullPath().mb_str(wxConvUTF8));
+        StackHandler sa(vm);
+        wxFileName& self = *sa.GetInstance<wxFileName>(1);
+        sa.PushValue<const SQChar*>(self.GetFullPath().mb_str(wxConvUTF8));
+        return SC_RETURN_VALUE;
     }
 
     /////////////
@@ -66,27 +69,32 @@ namespace ScriptBindings
     SQInteger wxPoint_OpCmp(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        wxPoint& self = *SqPlus::GetInstance<wxPoint,false>(v, 1);
-        wxPoint& other = *SqPlus::GetInstance<wxPoint,false>(v, 2);
-        return sa.Return(self==other);
+        wxPoint& self = *sa.GetInstance<wxPoint>(1);
+        wxPoint& other = *sa.GetInstance<wxPoint>(2);
+        sa.PushValue<bool>(self==other);
+        return SC_RETURN_VALUE;
     }
     SQInteger wxPoint_x(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        wxPoint& self = *SqPlus::GetInstance<wxPoint,false>(v, 1);
-        return sa.Return((SQInteger)(self.x));
+        wxPoint& self = *sa.GetInstance<wxPoint>(1);
+        sa.PushValue<SQInteger>(self.x);
+        return SC_RETURN_VALUE;
     }
     SQInteger wxPoint_y(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        wxPoint& self = *SqPlus::GetInstance<wxPoint,false>(v, 1);
-        return sa.Return((SQInteger)(self.y));
+        wxPoint& self = *sa.GetInstance<wxPoint>(1);
+        sa.PushValue<SQInteger>(self.y);
+        return SC_RETURN_VALUE;
     }
 
     //////////////
     // wxString //
     //////////////
 
+    //! Is implemented in separate file
+/*
     // the _() function for scripts
     wxString static_(const SQChar* str)
     {
@@ -239,40 +247,45 @@ namespace ScriptBindings
             all = sa.GetBool(4);
         return sa.Return((SQInteger)self.Replace(from, to, all));
     }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    void Register_wxTypes()
+    void Register_wxTypes(HSQUIRRELVM vm)
     {
         ///////////////////
         // wxArrayString //
         ///////////////////
-        SqPlus::SQClassDef<wxArrayString>("wxArrayString").
-                emptyCtor().
-                func(&wxArrayString::Add, "Add").
-                func(&wxArrayString::Clear, "Clear").
+        Sqrat::Class<wxArrayString> array_string(vm,"wxArrayString");
+                array_string.
+                //emptyCtor().
+                Func("Add",     &wxArrayString::Add ).
+                Func("Clear",   &wxArrayString::Clear ).
 //                func(&wxArrayString::Index, "Index").
-                staticFuncVarArgs(&wxArrayString_Index, "Index", "*").
-                func(&wxArrayString::GetCount, "GetCount")
+                SquirrelFunc("Index",   &wxArrayString_Index).
+                Func("GetCount",        &wxArrayString::GetCount)
                 #if !wxCHECK_VERSION(2, 9, 0) // Strange that this does not work with wx 2.9.x?!
-                .func(&wxArrayString::Item, "Item")
+                .Func("Item",           &wxArrayString::Item)
                 #endif
                 ;
+        Sqrat::RootTable(vm).Bind("wxArrayString",array_string);
 
         //////////////
         // wxColour //
         //////////////
         typedef void(wxColour::*WXC_SET)(const unsigned char, const unsigned char, const unsigned char, const unsigned char);
-        SqPlus::SQClassDef<wxColour>("wxColour").
-                emptyCtor().
-                staticFuncVarArgs(&wxColour_OpToString, "_tostring", "").
-                func(&wxColour::Blue, "Blue").
-                func(&wxColour::Green, "Green").
-                func(&wxColour::Red, "Red").
+        Sqrat::Class<wxColour> wx_colour(vm,"wxColour");
+                wx_colour.
+                //emptyCtor().
+                SquirrelFunc("_tostring",   &wxColour_OpToString).
+                Func("Blue",    &wxColour::Blue).
+                Func("Green",   &wxColour::Green).
+                Func("Red",     &wxColour::Red).
 #if wxVERSION_NUMBER < 2900 || !wxCOLOUR_IS_GDIOBJECT
-                func(&wxColour::IsOk, "IsOk").
+                Func("IsOk",    &wxColour::IsOk).
 #endif
-                func<WXC_SET>(&wxColour::Set, "Set");
+                Func<WXC_SET>("Set",    &wxColour::Set);
+        Sqrat::RootTable(vm).Bind("wxColour",wx_colour);
 
         ////////////////
         // wxFileName //
@@ -287,58 +300,64 @@ namespace ScriptBindings
 #endif
         typedef bool(wxFileName::*WXFN_ISFILEWRITEABLE)()const;
 
-        SqPlus::SQClassDef<wxFileName>("wxFileName").
-                emptyCtor().
-                staticFuncVarArgs(&wxFileName_OpToString, "_tostring", "").
-                func<WXFN_ASSIGN_FN>(&wxFileName::Assign, "Assign").
-                func<WXFN_ASSIGN_STR>(&wxFileName::Assign, "Assign").
-                func(&wxFileName::AssignCwd, "AssignCwd").
-                func(&wxFileName::AssignDir, "AssignDir").
-                func(&wxFileName::AssignHomeDir, "AssignHomeDir").
-                func(&wxFileName::Clear, "Clear").
-                func(&wxFileName::ClearExt, "ClearExt").
-//                func(&wxFileName::GetCwd, "GetCwd").
-                func(&wxFileName::GetDirCount, "GetDirCount").
-                func(&wxFileName::GetDirs, "GetDirs").
-                func(&wxFileName::GetExt, "GetExt").
-                func(&wxFileName::GetFullName, "GetFullName").
-                func(&wxFileName::GetFullPath, "GetFullPath").
-                func(&wxFileName::GetLongPath, "GetLongPath").
-                func(&wxFileName::GetName, "GetName").
-                func<WXFN_GETPATH>(&wxFileName::GetPath, "GetPath").
-                func(&wxFileName::GetShortPath, "GetShortPath").
-                func(&wxFileName::GetVolume, "GetVolume").
-                func(&wxFileName::HasExt, "HasExt").
-                func(&wxFileName::HasName, "HasName").
-                func(&wxFileName::HasVolume, "HasVolume").
-                func(&wxFileName::InsertDir, "InsertDir").
-                func(&wxFileName::IsAbsolute, "IsAbsolute").
-                func(&wxFileName::IsOk, "IsOk").
-                func(&wxFileName::IsRelative, "IsRelative").
-                func(&wxFileName::IsDir, "IsDir").
-                func(&wxFileName::MakeAbsolute, "MakeAbsolute").
-                func(&wxFileName::MakeRelativeTo, "MakeRelativeTo").
-                func(&wxFileName::Normalize, "Normalize").
-                func(&wxFileName::PrependDir, "PrependDir").
-                func(&wxFileName::RemoveDir, "RemoveDir").
-                func(&wxFileName::RemoveLastDir, "RemoveLastDir").
-                func(&wxFileName::SameAs, "SameAs").
-                func<WXFN_SETCWD>(&wxFileName::SetCwd, "SetCwd").
-                func(&wxFileName::SetExt, "SetExt").
-                func(&wxFileName::SetEmptyExt, "SetEmptyExt").
-                func(&wxFileName::SetFullName, "SetFullName").
-                func(&wxFileName::SetName, "SetName").
-                func(&wxFileName::SetVolume, "SetVolume").
-                func<WXFN_ISFILEWRITEABLE>(&wxFileName::IsFileWritable,"IsFileWritable");
+        Sqrat::Class<wxFileName> wx_filename(vm,"wxFileName");
+                wx_filename.
+                //emptyCtor().
+                SquirrelFunc("_tostring",       &wxFileName_OpToString).
+                Func<WXFN_ASSIGN_FN>("Assign",  &wxFileName::Assign).
+                Func<WXFN_ASSIGN_STR>("Assign", &wxFileName::Assign).
+                Func("AssignCwd",       &wxFileName::AssignCwd).
+                Func("AssignDir",       &wxFileName::AssignDir).
+                Func("AssignHomeDir",   &wxFileName::AssignHomeDir).
+                Func("Clear",           &wxFileName::Clear).
+                Func("ClearExt",        &wxFileName::ClearExt).
+//                Func("GetCwd",&wxFileName::GetCwd).
+                Func("GetDirCount",     &wxFileName::GetDirCount).
+                Func("GetDirs",         &wxFileName::GetDirs).
+                Func("GetExt",          &wxFileName::GetExt).
+                Func("GetFullName",     &wxFileName::GetFullName).
+                Func("GetFullPath",     &wxFileName::GetFullPath).
+                Func("GetLongPath",     &wxFileName::GetLongPath).
+                Func("GetName",         &wxFileName::GetName).
+                Func<WXFN_GETPATH>("GetPath",&wxFileName::GetPath).
+                Func("GetShortPath",    &wxFileName::GetShortPath).
+                Func("GetVolume",       &wxFileName::GetVolume).
+                Func("HasExt",          &wxFileName::HasExt).
+                Func("HasName",         &wxFileName::HasName).
+                Func("HasVolume",       &wxFileName::HasVolume).
+                Func("InsertDir",       &wxFileName::InsertDir).
+                Func("IsAbsolute",      &wxFileName::IsAbsolute).
+                Func("IsOk",            &wxFileName::IsOk).
+                Func("IsRelative",      &wxFileName::IsRelative).
+                Func("IsDir",           &wxFileName::IsDir).
+                Func("MakeAbsolute",    &wxFileName::MakeAbsolute).
+                Func("MakeRelativeTo",  &wxFileName::MakeRelativeTo).
+                Func("Normalize",       &wxFileName::Normalize).
+                Func("PrependDir",      &wxFileName::PrependDir).
+                Func("RemoveDir",       &wxFileName::RemoveDir).
+                Func("RemoveLastDir",   &wxFileName::RemoveLastDir).
+                Func("SameAs",          &wxFileName::SameAs).
+                Func<WXFN_SETCWD>("SetCwd",&wxFileName::SetCwd).
+                Func("SetExt",          &wxFileName::SetExt).
+                Func("SetEmptyExt",     &wxFileName::SetEmptyExt).
+                Func("SetFullName",     &wxFileName::SetFullName).
+                Func("SetName",         &wxFileName::SetName).
+                Func("SetVolume",       &wxFileName::SetVolume).
+                Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable);
+        Sqrat::RootTable(vm).Bind("wxFileName",wx_filename);
 
         /////////////
         // wxPoint //
         /////////////
-        SqPlus::SQClassDef<wxPoint>("wxPoint").
-                emptyCtor().
-                staticFuncVarArgs(&wxPoint_OpCmp, "_cmp", "*").
-                var(&wxPoint::x, "x").
-                var(&wxPoint::y, "y");
+        Sqrat::Class<wxPoint> wx_point(vm,"wxPoint");
+        wx_point.
+                //emptyCtor().
+            Ctor().
+            Ctor<int,int>().
+            SquirrelFunc("_cmp",    &wxPoint_OpCmp).
+            Var("x",    &wxPoint::x).
+            Var("y",    &wxPoint::y);
+        Sqrat::RootTable(vm).Bind("wxPoint",wx_point);
 
         ////////////
         // wxSize //
@@ -346,51 +365,16 @@ namespace ScriptBindings
         typedef void(wxSize::*WXS_SET)(int, int);
         typedef void(wxSize::*WXS_SETH)(int);
         typedef void(wxSize::*WXS_SETW)(int);
-        SqPlus::SQClassDef<wxSize>("wxSize").
-                emptyCtor().
-                func(&wxSize::GetWidth, "GetWidth").
-                func(&wxSize::GetHeight, "GetHeight").
-                func<WXS_SET>(&wxSize::Set, "Set").
-                func<WXS_SETH>(&wxSize::SetHeight, "SetHeight").
-                func<WXS_SETW>(&wxSize::SetWidth, "SetWidth");
+        Sqrat::Class<wxSize> wx_size(vm,"wxSize");
+        wx_size.
+                Ctor().
+                Ctor<int,int>().
+                Func("GetWidth",    &wxSize::GetWidth).
+                Func("GetHeight",   &wxSize::GetHeight).
+                Func<WXS_SET>("Set",&wxSize::Set).
+                Func<WXS_SETH>("SetHeight", &wxSize::SetHeight).
+                Func<WXS_SETW>("SetWidth",  &wxSize::SetWidth);
+        Sqrat::RootTable(vm).Bind("wxSize",wx_size);
 
-        //////////////
-        // wxString //
-        //////////////
-        SqPlus::RegisterGlobal(&static_,  "_");
-        SqPlus::RegisterGlobal(&static_T, "_T");
-
-        typedef int(wxString::*WXSTR_FIRST_STR)(const wxString&)const;
-        typedef wxString&(wxString::*WXSTR_REMOVE_2)(size_t pos, size_t len);
-
-        SqPlus::SQClassDef<wxString>("wxString").
-                emptyCtor().
-                staticFuncVarArgs(&wxString_OpAdd, "_add", "*").
-                staticFuncVarArgs(&wxString_OpCmp, "_cmp", "*").
-                staticFuncVarArgs(&wxString_OpToString, "_tostring", "").
-                func<WXSTR_FIRST_STR>(&wxString::First, "Find").
-                staticFuncVarArgs(&wxString_Matches, "Matches", "*").
-                staticFuncVarArgs(&wxString_AddChar, "AddChar", "n").
-                staticFuncVarArgs(&wxString_GetChar, "GetChar", "n").
-                func(&wxString::IsEmpty, "IsEmpty").
-                func(&wxString::Length, "Length").
-                func(&wxString::Length, "length").
-                func(&wxString::Length, "len").
-                func(&wxString::Length, "size").
-                func(&wxString::Lower, "Lower").
-                func(&wxString::LowerCase, "LowerCase").
-                func(&wxString::MakeLower, "MakeLower").
-                func(&wxString::Upper, "Upper").
-                func(&wxString::UpperCase, "UpperCase").
-                func(&wxString::MakeUpper, "MakeUpper").
-                func(&wxString::Mid, "Mid").
-                func<WXSTR_REMOVE_2>(&wxString::Remove, "Remove").
-                func(&wxString::RemoveLast, "RemoveLast").
-                staticFuncVarArgs(&wxString_Replace, "Replace", "*").
-                func(&wxString::Right, "Right").
-                staticFuncVarArgs(&wxString_AfterFirst, "AfterFirst", "*").
-                staticFuncVarArgs(&wxString_AfterLast, "AfterLast", "*").
-                staticFuncVarArgs(&wxString_BeforeFirst, "BeforeFirst", "*").
-                staticFuncVarArgs(&wxString_BeforeLast, "BeforeLast", "*");
     }
 };

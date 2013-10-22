@@ -46,7 +46,8 @@ namespace ScriptBindings
         StackHandler sa(v);
         SQUserPointer up = nullptr;
         sq_getinstanceup(v, 2, &up, nullptr);
-        return sa.Return(up == nullptr);
+        sa.PushValue<SQBool>((up == nullptr));
+        return SC_RETURN_VALUE;
     }
 
     ProjectManager* getPM()
@@ -154,39 +155,25 @@ namespace ScriptBindings
             pos = nextPos; // prepare for next loop
         }
     }
+
     void Include(const wxString& filename)
     {
         getSM()->LoadScript(filename);
     }
+
     SQInteger Require(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        const wxString& filename = *SqPlus::GetInstance<wxString,false>(v, 2);
+        const wxString& filename = *sa.GetInstance<wxString>(2);
         if (!getSM()->LoadScript(filename))
         {
             wxString msg = wxString::Format(_("Failed to load required script: %s"), filename.c_str());
-            return sa.ThrowError(cbU2C(msg));
+            return sa.ThrowError(msg);
         }
-        return sa.Return(static_cast<SQInteger>(0));
+        sa.PushValue<SQInteger>(0);
+        return SC_RETURN_VALUE;
     }
-    SQInteger wx_GetColourFromUser(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        const wxColour& c = sa.GetParamCount() == 2 ? *SqPlus::GetInstance<wxColour,false>(v, 2) : *wxBLACK;
-        return SqPlus::ReturnCopy(v, wxGetColourFromUser(Manager::Get()->GetAppWindow(), c));
-    }
-    long wx_GetNumberFromUser(const wxString& message, const wxString& prompt, const wxString& caption, long value)
-    {
-        return wxGetNumberFromUser(message, prompt, caption, value);
-    }
-    wxString wx_GetPasswordFromUser(const wxString& message, const wxString& caption, const wxString& default_value)
-    {
-        return wxGetPasswordFromUser(message, caption, default_value);
-    }
-    wxString wx_GetTextFromUser(const wxString& message, const wxString& caption, const wxString& default_value)
-    {
-        return wxGetTextFromUser(message, caption, default_value);
-    }
+
 
     long wxString_ToLong(wxString const &str)
     {
@@ -197,62 +184,59 @@ namespace ScriptBindings
     }
 
 
-    void Register_Globals()
+    void Register_Globals(HSQUIRRELVM vm)
     {
         // global funcs
-        SqPlus::RegisterGlobal(gLog, "Log");
-        SqPlus::RegisterGlobal(gDebugLog, "LogDebug");
-        SqPlus::RegisterGlobal(gWarningLog, "LogWarning");
-        SqPlus::RegisterGlobal(gErrorLog, "LogError");
+        Sqrat::RootTable(vm).Func("Log",        gLog);
+        Sqrat::RootTable(vm).Func("LogDebug",   gDebugLog);
+        Sqrat::RootTable(vm).Func("LogWarning", gWarningLog);
+        Sqrat::RootTable(vm).Func("LogError",   gErrorLog);
 
-        SqPlus::RegisterGlobal(gMessage, "Message");
-        SqPlus::RegisterGlobal(gShowMessage, "ShowMessage");
-        SqPlus::RegisterGlobal(gShowMessageWarn, "ShowWarning");
-        SqPlus::RegisterGlobal(gShowMessageError, "ShowError");
-        SqPlus::RegisterGlobal(gShowMessageInfo, "ShowInfo");
-        SqPlus::RegisterGlobal(gReplaceMacros, "ReplaceMacros");
+        Sqrat::RootTable(vm).Func("Message",    gMessage);
+        Sqrat::RootTable(vm).Func("ShowMessage",gShowMessage);
+        Sqrat::RootTable(vm).Func("ShowWarning",gShowMessageWarn);
+        Sqrat::RootTable(vm).Func("ShowError",  gShowMessageError);
+        Sqrat::RootTable(vm).Func("ShowInfo",   gShowMessageInfo);
+        Sqrat::RootTable(vm).Func("ReplaceMacros",gReplaceMacros);
 
-        SqPlus::RegisterGlobal(getPM, "GetProjectManager");
-        SqPlus::RegisterGlobal(getEM, "GetEditorManager");
-        SqPlus::RegisterGlobal(getCM, "GetConfigManager");
-        SqPlus::RegisterGlobal(getUVM, "GetUserVariableManager");
-        SqPlus::RegisterGlobal(getSM, "GetScriptingManager");
-        SqPlus::RegisterGlobal(getCF, "GetCompilerFactory");
+        Sqrat::RootTable(vm).Func("GetProjectManager",  getPM);
+        Sqrat::RootTable(vm).Func("GetEditorManager",   getEM);
+        Sqrat::RootTable(vm).Func("GetConfigManager",   getCM);
+        Sqrat::RootTable(vm).Func("GetUserVariableManager",getUVM);
+        Sqrat::RootTable(vm).Func("GetScriptingManager",getSM);
+        Sqrat::RootTable(vm).Func("GetCompilerFactory", getCF);
 
         // from globals.h
-        SqPlus::RegisterGlobal(GetArrayFromString, "GetArrayFromString");
-        SqPlus::RegisterGlobal(GetStringFromArray, "GetStringFromArray");
-        SqPlus::RegisterGlobal(EscapeSpaces, "EscapeSpaces");
-        SqPlus::RegisterGlobal(UnixFilename, "UnixFilename");
-        SqPlus::RegisterGlobal(FileTypeOf, "FileTypeOf");
-        SqPlus::RegisterGlobal(URLEncode, "URLEncode");
-        SqPlus::RegisterGlobal(NotifyMissingFile, "NotifyMissingFile");
-        SqPlus::RegisterGlobal(GetPlatformsFromString, "GetPlatformsFromString");
-        SqPlus::RegisterGlobal(GetStringFromPlatforms, "GetStringFromPlatforms");
+        Sqrat::RootTable(vm).Func("GetArrayFromString", GetArrayFromString);
+        Sqrat::RootTable(vm).Func("GetStringFromArray", GetStringFromArray);
+        Sqrat::RootTable(vm).Func("EscapeSpaces",       EscapeSpaces);
+        Sqrat::RootTable(vm).Func("UnixFilename",       UnixFilename);
+        Sqrat::RootTable(vm).Func("FileTypeOf",         FileTypeOf);
+        Sqrat::RootTable(vm).Func("URLEncode",          URLEncode);
+        Sqrat::RootTable(vm).Func("NotifyMissingFile",  NotifyMissingFile);
+        Sqrat::RootTable(vm).Func("GetPlatformsFromString",GetPlatformsFromString);
+        Sqrat::RootTable(vm).Func("GetStringFromPlatforms",GetStringFromPlatforms);
 
-        SqPlus::RegisterGlobal(ConfigManager::GetFolder, "GetFolder");
-        SqPlus::RegisterGlobal(ConfigManager::LocateDataFile, "LocateDataFile");
+        Sqrat::RootTable(vm).Func("GetFolder",          ConfigManager::GetFolder);
+        Sqrat::RootTable(vm).Func("LocateDataFile",     ConfigManager::LocateDataFile);
 
-        SqPlus::RegisterGlobal(ExecutePlugin, "ExecuteToolPlugin");
-        SqPlus::RegisterGlobal(ConfigurePlugin, "ConfigureToolPlugin");
-        SqPlus::RegisterGlobal(InstallPlugin, "InstallPlugin");
+        Sqrat::RootTable(vm).Func("ExecuteToolPlugin",  ExecutePlugin);
+        Sqrat::RootTable(vm).Func("ConfigureToolPlugin",ConfigurePlugin);
+        Sqrat::RootTable(vm).Func("InstallPlugin",      InstallPlugin);
 
-        SqPlus::RegisterGlobal(CallMenu, "CallMenu");
+        Sqrat::RootTable(vm).Func("CallMenu",   CallMenu);
 
-        SqPlus::RegisterGlobal(Include, "Include");
-        SquirrelVM::CreateFunctionGlobal(Require, "Require", "*");
+        Sqrat::RootTable(vm).Func("Include",        Include);
+        Sqrat::RootTable(vm).SquirrelFunc("Require",Require);
 
-        SqPlus::RegisterGlobal(InfoWindow::Display, "InfoWindow");
+        Sqrat::RootTable(vm).Func("InfoWindow", InfoWindow::Display);
 
-        SquirrelVM::CreateFunctionGlobal(IsNull, "IsNull", "*");
+        Sqrat::RootTable(vm).SquirrelFunc("IsNull",IsNull);
 
         // now for some wx globals (utility) functions
-        SqPlus::RegisterGlobal(wxLaunchDefaultBrowser, "wxLaunchDefaultBrowser");
-        SquirrelVM::CreateFunctionGlobal(wx_GetColourFromUser, "wxGetColourFromUser", "*");
-        SqPlus::RegisterGlobal(wx_GetNumberFromUser, "wxGetNumberFromUser");
-        SqPlus::RegisterGlobal(wx_GetPasswordFromUser, "wxGetPasswordFromUser");
-        SqPlus::RegisterGlobal(wx_GetTextFromUser, "wxGetTextFromUser");
+        Sqrat::RootTable(vm).Func("wxLaunchDefaultBrowser",     wxLaunchDefaultBrowser);
 
-        SqPlus::RegisterGlobal(wxString_ToLong, "wxString_ToLong");
+
+        Sqrat::RootTable(vm).Func("wxString_ToLong",wxString_ToLong);
     }
 }

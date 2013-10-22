@@ -31,8 +31,9 @@
 #include <wx/stdpaths.h> // wxStandardPaths
 #include <cstdlib>
 
-#include "scripting/sqplus/sqplus.h"
-#include "scripting/bindings/scriptbindings.h"
+// FIXME (bluehazzard#1#): remove if not needed
+//#include "scripting/sqplus/sqplus.h"
+//#include "scripting/bindings/scriptbindings.h"
 
 #include "cbstyledtextctrl.h"
 

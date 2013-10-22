@@ -62,18 +62,20 @@ namespace ScriptBindings
         // standard event IDs like wxID_OK/wxID_CANCEL/etc.
         event.Skip(true);
 
-        try
-        {
+
 //            Manager::Get()->GetLogManager()->DebugLog(F(_T("Script dialog event: %d"), event.GetId()));
-            SqPlus::SquirrelFunction<void> cb(cbU2C(m_CallBack));
-            if (cb.func.IsNull())
-                return;
-            cb(event.GetId());
-        }
-        catch (SquirrelError& e)
+        //SqPlus::SquirrelFunction<void> cb(cbU2C(m_CallBack));
+        Sqrat::Function call_back(Sqrat::RootTable(),m_CallBack.ToUTF8());
+        if (call_back.IsNull())
+            return;
+        call_back(event.GetId());
+        // FIXME (bluehazzard#1#): Check the vm...
+        StackHandler sa(Sqrat::DefaultVM::Get());
+        if(sa.HasError())
         {
-            Manager::Get()->GetScriptingManager()->DisplayErrors(&e);
+            Manager::Get()->GetScriptingManager()->DisplayErrors(sa.GetError());
         }
+
     }
 
     int ShowDialog(const wxString& xrc, const wxString& dlgName, const wxString& callback)
@@ -128,21 +130,24 @@ namespace ScriptBindings
         if (!s_ActiveDialog)
         {
             cbMessageBox(_("XRCID() only valid while inside a ShowDialog() call..."), _("Error"), wxICON_ERROR);
-            return sa.Return((SQInteger)-1);
+            sa.PushValue<SQInteger>(-1);
+            return SC_RETURN_VALUE;
         }
 
         wxWindow* win = nullptr;
         if (sa.GetType(2) == OT_STRING)
-            win = wxWindow::FindWindowByName(cbC2U(sa.GetString(2)), s_ActiveDialog);
+            win = wxWindow::FindWindowByName(cbC2U(sa.GetValue<char*>(2)), s_ActiveDialog);
         else
-            win = wxWindow::FindWindowByName(*SqPlus::GetInstance<wxString,false>(v, 2), s_ActiveDialog);
-        return sa.Return((SQInteger)(win ? win->GetId() : -1));
+            win = wxWindow::FindWindowByName(*sa.GetInstance<wxString>(2), s_ActiveDialog);
+        sa.PushValue<SQInteger>((win ? win->GetId() : -1));
+        return SC_RETURN_VALUE;
     }
 
-    void Register_Dialog()
+    void Register_Dialog( HSQUIRRELVM vm)
     {
-        SqPlus::RegisterGlobal(ShowDialog, "ShowDialog");
-        SqPlus::RegisterGlobal(EndModal, "EndModal");
-        SquirrelVM::CreateFunctionGlobal(XrcId, "XRCID", "*");
+        Sqrat::RootTable(vm).Func("ShowDialog",ShowDialog);
+        Sqrat::RootTable(vm).Func("EndModal",EndModal);
+        Sqrat::RootTable(vm).SquirrelFunc("EndModal",XrcId);
+
     }
 } // namespace ScriptBindings
