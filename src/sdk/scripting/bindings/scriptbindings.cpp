@@ -23,11 +23,11 @@
 #endif
 #include "cbstyledtextctrl.h"
 
-#include "scriptbindings.h"
+#include "scripting/bindings/scriptbindings.h"
 #include <cbexception.h>
-#include "sc_base_types.h"
-#include "sc_cb_vm.h"
-#include "sq_wx/sq_wx.h"
+#include "scripting/bindings/sc_base_types.h"
+#include "scripting/bindings/sc_cb_vm.h"
+#include "scripting/bindings/sq_wx/sq_wx.h"
 
 /** \defgroup Squirrel Squirrel Binding
  *  \brief The Squirrel scripting Module of Code Blocks
@@ -134,7 +134,8 @@ namespace ScriptBindings
             if (config_type == OT_INTEGER)
             {
                 Sqrat::Var<SQInteger> val(vm,3);
-                Manager::Get()->GetConfigManager(_T("scripts"))->Write(*key,val.value);
+                // FIXME (bluehazzard#1#): Fix this ugly case
+                Manager::Get()->GetConfigManager(_T("scripts"))->Write(*key,static_cast<int>(val.value));
                 return SC_RETURN_OK;
             }
             else if (config_type == OT_BOOL)
@@ -358,7 +359,7 @@ namespace ScriptBindings
             {
                 i = sa.GetValue<SQInteger>(6);
             }
-            if(Sqrat::Error::Instance().Occurred(vm))
+            if(Sqrat::Error::Occurred(vm))
             {
                 return sa.ThrowError(_("Invalid arguments to \"cbProject::AddFile\""));
             }
@@ -389,12 +390,17 @@ namespace ScriptBindings
             if (sa.GetType(2) == OT_INTEGER)
             {
                 bt = prj->GetBuildTarget(sa.GetValue<SQInteger>(2));
+                if(bt == nullptr)
+                    return sa.ThrowError(wxString::Format(_("Could not find build Targte Nr. %d"),sa.GetValue<SQInteger>(2)));
             }
             else
             {
                 bt = prj->GetBuildTarget(*sa.GetInstance<wxString>(2));
+                if(bt == nullptr)
+                    return sa.ThrowError(_("Could not find build Targte") + *sa.GetInstance<wxString>(2));
             }
-            sa.PushValue<ProjectBuildTarget*>(bt);
+
+            sa.PushInstance<ProjectBuildTarget>(bt);
             return SC_RETURN_VALUE;
         }
         return sa.ThrowError(_("Invalid arguments to \"cbProject::GetBuildTarget\""));
@@ -603,18 +609,18 @@ namespace ScriptBindings
         return sa.ThrowError(_("Invalid arguments to \"CompilerFactory::GetCompilerIndex\""));
     }
 
-    void RegisterBindings(HSQUIRRELVM vm)
-    }
-    
     wxString CompilerFactory_GetCompilerIDByName(const wxString &name)
     {
         Compiler *compiler = CompilerFactory::GetCompilerByName(name);
         return (compiler ? compiler->GetID() : wxString(wxEmptyString));
     }
 
-    
 
-    void RegisterBindings()
+    /** \defgroup sq_cb_global Code::Blocks binding to internal classes and functions
+     *  \ingroup Squirrel
+     *  \brief Code::Blocks binding to internal classes and functions
+     */
+    void RegisterBindings(HSQUIRRELVM vm)
     {
         if (!vm)
             cbThrow(_T("Scripting engine not initialized!?"));
@@ -641,7 +647,7 @@ namespace ScriptBindings
                 Func("AddBuildTarget",      &ProjectFile::AddBuildTarget).
                 Func("RenameBuildTarget",   &ProjectFile::RenameBuildTarget).
                 Func("RemoveBuildTarget",   &ProjectFile::RemoveBuildTarget).
-                Func( "GetbuildTargets",    &ProjectFile::GetbuildTargets).
+                Func("GetbuildTargets",    &ProjectFile::GetBuildTargets).
                 Func("GetBaseName",         &ProjectFile::GetBaseName).
                 Func("GetObjName",          &ProjectFile::GetObjName).
                 Func("SetObjName",          &ProjectFile::SetObjName).
@@ -970,12 +976,27 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Bind("UserVariableManager",user_variable_manager);
 
 
+        /** \brief ScriptingManager class binding.
+         *  \ingroup sq_cb_global
+         *
+         *  ### ScriptingManager Function bound to squirrel
+         *   | Name                     | parameter                                                     | description               | info  |
+         *   | :-----------------------:| :-----------------------------------------------------------: | :-----------------------: | :----:|
+         *   | RegisterScriptMenu       | [string] menu_path, [string] script_or_func,[bool] isFunc     | Register a menu entry     |   x   |
+         *   | DisplayErrors            | [string] message, [bool] del_errors                           | Display scripting errors. Empty string if the cache should be called    |   x   |
+         */
+
         Sqrat::Class<ScriptingManager, Sqrat::NoConstructor<ScriptingManager> > scripting_manager(vm,"ScriptingManager");
         scripting_manager.
-                Func("RegisterScriptMenu",  &ScriptingManager::RegisterScriptMenu);
+                Func("RegisterScriptMenu",  &ScriptingManager::RegisterScriptMenu).
+                Func("DisplayErrors",  &ScriptingManager::DisplayErrors);
         Sqrat::RootTable(vm).Bind("ScriptingManager",scripting_manager);
 
         typedef bool(*CF_INHERITSFROM)(const wxString&, const wxString&); // CompilerInheritsFrom
+
+		// NOTE this is a remaining of the rebase process.
+		// It can be removed if no problems were reported
+        //Sqrat::RootTable(vm).Func("GetCompilerIDByName",CompilerFactory_GetCompilerIDByName);
 
         Sqrat::Class<CompilerFactory> compiler_factory(vm,"CompilerFactory");
         compiler_factory.
@@ -1016,6 +1037,52 @@ namespace ScriptBindings
             Func("SetProjectFile",  &FileTreeData::SetProjectFile).
             Func("SetFolder",       &FileTreeData::SetFolder);
         Sqrat::RootTable(vm).Bind("FileTreeData",file_tree_data);
+
+/** \brief CodeBlocksEvent class binding.
+ *  \ingroup sq_cb_global
+ *
+ * Function bound to squirrel:
+ *
+ *  ### CodeBlocksEvent Function bound to squirrel
+ *   | Name                     | parameter             | description               | info  |
+ *   | :-----------------------:| :-------------------: | :-----------------------: | :----:|
+ *   | CodeBlocksEvent()        | &CodeBlocksEvent      |  Copy only constructor    |   x   |
+ *   | GetEventType             |   x                   |    x                      |   x   |
+ *   | GetProject               |   x                   |    x                      |   x   |
+ *   | SetProject               |   x                   |    x                      |   x   |
+ *   | GetEditor                |   x                   |    x                      |   x   |
+ *   | SetEditor                |   x                   |    x                      |   x   |
+ *   | GetOldEditor             |   x                   |    x                      |   x   |
+ *   | SetOldEditor             |   x                   |    x                      |   x   |
+ *   | GetX                     |   x                   |    x                      |   x   |
+ *   | SetX                     |   x                   |    x                      |   x   |
+ *   | GetY                     |   x                   |    x                      |   x   |
+ *   | SetY                     |   x                   |    x                      |   x   |
+ *   | GetBuildTargetName       |   x                   |    x                      |   x   |
+ *   | GetOldBuildTargetName    |   x                   |    x                      |   x   |
+ *   | SetOldBuildTargetName    |   x                   |    x                      |   x   |
+
+ */
+
+        Sqrat::Class<CodeBlocksEvent, Sqrat::CopyOnly<CodeBlocksEvent> > cb_event(vm,"CodeBlocksEvent");
+        cb_event.
+            Func("GetEventType",   &CodeBlocksEvent::GetEventType).
+            Func("GetProject",     &CodeBlocksEvent::GetProject).
+            Func("SetProject",     &CodeBlocksEvent::SetProject).
+            Func("GetEditor",      &CodeBlocksEvent::GetEditor).
+            Func("SetEditor",      &CodeBlocksEvent::SetEditor).
+            Func("GetOldEditor",   &CodeBlocksEvent::GetOldEditor).
+            Func("SetOldEditor",   &CodeBlocksEvent::SetOldEditor).
+            //Func("GetPlugin",    &CodeBlocksEvent::GetPlugin).
+            //Func("SetPlugin",    &CodeBlocksEvent::SetPlugin).
+            Func("GetX",      &CodeBlocksEvent::GetX).
+            Func("SetX",      &CodeBlocksEvent::SetX).
+            Func("GetY",      &CodeBlocksEvent::GetY).
+            Func("SetY",      &CodeBlocksEvent::SetY).
+            Func("GetBuildTargetName",    &CodeBlocksEvent::GetBuildTargetName).
+            Func("GetOldBuildTargetName", &CodeBlocksEvent::GetOldBuildTargetName).
+            Func("SetOldBuildTargetName", &CodeBlocksEvent::SetOldBuildTargetName);
+        Sqrat::RootTable(vm).Bind("CodeBlocksEvent",cb_event);
 
         // called last because it needs a few previously registered types
         Register_ScriptPlugin(vm);

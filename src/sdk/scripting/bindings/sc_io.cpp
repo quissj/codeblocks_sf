@@ -23,7 +23,7 @@
 #include <wx/utils.h>
 
 #include "scriptsecuritywarningdlg.h"
-#include "sc_base_types.h"
+#include "scripting/bindings/sc_base_types.h"
 
 namespace ScriptBindings
 {

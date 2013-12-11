@@ -107,6 +107,6 @@ xcopy /D /y devel\*.dll output > nul
 xcopy /D /y %CB_DEVEL_RESDIR%\plugins\*.dll %CB_OUTPUT_RESDIR%\plugins > nul
 
 echo Stripping debug info from output tree
-strip output\*.exe
-strip output\*.dll
-strip %CB_OUTPUT_RESDIR%\plugins\*.dll
+echo strip output\*.exe
+echo strip output\*.dll
+echo strip %CB_OUTPUT_RESDIR%\plugins\*.dll

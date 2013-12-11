@@ -1,0 +1,107 @@
+
+/*
+ * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * $Revision$
+ * $Id$
+ * $HeadURL$
+ */
+
+// user-dialog-test
+// Script plugins must extend cbScriptPlugin
+class user_dialog_test_Plugin extends cbScriptPlugin
+{
+    // mandatory to setup the plugin's info
+    constructor()
+    {
+        info = PluginInfo();
+
+        info.name = _T("user_dialog_test");
+        info.title = _T("Test the user dialogs");
+        info.version = _T("0.1a");
+        info.license = _T("GPL");
+    }
+
+    // optional to create menubar items
+    function GetMenu()
+    {
+        local entries = ::wxArrayString();
+        entries.Add(_T("Plugins/Test Scripting/User Dialogs"), 1);
+        return entries;
+    }
+
+    // optional to create context menu entries
+    /*function GetModuleMenu(who, data)
+    {
+
+    }*/
+
+    // optional to support ExecutePlugin(pluginNameString)
+    function Execute()
+    {
+        StartTest();
+        return 0;
+    }
+
+    // optional calback for menubar items clicking
+    function OnMenuClicked(index)
+    {
+        if (index == 0)
+        {
+            StartTest();
+
+        }
+
+    }
+
+    // optional calback for context menu items clicking
+    function OnModuleMenuClicked(index)
+    {
+
+    }
+
+    function StartTest()
+    {
+        print("Start dialog test\n");
+        print("ShowMessage\n");
+        local message_ret = ::ShowMessage("The Show Message test");
+        print(" -> Value returned: " + message_ret + "\n");
+
+		print("GetFilefromUser Dialog\n");
+        local files = ::wxGetFileFromUser("Pleas select the files ","Files to be converted"," ","*.*",wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
+        print(" -> files returned (" + files.GetCount() + "): ");
+        for(local i = 0;i < files.GetCount();i++)
+        {
+            print(" " + files.Item(i) + " |");
+        }
+		print("\n");
+		print("wxGetColourFromUser Dialog\n");
+        local colour = ::wxGetColourFromUser(wxColour(128,128,128));
+		print(" -> returned color: " + colour + "\n");
+		print("wxGetPasswordFromUser Dialog\n");
+        local password = ::wxGetPasswordFromUser("please enter a password","A password please","default_password");
+		print(" -> returned password: " + password + "\n");
+		print("wxGetNumberFromUser Dialog\n");
+        local number = ::wxGetNumberFromUser("please enter a number","the prompt","A number please",42);
+		print(" -> returned number: " + number + "\n");
+		print("wxGetTextFromUser Dialog\n");
+        local text = ::wxGetTextFromUser("please enter a text","A text please","sample text");
+		print(" -> returned text: " + text + "\n");
+
+		print("wxBell\n");
+        ::wxBell();
+		print(" -> system bell ringing \n");
+
+		print("wxDirSelector Dialog\n");
+        local dir_selector = ::wxDirSelector("Directory selector","",wxDD_DEFAULT_STYLE);
+		print(" -> returned dir_selector: " + dir_selector + "\n");
+
+    };
+}
+
+// this call actually registers the script plugin with Code::Blocks
+RegisterPlugin(user_dialog_test_Plugin());
+
+// if you want to call this plugin's Execute() function, use this in a script:
+// ExecutePlugin(_T("Scripting_TestPlugin"));

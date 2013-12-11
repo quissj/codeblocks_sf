@@ -2,8 +2,8 @@
 #ifndef SC_CB_VM_H
 #define SC_CB_VM_H
 
-#include <squirrel.h>
-#include <sqrat.h>
+#include <scripting/squirrel/squirrel.h>
+#include <scripting/sqrat.h>
 #include "manager.h"
 #include <wx/hashmap.h>
 #include <wx/string.h>
@@ -12,7 +12,7 @@ namespace ScriptBindings
 {
 
 class CBsquirrelVMManager;
-
+class CBSquirrelThread;
 
 
 /** \brief A helper class to manage Exceptions thrown from the script environment
@@ -57,6 +57,19 @@ const uint32_t VM_LIB_SYST  = 0x00000008;   /**< Load the system library (clock(
 const uint32_t VM_LIB_STR   = 0x00000010;   /**< Load the string library */
 /**@}*/
 
+
+
+/** \brief Returns the success/fail of the run/compile
+    *
+    * This are the return values from \ref doString and \ref doFile
+*/
+    enum SC_ERROR_STATE
+    {
+        SC_NO_ERROR,       /**< No error occurred */
+        SC_COMPILE_ERROR,  /**< A compilation error occurred. Call \ref getLastErrorMsg() to get a detailed description of the error: file and line */
+        SC_RUNTIME_ERROR   /**< A runtime error occurred. Call \ref getLastErrorMsg() to get a detailed description of the error */
+    };
+
 /** \brief A class to manage the squirrel VM.
  *
  * Based on SqratVM
@@ -68,18 +81,11 @@ class CBsquirrelVM
 
     static void compilerErrorHandler(HSQUIRRELVM v,const SQChar* desc,const SQChar* source,SQInteger line,SQInteger column);
     static SQInteger runtimeErrorHandler(HSQUIRRELVM v);
+private:
+
 public:
 
-    /** \brief Returns the success/fail of the run/compile
-     *
-     * This are the return values from \ref doString and \ref doFile
-     */
-    enum SC_ERROR_STATE
-    {
-        SC_NO_ERROR,       /**< No error occurred */
-        SC_COMPILE_ERROR,  /**< A compilation error occurred. Call \ref getLastErrorMsg() to get a detailed description of the error: file and line */
-        SC_RUNTIME_ERROR   /**< A runtime error occurred. Call \ref getLastErrorMsg() to get a detailed description of the error */
-    };
+
 
     /** \brief Initialize a squirrel VM and load the specified standard libraries.
      *
@@ -94,7 +100,7 @@ public:
      * For a list with flags see \ref vm_library_flags
      */
     CBsquirrelVM(int initialStackSize = 1024,const uint32_t library_to_load = VM_LIB_ALL);
-
+    CBsquirrelVM(HSQUIRRELVM vm, bool close = true);
     ~CBsquirrelVM();
 
     /** \brief Shuts down the vm
@@ -104,6 +110,8 @@ public:
      *
      */
     void Shutdown();
+
+    CBSquirrelThread* CreateThread();
 
     /** \brief Loads additional std libraries
      * \param[in] library_to_load const uint32_t
@@ -155,7 +163,14 @@ public:
      * The error is returned in an readable format. It is not differenced between compiler or tuntime error
      * \return wxString The error string
      */
-    wxString getLastErrorMsg()     {   return wxString(m_lastErrorMsg.c_str(),wxConvUTF8); };
+    wxString getLastErrorMsg();
+
+    /** \brief Reports if a error occurred on this vm
+     *
+     * The detailed error can be retrieved with getLastErrorMsg()
+     * \return bool true if a error occurred
+     */
+    bool HasError();
 
     /** \brief Sets the last error
      * \param str const Sqrat::string& The error message
@@ -169,12 +184,12 @@ public:
          * \param[in] str Sqrat::string& A sqrat string to compile and run
          * \return See \ref ERROR_STATE for the return values
         */
-    SC_ERROR_STATE doString(const Sqrat::string& str);
+    SC_ERROR_STATE doString(const Sqrat::string& str,const Sqrat::string& name);
         /**
          * \param[in] str wxString A wxWidgets string to compile and run
          * \return See \ref ERROR_STATE for the return values
         */
-    SC_ERROR_STATE doString(const wxString str);
+    SC_ERROR_STATE doString(const wxString str,const wxString name);
     /** @} */
 
     /** \brief Compiles and runs a file
@@ -196,6 +211,7 @@ private:
     Sqrat::string m_lastErrorMsg;
     uint32_t m_lib_loaded;
     bool m_shutdwon;
+    bool m_close;
 };
 
 /** \brief A hash map to save the different vms (not for public use)
@@ -208,6 +224,31 @@ WX_DECLARE_HASH_MAP(HSQUIRRELVM,
                     VMHashMap);
 
 
+
+class CBSquirrelThread
+{
+public:
+    CBSquirrelThread(HSQUIRRELVM parent);
+    ~CBSquirrelThread();
+
+
+    SC_ERROR_STATE doString(const wxString script,const wxString name);
+
+    CBsquirrelVM* GetVM()   {return m_vm;};
+
+
+private:
+
+    bool create_thread();
+    bool destroy_thread();
+
+    CBsquirrelVM* m_vm;
+
+    HSQUIRRELVM m_parent_vm;
+    //HSQUIRRELVM m_thread;
+    HSQOBJECT m_thread_obj;
+
+};
 
 /** \brief A helper class to Manage different squirrel VMs
  *
@@ -253,6 +294,7 @@ class CBsquirrelVMManager : public Mgr<CBsquirrelVMManager>
         ~CBsquirrelVMManager();
         CBsquirrelVMManager(cb_unused const CBsquirrelVMManager& rhs); // prevent copy construction
         VMHashMap m_map;
+
 };
 
 
@@ -287,8 +329,8 @@ public:
     template<typename RETURN_VALUE> RETURN_VALUE GetValue(int pos)
     {
         Sqrat::Var<RETURN_VALUE> val(m_vm,pos);
-        if(Sqrat::Error::Instance().Occurred(m_vm))
-            throw CBScriptException(_("Script Error: GetValue<> failed"));   // FIXME (bluehazzard#1#): Is this a good solution?
+        if(Sqrat::Error::Occurred(m_vm))
+            throw CBScriptException(_("Script Error: GetValue<> failed\n"));   // FIXME (bluehazzard#1#): Is this a good solution?
         return val.value;
     }
 
@@ -299,8 +341,8 @@ public:
     template<typename INSTANCE_TYPE> INSTANCE_TYPE* GetInstance(int pos)
     {
         INSTANCE_TYPE* ret = Sqrat::ClassType<INSTANCE_TYPE>::GetInstance(m_vm, pos);
-        if(Sqrat::Error::Instance().Occurred(m_vm))
-            throw CBScriptException(_("Script Error: GetInstance<> failed with ") + GetError());   // FIXME (bluehazzard#1#): Is this a good solution?
+        if(Sqrat::Error::Occurred(m_vm))
+            throw CBScriptException(_("Script Error: GetInstance<> failed\n"));   // FIXME (bluehazzard#1#): Is this a good solution?
         return ret;
     }
 
@@ -324,17 +366,22 @@ public:
         Sqrat::ClassType<VALUE_TYPE>::PushInstanceCopy(m_vm, value);
     }
 
-    /** \brief Throws an squirrel error
-     * \param error SQChar a error description
-     * \return SQInteger
-     */
-    SQInteger ThrowError(SQChar* error);
+    template<typename VALUE_TYPE> void PushInstance(VALUE_TYPE* value)
+    {
+        Sqrat::ClassType<VALUE_TYPE>::PushInstance(m_vm, value);
+    }
 
     /** \brief Throws an squirrel error
      * \param error SQChar a error description
      * \return SQInteger
      */
-    SQInteger ThrowError(wxString error);
+    SQInteger ThrowError(const SQChar* error);
+
+    /** \brief Throws an squirrel error
+     * \param error SQChar a error description
+     * \return SQInteger
+     */
+    SQInteger ThrowError(const wxString error);
 
     /** \brief Returns the error message of the last occurred error or an empty string
      *
@@ -350,6 +397,15 @@ public:
      * \return bool True if a error occurred
      */
     bool HasError();
+
+    /** \brief Returns a backtrace of the current call stack
+     *
+     * \return wxString
+     *
+     */
+    wxString CreateStackInfo();
+
+    HSQUIRRELVM GetVM()     {return m_vm;};
 
 protected:
 private:

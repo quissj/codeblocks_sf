@@ -7,14 +7,18 @@
  * $HeadURL$
  */
 
- #include <squirrel.h>
- #include <sqrat.h>
- #include <sq_wx/sq_wx.h>
  #include <wx/numdlg.h>
  #include <wx/colordlg.h>
  #include <wx/textdlg.h>
- #include <sc_cb_vm.h>
- #include <sc_binding_util.h>
+ #include <wx/filedlg.h>
+ #include <wx/dirdlg.h>
+ #include <wx/utils.h>
+ #include <wx/msgdlg.h>
+ #include <scripting/bindings/sq_wx/sq_wx.h>
+ #include <scripting/bindings/sc_cb_vm.h>
+ #include <scripting/bindings/sc_binding_util.h>
+
+
 
 /** \defgroup sq_dialogs Squirrel User dialogs
  *  \ingroup Squirrel
@@ -44,6 +48,22 @@ namespace ScriptBindings
         return wxGetTextFromUser(message, caption, default_value);
     }
 
+    wxArrayString wx_GetFileFromUser(const wxString& message, const wxString& caption, const wxString& default_value,const wxString& wildcart,long style)
+    {
+        wxFileDialog* filedlg;
+        filedlg = new wxFileDialog(nullptr,message,default_value,wxEmptyString,wildcart,style);
+        wxArrayString ret;
+        if(filedlg->ShowModal() == wxID_OK)
+        {
+            filedlg->GetPaths(ret);
+        }
+        return ret;
+    }
+
+    wxString wx_GetDirFromUser(const wxString& message, const wxString& default_path,long style)
+    {
+        return wxDirSelector(message,default_path,style,wxDefaultPosition,nullptr);
+    }
 
     void bind_wx_util_dialogs(HSQUIRRELVM vm)
     {
@@ -60,7 +80,7 @@ namespace ScriptBindings
          *### wxGetNumberFromUser(message,prompt,caption,value)
          *
          *  - __message__   Message to inform the user [wxString]
-         *  - __prompt__    ... [wxString]
+         *  - __prompt__    Prompt to inform the user [wxString]
          *  - __caption__   The caption for the Dialog [wxString]
          *  - __value__     A default value [int]
          *
@@ -73,7 +93,6 @@ namespace ScriptBindings
          *### wxGetPasswordFromUser(message,prompt,caption,value)
          *
          *  - __message__   Message to inform the user [wxString]
-         *  - __prompt__    ... [wxString]
          *  - __caption__   The caption for the Dialog [wxString]
          *  - __value__     A default value [wxString]
          *
@@ -86,7 +105,6 @@ namespace ScriptBindings
          *### wxGetTextFromUser(key,default_value)
          *
          *  - __message__   Message to inform the user [wxString]
-         *  - __prompt__    ... [wxString]
          *  - __caption__   The caption for the Dialog [wxString]
          *  - __value__     A default value [wxString]
          *
@@ -95,10 +113,78 @@ namespace ScriptBindings
          *  - __return__ The Value entered by the user or _value_
          */
 
+         /** \ingroup sq_dialogs
+         *### wxGetFileFromUser(message, caption, default_value,wildcart,style)
+         *
+         *  - __message__        Message to inform the user [wxString]
+         *  - __caption__        ... [wxString]
+         *  - __default_value__  The Default file/path [wxString]
+         *  - __wildcart__       The wildcart to filter the files [wxString]
+         *  - __style__          The styles: wxFD_DEFAULT_STYLE, wxFD_OPEN, wxFD_SAVE, wxFD_OVERWRITE_PROMPT, wxFD_FILE_MUST_EXIST, wxFD_MULTIPLE, wxFD_CHANGE_DIR, wxFD_PREVIEW
+         *
+         *
+         *  This function displays an dialog  with the possibility to ask for one or multiple files to be saved or loaded
+         *
+         *  - __return__ A wxArrayString with the given files (empty if the user canceled the dialog)
+         */
+
+         /** \ingroup sq_dialogs
+         *### wxBell()
+         *
+         *  Ring the system Bell
+         *
+         *  - __return__
+         */
+
+        /** \ingroup sq_dialogs
+         *### wxDirSelector(message,default_value,style)
+         *
+         *  - __message__        Message to inform the user [wxString]
+         *  - __default_value__  The Default path [wxString]
+         *  - __style__          The styles: wxDD_DEFAULT_STYLE, wxDD_DIR_MUST_EXIST, wxDD_CHANGE_DIR
+         *
+         *  This function displays an dialog  with the possibility to ask for a path
+         *
+         *  - __return__ A wxString with the given path ( a empty string if the user aborts the dialog)
+         */
+
+        BIND_INT_CONSTANT(wxDD_DEFAULT_STYLE);
+        BIND_INT_CONSTANT(wxDD_DIR_MUST_EXIST);
+        BIND_INT_CONSTANT(wxDD_CHANGE_DIR);
+
+        // FileDialog styles
+        BIND_INT_CONSTANT(wxFD_DEFAULT_STYLE);
+        BIND_INT_CONSTANT(wxFD_OPEN);
+        BIND_INT_CONSTANT(wxFD_SAVE);
+        BIND_INT_CONSTANT(wxFD_OVERWRITE_PROMPT);
+        BIND_INT_CONSTANT(wxFD_FILE_MUST_EXIST);
+        BIND_INT_CONSTANT(wxFD_MULTIPLE);
+        BIND_INT_CONSTANT(wxFD_CHANGE_DIR);
+        BIND_INT_CONSTANT(wxFD_PREVIEW);
+
+        // dialog buttons
+        BIND_INT_CONSTANT(wxOK);
+        BIND_INT_CONSTANT(wxYES_NO);
+        BIND_INT_CONSTANT(wxCANCEL);
+        BIND_INT_CONSTANT(wxID_OK);
+        BIND_INT_CONSTANT(wxID_YES);
+        BIND_INT_CONSTANT(wxID_NO);
+        BIND_INT_CONSTANT(wxID_CANCEL);
+        BIND_INT_CONSTANT(wxICON_QUESTION);
+        BIND_INT_CONSTANT(wxICON_INFORMATION);
+        BIND_INT_CONSTANT(wxICON_WARNING);
+        BIND_INT_CONSTANT(wxICON_ERROR);
+        BIND_INT_CONSTANT(wxICON_HAND);
+
+
         Sqrat::RootTable()
         .SquirrelFunc(_SC("wxGetColourFromUser"),&wx_GetColourFromUser)
         .Func(_SC("wxGetNumberFromUser"),&wx_GetNumberFromUser)
         .Func(_SC("wxGetPasswordFromUser"),&wx_GetPasswordFromUser)
-        .Func(_SC("wxGetTextFromUser"),&wx_GetTextFromUser);
+        .Func(_SC("wxGetTextFromUser"),&wx_GetTextFromUser)
+        .Func(_SC("wxGetFileFromUser"),&wx_GetFileFromUser)
+        .Func(_SC("wxBell"),&wxBell)
+        .Func(_SC("wxDirSelector"),&wx_GetDirFromUser);
+
     }
 }

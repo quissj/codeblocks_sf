@@ -20,7 +20,8 @@
     #include <pluginmanager.h>
 #endif
 
-#include "sc_base_types.h"
+#include "scripting/bindings/sc_base_types.h"
+#include "scripting/bindings/sq_wx/sq_wx_type_handler.h"
 
 #include <wx/colordlg.h>
 #include <wx/numdlg.h>
@@ -39,7 +40,35 @@ namespace ScriptBindings
     void gShowMessageWarn(const wxString& msg){ cbMessageBox(msg, _("Script warning"), wxICON_WARNING | wxOK); }
     void gShowMessageError(const wxString& msg){ cbMessageBox(msg, _("Script error"), wxICON_ERROR | wxOK); }
     void gShowMessageInfo(const wxString& msg){ cbMessageBox(msg, _("Script information"), wxICON_INFORMATION | wxOK); }
-    wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+    //wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+    //wxString gReplaceMacros(const wxString& buffer,bool subrequest){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+
+// FIXME (bluehazzard#1#): Fix the scripts, because replace macros only use one parameter, for compatibility this is implemented
+
+    SQInteger gReplaceMacros(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+
+        if (sa.GetParamCount() == 0) {
+            return sa.ThrowError(_("ReplaceMacros: wrong number of parameters"));
+        }
+        bool subrequest = false;
+        //Sqrat::Var<wxString> to_replace(v,2);
+        wxString origin = sa.GetValue<wxString>(2);
+        if(sa.GetParamCount() >= 3)
+        {
+            subrequest = sa.GetValue<bool>(3);
+        }
+        if(sa.HasError()) {
+            return sa.ThrowError(_("ReplaceMacros: something is wrong"));
+        }
+
+        wxString ret_val(origin);
+        Manager::Get()->GetMacrosManager()->ReplaceMacros(ret_val,nullptr,subrequest);
+        sa.PushInstanceCopy(ret_val);
+
+        return SC_RETURN_VALUE;
+    }
 
     SQInteger IsNull(HSQUIRRELVM v)
     {
@@ -136,9 +165,12 @@ namespace ScriptBindings
                         #if wxCHECK_VERSION(2, 9, 0)
                         mbar->GetEventHandler()->ProcessEvent(evt);
                         #else
-                        if ( !mbar->ProcessEvent(evt) )
+                        if(!Manager::Get()->GetAppWindow()->ProcessEvent(evt))
+                        //if ( !mbar->ProcessEvent(evt) )
                         {
-                            wxString msg; msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
+                            // TODO (bluehazzard#1#): Report the error to squirrel
+                            wxString msg;
+                            msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
                             cbMessageBox(msg, _("Script error"), wxICON_WARNING);
                         }
                         #endif
@@ -164,7 +196,7 @@ namespace ScriptBindings
     SQInteger Require(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        const wxString& filename = *sa.GetInstance<wxString>(2);
+        wxString filename = sa.GetValue<wxString>(2);
         if (!getSM()->LoadScript(filename))
         {
             wxString msg = wxString::Format(_("Failed to load required script: %s"), filename.c_str());
@@ -183,6 +215,11 @@ namespace ScriptBindings
         return value;
     }
 
+    bool LoadResource(wxString& res)
+    {
+        return Manager::LoadResource(res);
+    }
+
 
     void Register_Globals(HSQUIRRELVM vm)
     {
@@ -197,7 +234,10 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("ShowWarning",gShowMessageWarn);
         Sqrat::RootTable(vm).Func("ShowError",  gShowMessageError);
         Sqrat::RootTable(vm).Func("ShowInfo",   gShowMessageInfo);
-        Sqrat::RootTable(vm).Func("ReplaceMacros",gReplaceMacros);
+        // TODO (bluehazzard#1#): Remove this. The ReplaceMacro function uses only one parameter
+        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString&)>("ReplaceMacros",gReplaceMacros);
+        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString& ,bool)>("ReplaceMacros",gReplaceMacros);
+        Sqrat::RootTable(vm).SquirrelFunc("ReplaceMacros",gReplaceMacros);
 
         Sqrat::RootTable(vm).Func("GetProjectManager",  getPM);
         Sqrat::RootTable(vm).Func("GetEditorManager",   getEM);
@@ -225,6 +265,9 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("InstallPlugin",      InstallPlugin);
 
         Sqrat::RootTable(vm).Func("CallMenu",   CallMenu);
+
+
+        //Sqrat::RootTable(vm).Func("LoadResource",   LoadResource);
 
         Sqrat::RootTable(vm).Func("Include",        Include);
         Sqrat::RootTable(vm).SquirrelFunc("Require",Require);

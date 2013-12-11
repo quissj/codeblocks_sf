@@ -351,11 +351,6 @@ AC_CONFIG_FILES([Makefile
 	src/include/autorevision.h
 	src/include/Makefile
 	src/include/scripting/Makefile
-	src/include/scripting/bindings/Makefile
-	src/include/scripting/include/Makefile
-	src/include/scripting/sqplus/Makefile
-	src/include/scripting/sqstdlib/Makefile
-	src/include/scripting/squirrel/Makefile
 	src/include/tinyxml/Makefile
 	src/sdk/Makefile
 	src/sdk/wxpropgrid/Makefile
@@ -363,7 +358,6 @@ AC_CONFIG_FILES([Makefile
 	src/sdk/scripting/bindings/Makefile
 	src/sdk/scripting/squirrel/Makefile
 	src/sdk/scripting/sqstdlib/Makefile
-	src/sdk/scripting/sqplus/Makefile
 	src/sdk/wxscintilla/Makefile
 	src/sdk/resources/Makefile
 	src/sdk/resources/lexers/Makefile

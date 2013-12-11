@@ -29,13 +29,10 @@
 #include "crc32.h"
 #include "menuitemsmanager.h"
 #include "genericmultilinenotesdlg.h"
-// FIXME (bluehazzard#1#): remove if not needed
-//#include "sqplus.h"
-#include "sqrat.h"
-#include "scriptbindings.h"
-#include "sc_plugin.h"
-#include "sqstdstring.h"
-//#include <sc_cb_vm.h>
+#include "scripting/sqrat.h"
+#include "scripting/bindings/scriptbindings.h"
+#include "scripting/bindings/sc_plugin.h"
+#include "scripting/squirrel/sqstdstring.h"
 
 template<> ScriptingManager* Mgr<ScriptingManager>::instance = nullptr;
 template<> bool  Mgr<ScriptingManager>::isShutdown = false;
@@ -86,6 +83,18 @@ static void CaptureScriptOutput(HSQUIRRELVM /*v*/, const SQChar * s, ...)
     va_end(vl);
 }
 
+static void CaptureScriptErrors(HSQUIRRELVM /*v*/, const SQChar * s, ...)
+{
+    va_list vl;
+    va_start(vl,s);
+    wxString msg;
+    PrintSquirrelToWxString(msg,s,vl);
+    va_end(vl);
+
+    s_ScriptErrors << msg;
+    Manager::Get()->GetLogManager()->LogError(_("Script error: ") + msg);
+}
+
 BEGIN_EVENT_TABLE(ScriptingManager, wxEvtHandler)
 //
 END_EVENT_TABLE()
@@ -97,19 +106,17 @@ ScriptingManager::ScriptingManager()
     //ctor
 
     // initialize but don't load the IO lib
-    //SquirrelVM::Init((SquirrelInitFlags)(sqifAll & ~sqifIO));
-    vm = new ScriptBindings::CBsquirrelVM(1024,(ScriptBindings::VM_LIB_ALL & ~ScriptBindings::VM_LIB_IO));
+    m_vm = new ScriptBindings::CBsquirrelVM(1024,(ScriptBindings::VM_LIB_ALL & ~ScriptBindings::VM_LIB_IO));
 
-    if (!vm->GetVM())
+    if (!m_vm->GetVM())
         cbThrow(_T("Can't create scripting engine!"));
 
-    // TODO (bluehazzard#1#): Errors should not be passed to the std output...
-    vm->SetPrintFunc(ScriptsPrintFunc,ScriptsPrintFunc);
-    vm->SetMeDefault();
+    m_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptErrors);
+    m_vm->SetMeDefault();
     RefreshTrusts();
 
     // register types
-    ScriptBindings::RegisterBindings();
+    ScriptBindings::RegisterBindings(m_vm->GetVM());
 }
 
 ScriptingManager::~ScriptingManager()
@@ -128,6 +135,14 @@ ScriptingManager::~ScriptingManager()
         myMap.insert(myMap.end(), std::make_pair(key, value));
     }
     Manager::Get()->GetConfigManager(_T("security"))->Write(_T("/trusted_scripts"), myMap);
+
+    // delete all plugins
+    scripted_plugin_map::iterator itr;
+    for(itr = m_registered_plugins.begin();itr != m_registered_plugins.end();++itr)
+    {
+        delete itr->second;
+    }
+    m_registered_plugins.clear();
 
     //SquirrelVM::Shutdown();
 }
@@ -156,7 +171,6 @@ bool ScriptingManager::LoadScript(const wxString& filename)
             f.Open(fname);
             found = f.IsOpened();
         }
-
         if (!found)
         {
             // check in standard script dirs
@@ -164,7 +178,7 @@ bool ScriptingManager::LoadScript(const wxString& filename)
             f.Open(fname);
             if (!f.IsOpened())
             {
-                Manager::Get()->GetLogManager()->DebugLog(_T("Can't open script ") + filename);
+                Manager::Get()->GetLogManager()->DebugLog(_("Can't open script ") + filename);
                 return false;
             }
         }
@@ -183,7 +197,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     wxString incName = UnixFilename(debugName);
     if (m_IncludeSet.find(incName) != m_IncludeSet.end())
     {
-        Manager::Get()->GetLogManager()->LogWarning(F(_T("Ignoring Include(\"%s\") because it would cause recursion..."), incName.wx_str()));
+        Manager::Get()->GetLogManager()->LogWarning(F(_("Ignoring Include(\"%s\") because it would cause recursion..."), incName.wx_str()));
         return true;
     }
     m_IncludeSet.insert(incName);
@@ -192,26 +206,12 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
 
     s_ScriptErrors.Clear();
 
-    // TODO (bluehazzard#1#): THIS IS FUCKING UGLY
-    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
-
     // compile script
 
-    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = sq_vm->doString(buffer);
-    if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
+    SC_ERROR_STATE ret = m_vm->doString(buffer,debugName);
+    if(ret != SC_NO_ERROR)
     {
-        // A compiling error occurred
-        wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
-        cbMessageBox(err_msg, _("Script compile error"), wxICON_ERROR);
-        m_IncludeSet.erase(incName);
-        return false;
-    } else if(ret == ScriptBindings::CBsquirrelVM::SC_RUNTIME_ERROR)
-    {
-        // A runtime Error occurred
-        wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
-        cbMessageBox(err_msg, _("Script run error"), wxICON_ERROR);
+        DisplayErrors();
         m_IncludeSet.erase(incName);
         return false;
     }
@@ -221,7 +221,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
 }
 
 
-wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
+wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer,const wxString& name)
 {
 //    wxCriticalSectionLocker c(cs);
 
@@ -230,41 +230,49 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
 
     // FIXME (bluehazzard#1#): Here is a absolute mess with the error handling...
 
-    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+    SQPRINTFUNCTION old_printFunc = nullptr;
+    SQPRINTFUNCTION old_errorFunc = nullptr;
 
-    sq_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptOutput);
+    m_vm->GetPrintFunc(old_printFunc,old_errorFunc);
 
-    //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
-    bool res = LoadBuffer(buffer);
-    //sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
+    // Redirect the script output to the ::capture string
+    m_vm->SetPrintFunc(CaptureScriptOutput,CaptureScriptErrors);
+
+    bool res = LoadBuffer(buffer,name);
+
+    // restore the old output
+    m_vm->SetPrintFunc(old_printFunc,old_errorFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
 }
 
-/*wxString ScriptingManager::GetErrorString(Sqrat::Exception* exception, bool clearErrors)
+wxString ScriptingManager::GetErrorString( bool clearErrors)
 {
-    wxString msg;
-    if (exception)
-        msg.FromUTF8("%s",exception.Message());
-    msg << s_ScriptErrors;
+    //ScriptBindings::StackHandler sa(m_vm->GetVM());
+    return m_vm->getLastErrorMsg();
+    //return sa.GetError(clearErrors);
+}
 
-    if (clearErrors)
-        s_ScriptErrors.Clear();
-
-    return msg;
-}*/
-
-wxString ScriptingManager::GetErrorString(HSQUIRRELVM vm , bool clearErrors)
+bool ScriptingManager::DisplayErrorsAndText(wxString pre_error, bool clearErrors)
 {
-    ScriptBindings::StackHandler sa(vm);
-    return sa.GetError(clearErrors);
+    if(!m_vm->HasError())   // If no error return
+        return false;
+
+    pre_error.Append(GetErrorString(clearErrors));
+    return DisplayErrors(pre_error,clearErrors);
 }
 
 bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
 {
 
     if(error_msg == wxEmptyString)
-        error_msg = GetErrorString(Sqrat::DefaultVM::Get(), clearErrors);
+    {
+        if(!m_vm->HasError())   // If no error return
+            return false;
+
+        error_msg = GetErrorString(clearErrors);
+    }
+
 
     if (!error_msg.IsEmpty())
     {
@@ -278,6 +286,7 @@ bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
                                         true);
             dlg.ShowModal();
         }
+        Manager::Get()->GetLogManager()->DebugLog(_("Scripting error: ") + error_msg);
         return true;
     }
     return false;
@@ -293,22 +302,42 @@ int ScriptingManager::Configure()
     return -1;
 }
 
-bool ScriptingManager::RegisterScriptPlugin(const wxString& /*name*/, const wxArrayInt& ids)
+bool ScriptingManager::RegisterScriptPlugin(const wxString& name, cbScriptPlugin* plugin )
 {
-    // attach this event handler in the main window (one-time run)
-    if (!m_AttachedToMainWindow)
-    {
-        Manager::Get()->GetAppWindow()->PushEventHandler(this);
-        m_AttachedToMainWindow = true;
-    }
 
-    for (size_t i = 0; i < ids.GetCount(); ++i)
-    {
-        Connect(ids[i], -1, wxEVT_COMMAND_MENU_SELECTED,
-                (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
-                &ScriptingManager::OnScriptPluginMenu);
-    }
+    // unregister script...
+    UnRegisterScriptPlugin(name);
+
+    m_registered_plugins.insert(m_registered_plugins.end(),std::make_pair(name,plugin));
+    plugin->CreateMenus();
+
+    Manager::Get()->GetLogManager()->Log(_("Script plugin registered: ") + name);
     return true;
+}
+
+bool ScriptingManager::UnRegisterScriptPlugin(const wxString& name)
+{
+    scripted_plugin_map::iterator itr = m_registered_plugins.find(name);
+    if(itr == m_registered_plugins.end())
+        return false;
+
+    delete itr->second;
+    m_registered_plugins.erase(itr);
+    Manager::Get()->GetLogManager()->Log(_("Script plugin unregistered: ") + name);
+    return true;
+}
+
+bool ScriptingManager::UnInstallScriptPlugin(const wxString& name, bool del_files)
+{
+    // TODO (bluehazzard#1#): Implement uninstall plugin
+
+    return UnRegisterScriptPlugin(name);
+}
+
+bool ScriptingManager::InstallScriptPlugin(const wxString& file)
+{
+    // TODO (bluehazzard#1#): Implement install plugin
+    return false;
 }
 
 bool ScriptingManager::RegisterScriptMenu(const wxString& menuPath, const wxString& scriptOrFunc, bool isFunction)
@@ -349,10 +378,50 @@ bool ScriptingManager::RegisterScriptMenu(const wxString& menuPath, const wxStri
     return false;
 }
 
+void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
+{
+    MenuIDToScript::iterator it = m_MenuIDToScript.find(event.GetId());
+    if (it == m_MenuIDToScript.end())
+    {
+        cbMessageBox(_("No script associated with this menu?!?"), _("Error"), wxICON_ERROR);
+        return;
+    }
+
+    MenuBoundScript& mbs = it->second;
+
+    // is it a function?
+    if (mbs.isFunc)
+    {
+        Sqrat::Function call_back(Sqrat::RootTable(),mbs.scriptOrFunc.ToUTF8());
+        if (call_back.IsNull())
+            return;
+        call_back();
+
+        if(DisplayErrors())
+        {
+            //DisplayErrors(sa.GetError());
+        }
+        return;
+    }
+
+    // script loading below
+
+    if (wxGetKeyState(WXK_SHIFT))
+    {
+        wxString script = ConfigManager::LocateDataFile(mbs.scriptOrFunc, sdScriptsUser | sdScriptsGlobal);
+        Manager::Get()->GetEditorManager()->Open(script);
+        return;
+    }
+
+    if (!LoadScript(mbs.scriptOrFunc))
+        cbMessageBox(_("Could not run script: ") + mbs.scriptOrFunc, _("Error"), wxICON_ERROR);
+
+}
+
 bool ScriptingManager::UnRegisterScriptMenu(cb_unused const wxString& menuPath)
 {
     // TODO: not implemented
-    Manager::Get()->GetLogManager()->DebugLog(_T("ScriptingManager::UnRegisterScriptMenu() not implemented"));
+    Manager::Get()->GetLogManager()->DebugLog(_("ScriptingManager::UnRegisterScriptMenu() not implemented"));
     return false;
 }
 
@@ -377,6 +446,7 @@ bool ScriptingManager::IsScriptTrusted(const wxString& script)
     m_TrustedScripts.erase(it);
     return false;
 }
+
 
 bool ScriptingManager::IsCurrentlyRunningScriptTrusted()
 {
@@ -444,57 +514,90 @@ const ScriptingManager::TrustedScripts& ScriptingManager::GetTrustedScripts()
     return m_TrustedScripts;
 }
 
-void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
+
+int ScriptingManager::ExecutePlugin(wxString Name)
 {
-    MenuIDToScript::iterator it = m_MenuIDToScript.find(event.GetId());
-    if (it == m_MenuIDToScript.end())
-    {
-        cbMessageBox(_("No script associated with this menu?!?"), _("Error"), wxICON_ERROR);
-        return;
-    }
-
-    MenuBoundScript& mbs = it->second;
-
-    // is it a function?
-    if (mbs.isFunc)
-    {
-
-        Sqrat::Function call_back(Sqrat::RootTable(),mbs.scriptOrFunc.ToUTF8());
-        if (call_back.IsNull())
-            return;
-        call_back();
-        // FIXME (bluehazzard#1#): Check the vm...
-        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
-        if(sa.HasError())
-        {
-            DisplayErrors(sa.GetError());
-        }
-        return;
-    }
-
-    // script loading below
-
-    if (wxGetKeyState(WXK_SHIFT))
-    {
-        wxString script = ConfigManager::LocateDataFile(mbs.scriptOrFunc, sdScriptsUser | sdScriptsGlobal);
-        Manager::Get()->GetEditorManager()->Open(script);
-        return;
-    }
-
-
-    // run script
-    //try
-    //{
-        if (!LoadScript(mbs.scriptOrFunc))
-            cbMessageBox(_("Could not run script: ") + mbs.scriptOrFunc, _("Error"), wxICON_ERROR);
-    //}
-    //catch (SquirrelError exception)
-    //{
-    //    DisplayErrors(&exception);
-    //}
+    scripted_plugin_map::iterator itr =  m_registered_plugins.find(Name);
+    if(itr == m_registered_plugins.end())
+        return -3;  // The script with the name _Name_ could not be found
+    return itr->second->Execute();
 }
 
-void ScriptingManager::OnScriptPluginMenu(wxCommandEvent& event)
+cbScriptPlugin* ScriptingManager::GetPlugin(wxString Name)
 {
-    ScriptBindings::ScriptPluginWrapper::OnScriptMenu(event.GetId());
+    scripted_plugin_map::iterator itr =  m_registered_plugins.find(Name);
+    if(itr == m_registered_plugins.end())
+        return nullptr;  // The script with the name _Name_ could not be found
+    return itr->second;
+}
+
+void ScriptingManager::CreateModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data)
+{
+    scripted_plugin_map::iterator itr;
+    for(itr = m_registered_plugins.begin(); itr != m_registered_plugins.end();++itr)
+    {
+        itr->second->BuildModuleMenu(type,menu,data);
+    }
+}
+
+cbScriptPlugin* ScriptingManager::GetPlugin(unsigned int index)
+{
+    unsigned int i = 0;
+    scripted_plugin_map::iterator itr;
+    for(itr = m_registered_plugins.begin(); itr != m_registered_plugins.end();++itr)
+    {
+        if(i == index)
+        {
+            return itr->second;
+        }
+        i++;
+    }
+
+    return nullptr;
+}
+
+ScriptBindings::CBSquirrelThread* ScriptingManager::CreateSandbox()
+{
+    return m_vm->CreateThread();
+}
+
+int ScriptingManager::LoadFileFromZip(wxString path,wxString file,wxString& contents)
+{
+
+    wxString filename = path + _T("#zip:") + file;
+
+    contents.Clear();
+
+    wxFileSystem* fs = new wxFileSystem;
+    wxFSFile* f = fs->OpenFile(filename);
+    if (f)
+    {
+        wxInputStream* is = f->GetStream();
+        wxFileOffset file_length = is->GetLength();
+        if(file_length == wxInvalidOffset)
+        {
+            delete fs;
+            delete f;
+            Manager::Get()->GetLogManager()->LogWarning(_("file length for ") + filename+ _("is invlaid"));
+            return -1;
+        }
+        char tmp[1024] = {};
+        while (!is->Eof() && is->CanRead())
+        {
+            memset(tmp, 0, sizeof(tmp));
+            is->Read(tmp, sizeof(tmp) - 1);
+            contents << wxString::FromUTF8((const char*)tmp);
+        }
+        delete f;
+    }
+    else
+    {
+        delete fs;
+        Manager::Get()->GetLogManager()->LogWarning(_("Could not find File ") + filename );
+        return -2;
+    }
+    delete fs;
+
+    return 0;
+
 }

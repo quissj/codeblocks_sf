@@ -7,9 +7,6 @@ AM_CPPFLAGS = $(WX_CXXFLAGS) \
 			-I$(top_srcdir)/src/sdk/wxscintilla/include \
 			 $(WXPROPGRID_INCLUDE) \
 			-I$(top_srcdir)/src/include/tinyxml \
-			-I$(top_srcdir)/src/include/scripting/include \
-			-I$(top_srcdir)/src/include/scripting/bindings \
- 			-I$(top_srcdir)/src/include/scripting/sqplus \
  			-I$(top_srcdir)/src/include/mozilla_chardet \
  			-I$(top_srcdir)/src/include/mozilla_chardet/mfbt \
  			-I$(top_srcdir)/src/include/mozilla_chardet/nsprpub/pr/include \
@@ -22,7 +19,6 @@ lib_LTLIBRARIES = libcodeblocks.la
 libcodeblocks_la_LDFLAGS = -version-info @CODEBLOCKS_VERSION_INFO@
 
 libcodeblocks_la_LIBADD = scripting/bindings/libsqbindings.la \
-			scripting/sqplus/libsqplus.la \
 			scripting/sqstdlib/libsqstdlib.la \
 			scripting/squirrel/libsquirrel.la \
 			../base/tinyxml/libtinyxml.la \

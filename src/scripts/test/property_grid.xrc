@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<resource xmlns="http://www.wxwindows.org/wxxrc">
+	<object class="wxDialog" name="test_dialog">
+		<style>wxDEFAULT_DIALOG_STYLE</style>
+		<size>865,361</size>
+		<title></title>
+		<centered>1</centered>
+        <object class="wxPropertyGrid" name="m_propertygrid">
+            <size>800,200</size>
+            <property class="wxBoolProperty">
+                <label>Test item1</label>
+                <name>Test_time1_name</name>
+                <value>true</value>
+            </property>
+        </object>
+        <object class="wxButton" name="clickme_btn">
+            <label>Build</label>
+            <default>0</default>
+		</object>
+    </object>
+</resource>

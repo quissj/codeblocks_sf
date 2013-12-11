@@ -36,10 +36,10 @@ typedef void(*FreePluginProc)(cbPlugin*);
 /** Information about the plugin */
 struct PluginInfo
 {
-    wxString name;
-    wxString title;
-    wxString version;
-    wxString description;
+    wxString name;              /**< The name of the plugin */
+    wxString title;             /**< The title of the plugin */
+    wxString version;           /**< The plugin version*/
+    wxString description;       /**< A description*/
     wxString author;
     wxString authorEmail;
     wxString authorWebsite;
@@ -47,7 +47,7 @@ struct PluginInfo
     wxString license;
 };
 
-// struct with info about each pluing
+// struct with info about each plugin
 struct PluginElement
 {
     PluginInfo info; // plugin's info struct
@@ -56,6 +56,39 @@ struct PluginElement
     FreePluginProc freeProc; // plugin's release function pointer
     cbPlugin* plugin; // the plugin itself
 };
+
+struct InstallInfo
+{
+    InstallInfo()
+    {
+
+    }
+
+    InstallInfo(InstallInfo* info)
+    {
+        copy(info);
+    }
+
+    void copy(InstallInfo* info)
+    {
+        if(info == nullptr)
+            return;
+
+        name = info->name;
+        version_major = info->version_major;
+        version_minor = info->version_minor;
+        type = info->type;
+        InstallScript = info->InstallScript;
+    }
+
+    wxString name;
+    int version_major;
+    int version_minor;
+    wxString type;
+    wxString InstallScript;
+
+};
+
 
 WX_DEFINE_ARRAY(PluginElement*, PluginElementsArray);
 WX_DEFINE_ARRAY(cbPlugin*, PluginsArray);
@@ -85,7 +118,9 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
                             FreePluginProc freeProc,
                             PluginSDKVersionProc versionProc);
 
+        int ScanForScriptPlugins(const wxString& path);
         int ScanForPlugins(const wxString& path);
+        bool LoadScriptPlugin(const wxString& pluginName);
         bool LoadPlugin(const wxString& pluginName);
         void LoadAllPlugins();
         void UnloadAllPlugins();
@@ -96,7 +131,9 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool DetachPlugin(cbPlugin* plugin);
 
         bool InstallPlugin(const wxString& pluginName, bool forAllUsers = true, bool askForConfirmation = true);
+        bool InstallScriptPlugin(const wxString& pluginName,InstallInfo* info = nullptr, bool forAllUsers = true, bool askForConfirmation = true);
         bool UninstallPlugin(cbPlugin* plugin, bool removeFiles = true);
+        bool UninstallScriptPlugin(const wxString& pluginName, bool removeFiles);
         bool ExportPlugin(cbPlugin* plugin, const wxString& filename);
 
         const PluginInfo* GetPluginInfo(const wxString& pluginName);
@@ -128,17 +165,32 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
 
         static void SetSafeMode(bool on){ s_SafeMode = on; }
         static bool GetSafeMode(){ return s_SafeMode; }
+
+
     private:
         PluginManager();
         ~PluginManager();
-
-        void OnScriptMenu(wxCommandEvent& event);
-        void OnScriptModuleMenu(wxCommandEvent& event);
 
         /// @return True if the plugin should be loaded, false if not.
         bool ReadManifestFile(const wxString& pluginFilename,
                                 const wxString& pluginName = wxEmptyString,
                                 PluginInfo* infoOut = nullptr);
+
+
+        /** \brief Read the install.xml file from a .cbplugin
+         *
+         * \param
+         * \param
+         * \return  0 if all is ok
+         *         -1 if infoOut is invalid
+         *         -2 file has no install.xml
+         *         -3 if the file has an error
+         *
+         */
+        int ReadInstallInfo(const wxString& pluginFilename,
+                            InstallInfo* infoOut);
+
+
         void ReadExtraFilesFromManifestFile(const wxString& pluginFilename,
                                             wxArrayString& extraFiles);
         bool ExtractFile(const wxString& bundlename,
@@ -150,6 +202,13 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         wxString m_CurrentlyLoadingFilename;
         wxDynamicLibrary* m_pCurrentlyLoadingLib;
         TiXmlDocument* m_pCurrentlyLoadingManifestDoc;
+
+        enum INSTALL_STATUS
+        {
+            STATUS_INSTALL  = 0,
+            STATUS_ERROR    = -1,
+            STATUS_USER_ABORT = -2
+        };
 
         // this struct fills the following vector each time
         // RegisterPlugin() is called.

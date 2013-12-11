@@ -39,8 +39,8 @@
 
 #include <wx/radiobox.h>
 
-// FIXME (bluehazzard#1#): sqrat
-#include <sqrat.h>
+
+#include <scripting/sqrat.h>
 
 #include "annoyingdialog.h"
 #include "configurationpanel.h"
@@ -934,14 +934,14 @@ bool ProjectOptionsDlg::IsScriptValid(ProjectBuildTarget* target, const wxString
     wxString script_nomacro = script;
     Manager::Get()->GetMacrosManager()->ReplaceMacros(script_nomacro, target);
     script_nomacro = wxFileName(script_nomacro).IsAbsolute() ? script_nomacro : m_Project->GetBasePath() + wxFILE_SEP_PATH + script_nomacro;
-    Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts); // clear previous script's context
+    Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts,_T("ClearBuildScripts")); // clear previous script's context
     Manager::Get()->GetScriptingManager()->LoadScript(script_nomacro);
     //SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetModuleMenu");
     Sqrat::Function setopts(Sqrat::RootTable(Sqrat::DefaultVM::Get()), "SetBuildOptions");
     if (setopts.IsNull())
         return false;
 
-    wxString Errors = Manager::Get()->GetScriptingManager()->GetErrorString(Sqrat::DefaultVM::Get(),true);
+    wxString Errors = Manager::Get()->GetScriptingManager()->GetErrorString(true);
     if(Errors!= wxEmptyString)
     {
         Manager::Get()->GetScriptingManager()->DisplayErrors(Errors);
