@@ -1,5 +1,7 @@
 
 
+#include <globals.h>
+#include <cbexception.h>
 #include <wx/msgdlg.h>
 #include <squirrel.h>
 #include <sqstdblob.h>
@@ -106,6 +108,9 @@ CBsquirrelVM::CBsquirrelVM(int initialStackSize,const uint32_t library_to_load) 
     sq_pop(m_vm, 1);    // Pop the root table
 
     m_lib_loaded = library_to_load;
+
+    // FIXME (bluehazzard#1#): temporary set me as default vm
+    Sqrat::DefaultVM::Set(m_vm);
 }
 
 CBsquirrelVM::~CBsquirrelVM()
@@ -277,6 +282,8 @@ CBsquirrelVM::SC_ERROR_STATE CBsquirrelVM::doString(const wxString str)
 
 void CBsquirrelVM::SetMeDefault()
 {
+    if(m_vm == nullptr)
+        cbThrow(_("Cant set nullptr as default vm"));
     Sqrat::DefaultVM::Set(m_vm);
 }
 
