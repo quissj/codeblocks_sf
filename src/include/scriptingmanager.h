@@ -18,8 +18,14 @@
 #include "manager.h"
 #include "menuitemsmanager.h"
 #include <wx/intl.h>
-#include <sc_cb_vm.h>
-#include <sqrat/sqratUtil.h>
+#include <scripting/bindings/sc_cb_vm.h>
+#include <scripting/sqrat/sqratUtil.h>
+#include <scripting/bindings/sc_plugin.h>
+
+namespace ScriptBindings
+{
+    class cbScriptPlugin;
+}
 
 
 void PrintSquirrelToWxString(wxString &msg,const SQChar *s, va_list& vl);
@@ -51,6 +57,9 @@ void PrintSquirrelToWxString(wxString &msg,const SQChar *s, va_list& vl);
   * The templated type denotes the function's return type. Also note that the
   * function name is not unicode (we 're not using Squirrel in unicode mode).
   */
+
+using namespace ScriptBindings;
+
 class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHandler
 {
         friend class Mgr<ScriptingManager>;
@@ -80,14 +89,14 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           * @param debugName A debug name. This will appear in any errors displayed.
           * @return True if the script compiled, false if not.
           */
-        bool LoadBuffer(const wxString& buffer, const wxString& debugName = _T("CommandLine"));
+        bool LoadBuffer(const wxString& buffer, const wxString& debugName/* = _T("CommandLine")*/);
 
         /** @brief Loads a string buffer and captures its output.
           *
           * @param buffer The script buffer to compile and run.
           * @return The script's output (if any).
           */
-        wxString LoadBufferRedirectOutput(const wxString& buffer);
+        wxString LoadBufferRedirectOutput(const wxString& buffer,const wxString& name);
 
         // TODO (bluehazzard#1#): Delete this if the Sqrat API doesn't change
         /** @brief Returns an accumulated error string.
@@ -100,7 +109,7 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           * @return The error string. If empty, it means "no errors".
           */
         //wxString GetErrorString(Sqrat::Exception* exception = nullptr, bool clearErrors = true);
-        wxString GetErrorString(HSQUIRRELVM vm = Sqrat::DefaultVM::Get(), bool clearErrors = true);
+        wxString GetErrorString(bool clearErrors = true);
 
         /** @brief Display error dialog.
           *
@@ -113,6 +122,18 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           * @return _true_ if a error occurred, _false_ otherwise
           */
         bool DisplayErrors(wxString error_msg = wxEmptyString, bool clearErrors = true);
+
+        /** @brief Display error dialog.
+          *
+          * Displays an error dialog containing exception info and any other
+          * script errors. If error_msg isempty the GetErrorString String is called
+          * internally and if no error is found no error is displayed and the function returns _false_
+          * @param pre_error Text printed previous the error
+          * @param clearErrors If true (default), when this function returns all
+          *        accumulated error messages are cleared.
+          * @return _true_ if a error occurred, _false_ otherwise
+          */
+        bool DisplayErrorsAndText(wxString pre_error, bool clearErrors = true);
 
         /** @brief Injects script output.
           *
@@ -130,13 +151,21 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           */
         int Configure();
 
-        /** @brief Registers a script plugin menu IDs with the callback function.
+        /** @brief Registers a script plugin
           *
           * @param name The script plugin's name.
           * @param ids The menu IDs to bind.
           * @return True on success, false on failure.
           */
-        bool RegisterScriptPlugin(const wxString& name, const wxArrayInt& ids);
+        bool RegisterScriptPlugin(const wxString& name, ScriptBindings::cbScriptPlugin* plugin);
+
+        /** @brief Unregisters a script plugin
+          *
+          * @param name The script plugin's name.
+          * @param ids The menu IDs to bind.
+          * @return True on success, false on failure.
+          */
+        bool UnRegisterScriptPlugin(const wxString& name);
 
         /** @brief Script-bound function to register a script with a menu item.
           *
@@ -227,6 +256,51 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         	cbThrow(_T("Can't assign a ScriptingManager* !!!"));
         	return *this;
 		}
+
+		ScriptBindings::CBSquirrelThread * CreateSandbox();
+
+		ScriptBindings::CBsquirrelVM* GetVM()       {return m_vm;};
+
+
+        /** \brief Search the plugin _Name_ and run its _Execute_ function
+         *
+         * \param Name wxString
+         * \return int  1 On success
+         *             -1 On script error. The error was reported by the script
+         *             -2 "Execute" could not be found in the script
+         *             -3 The script _Name_ could not be found
+         *
+         */
+		int ExecutePlugin(wxString Name);
+
+        /** \brief Search and return the Plugin with the _Name_
+         *
+         * \param Name wxString
+         * \return cbScriptPlugin* nullptr it not found
+         *
+         */
+		cbScriptPlugin* GetPlugin(wxString Name);
+
+        /** \brief Ask all script plugins to create the "right click" menu
+         *
+         * \param type const ModuleType
+         * \param menu wxMenu*
+         * \param data const FileTreeData*
+         * \return void
+         *
+         */
+		void CreateModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data);
+
+		unsigned int GetPluginCount()       {return m_registered_plugins.size();};
+
+		cbScriptPlugin* GetPlugin(unsigned int index);
+
+		bool UnInstallScriptPlugin(const wxString& name, bool del_files = true);
+        bool InstallScriptPlugin(const wxString& file);
+
+
+        int LoadFileFromZip(wxString path,wxString file,wxString& contents);
+
     private:
         // needed for SqPlus bindings
         ScriptingManager(cb_unused const ScriptingManager& rhs); // prevent copy construction
@@ -250,6 +324,9 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         typedef std::map<int, MenuBoundScript> MenuIDToScript;
         MenuIDToScript m_MenuIDToScript;
 
+        typedef std::map<wxString,cbScriptPlugin*> scripted_plugin_map;
+        scripted_plugin_map m_registered_plugins;
+
         bool m_AttachedToMainWindow;
         wxString m_CurrentlyRunningScriptFile;
 
@@ -258,7 +335,8 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
 
         MenuItemsManager m_MenuItemsManager;
 
-        ScriptBindings::CBsquirrelVM* vm;
+        ScriptBindings::CBsquirrelVM* m_vm;
+
 
         DECLARE_EVENT_TABLE()
 };

@@ -8,7 +8,7 @@
  */
 
 #include <sdk.h>
-#include <sqrat.h>
+#include <scripting/sqrat.h>
 
 #include "scriptconsole.h"
 
@@ -127,7 +127,7 @@ ScriptConsole::ScriptConsole(wxWindow* parent,wxWindowID id)
     {
 
         s_Console = this;
-        ScriptBindings::CBsquirrelVM *vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+        ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
         if(vm == nullptr)
         {
             // We have no vm registered...
@@ -137,7 +137,7 @@ ScriptConsole::ScriptConsole(wxWindow* parent,wxWindowID id)
             vm->SetPrintFunc(ScriptConsolePrintFunc,ScriptConsoleErrorFunc);
         }
     }
-    Log(_("Welcome to the script console!"));
+    Log(_("Welcome to the script console!\n"));
 }
 
 ScriptConsole::~ScriptConsole()
@@ -159,8 +159,8 @@ ScriptConsole::~ScriptConsole()
 void ScriptConsole::Log(const wxString& msg)
 {
     txtConsole->AppendText(msg);
-    /*if (msg.Last() != _T('\n'))
-        txtConsole->AppendText(_T('\n'));*/
+//    if (msg.Last() != _T('\n'))
+//        txtConsole->AppendText(_T('\n'));
 //    txtConsole->ScrollLines(-1);
     Manager::ProcessPendingEvents();
 }
@@ -170,7 +170,6 @@ void ScriptConsole::Error(const wxString& msg)
 {
     wxTextAttr old = txtConsole->GetDefaultStyle();
     txtConsole->SetDefaultStyle(wxTextAttr(wxColor(235,0,0)));
-     txtConsole->AppendText(_T('\n'));  //error in new line....
     txtConsole->AppendText(msg);
     if (msg.Last() != _T('\n'))
         txtConsole->AppendText(_T('\n'));
@@ -191,7 +190,7 @@ void ScriptConsole::OnbtnExecuteClick(cb_unused wxCommandEvent& event)
     }
 
     Log(_T("> ") + cmd);
-    if (Manager::Get()->GetScriptingManager()->LoadBuffer(cmd, _T("ScriptConsole")))
+    if (Manager::Get()->GetScriptingManager()->LoadBuffer(cmd, _("ScriptConsole")))
     {
         if (txtCommand->FindString(cmd) == wxNOT_FOUND)
             txtCommand->Insert(cmd, 1); // right after the blank entry
@@ -216,10 +215,10 @@ void ScriptConsole::OnbtnLoadClick(cb_unused wxCommandEvent& event)
     {
         mgr->Write(_T("/file_dialogs/file_run_script/directory"), dlg.GetDirectory());
         if (Manager::Get()->GetScriptingManager()->LoadScript(dlg.GetPath()))
-            Log(_("Script loaded successfully"));
+            Log(_("Script loaded successfully\n"));
         else
         {
-            Error(_("Loading script failed."));
+            Error(_("Loading script failed.\n"));
             Error(Manager::Get()->GetScriptingManager()->GetErrorString());
         }
     }

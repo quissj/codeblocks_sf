@@ -71,7 +71,6 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
 					<Add directory="include/scripting/squirrel" />
 				</Compiler>
 			</Target>
@@ -84,21 +83,8 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
 					<Add directory="include/scripting/sqstdlib" />
-				</Compiler>
-			</Target>
-			<Target title="SqPlus">
-				<Option output="sdk/scripting/lib/sqplus30" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="" />
-				<Option object_output=".objs30" />
-				<Option external_deps="sdk/scripting/lib/libsquirrel30.a;sdk/scripting/lib/libsqstdlib30.a;" />
-				<Option type="2" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/squirrel" />
 				</Compiler>
 			</Target>
 			<Target title="scintilla">
@@ -136,9 +122,6 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="include/tinyxml" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -149,7 +132,6 @@
 				<Linker>
 					<Add library="txml30" />
 					<Add library="wxscintilla_cb" />
-					<Add library="sqplus30" />
 					<Add library="sqstdlib30" />
 					<Add library="squirrel30" />
 					<Add directory="devel30" />
@@ -173,8 +155,6 @@
 					<Add option="-DENABLE_BINRELOC" />
 					<Add option="-DUSE_GTK_NOTEBOOK" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -200,9 +180,6 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
-					<Add directory="include/scripting/bindings" />
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs`" />
@@ -277,8 +254,6 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="plugins/compilergcc/depslib/src" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs std,propgrid`" />
@@ -301,8 +276,6 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs`" />
@@ -456,8 +429,6 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs`" />
@@ -528,7 +499,7 @@
 			</Environment>
 		</Build>
 		<VirtualTargets>
-			<Add alias="All" targets="tinyXML;AutoRevision;ConsoleRunner;Squirrel;Squirrel std lib;SqPlus;scintilla;sdk;src;Abbreviations;AStyle;Autosave;Compiler depslib;Compiler;Debugger;Code-completion;Class wizard;Default MIME handler;Occurrences Highlighting;Open files list;Projects-workspaces importer;Scripted wizard;To-do;" />
+			<Add alias="All" targets="tinyXML;AutoRevision;ConsoleRunner;Squirrel;Squirrel std lib;scintilla;sdk;src;Abbreviations;AStyle;Autosave;Compiler depslib;Compiler;Debugger;Code-completion;Class wizard;Default MIME handler;Occurrences Highlighting;Open files list;Projects-workspaces importer;Scripted wizard;To-do;" />
 			<Add alias="Core app &amp; plugins" targets="sdk;src;AStyle;Autosave;Compiler depslib;Compiler;Debugger;Code-completion;Class wizard;Default MIME handler;Occurrences Highlighting;Open files list;Projects-workspaces importer;Scripted wizard;To-do;" />
 			<Add alias="Third-party libs" targets="tinyXML;AutoRevision;ConsoleRunner;Squirrel;Squirrel std lib;SqPlus;scintilla;Compiler depslib;" />
 		</VirtualTargets>
@@ -972,59 +943,80 @@
 		<Unit filename="include/scripting/bindings/sc_base_types.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sc_binding_util.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sc_cb_vm.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/bindings/sc_plugin.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/scriptbindings.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqdbgserver.h">
-			<Option target="Squirrel" />
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqrdbg.h">
-			<Option target="Squirrel" />
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_base_controls.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdaux.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_dialog.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdblob.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdio.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/sqrat.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdmath.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/sqrat/sqratAllocator.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdstring.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/sqrat/sqratArray.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqstdsystem.h">
-			<Option target="Squirrel std lib" />
+		<Unit filename="include/scripting/sqrat/sqratClass.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/squirrel.h">
-			<Option target="Squirrel" />
+		<Unit filename="include/scripting/sqrat/sqratClassType.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SqPlusConst.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratConst.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelBindingsUtils.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratFunction.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelBindingsUtilsWin32.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratGlobalMethods.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelObject.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratMemberMethods.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelVM.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratObject.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/sqplus.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratOverloadMethods.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/sqplusWin32.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqratScript.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqratTable.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqratTypes.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqratUtil.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqratVM.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqratext_Ref.h">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/sqstdlib/sqstdblobimpl.h">
 			<Option target="Squirrel std lib" />
@@ -1043,6 +1035,10 @@
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqcompiler.h">
 			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqdbgserver.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqfuncproto.h">
 			<Option target="Squirrel" />
@@ -1065,14 +1061,46 @@
 		<Unit filename="include/scripting/squirrel/sqpcheader.h">
 			<Option target="Squirrel" />
 		</Unit>
+		<Unit filename="include/scripting/squirrel/sqrdbg.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
 		<Unit filename="include/scripting/squirrel/sqstate.h">
 			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdaux.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdblob.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdio.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdmath.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdstring.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdsystem.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqstring.h">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqtable.h">
 			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/squirrel.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/squserdata.h">
 			<Option target="Squirrel" />
@@ -2300,6 +2328,9 @@
 		<Unit filename="plugins/xpmanifest/windowsxplooknfeel.h">
 			<Option target="XP look &amp; feel" />
 		</Unit>
+		<Unit filename="scripts/ConvertOldToNewScript.script">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="scripts/gdb_types.script">
 			<Option target="Debugger" />
 		</Unit>
@@ -2313,6 +2344,32 @@
 			<Option target="src" />
 		</Unit>
 		<Unit filename="scripts/startup.script">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="scripts/test/event-test-plugin.script">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="scripts/test/script-test-plugin.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
+		</Unit>
+		<Unit filename="scripts/test/test_base.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/test/user-dialog-test-plugin.script">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="scripts/test/wx-test.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
+		</Unit>
+		<Unit filename="scripts/test/xrc-test-plugin.script">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="scripts/wx_help.script">
@@ -2982,6 +3039,9 @@
 		<Unit filename="sdk/resources/select_target.xrc">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="sdk/scripting/bindings/sc_cb_vm.cpp">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="sdk/scripting/bindings/sc_consts.cpp">
 			<Option target="sdk" />
 		</Unit>
@@ -3009,22 +3069,23 @@
 		<Unit filename="sdk/scripting/bindings/scriptbindings.cpp">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SqPlus.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_util_dialogs.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelBindingsUtils.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelBindingsUtilsWin32.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_base_controls.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelObject.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_constants.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelVM.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_dialog.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_string.cpp">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/sqstdlib/sqstdaux.cpp">
 			<Option target="Squirrel std lib" />

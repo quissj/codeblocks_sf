@@ -1,1 +1,1 @@
-SUBDIRS = squirrel sqstdlib sqplus bindings
+SUBDIRS = squirrel sqstdlib bindings

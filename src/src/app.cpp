@@ -47,7 +47,8 @@
 #include "crashhandler.h"
 #include "projectmanagerui.h"
 #include "splashscreen.h"
-#include <sqrat.h>
+#include <scripting/sqrat.h>
+
 
 #ifndef __WXMSW__
     #include "prefix.h" // binreloc
@@ -726,7 +727,9 @@ bool CodeBlocksApp::OnInit()
             LoaderBase* loader = Manager::Get()->GetFileManager()->Load(m_Script);
 
             if (loader->GetData())
-                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()));
+                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()),_("Command_line_script"));
+
+            Manager::Get()->GetScriptingManager()->DisplayErrors();
 
             delete loader;
             frame->Close();
@@ -742,7 +745,8 @@ bool CodeBlocksApp::OnInit()
 
         if (!startup.IsEmpty())
         {
-            bool ret =  Manager::Get()->GetScriptingManager()->LoadScript(startup);
+            Manager::Get()->GetScriptingManager()->LoadScript(startup);
+            Manager::Get()->GetScriptingManager()->DisplayErrors();
         }
         Manager::ProcessPendingEvents();
 

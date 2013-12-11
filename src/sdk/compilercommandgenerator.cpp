@@ -26,7 +26,7 @@
 
 // FIXME (bluehazzard#1#): sqrat
 #include "scripting/bindings/sc_base_types.h"
-#include "sc_cb_vm.h"
+#include "scripting/bindings/sc_cb_vm.h"
 
 // move this to globals if needed
 inline wxString UnquoteStringIfNeeded(const wxString& str)
@@ -519,7 +519,7 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
         }
 
         // clear previous script's context
-        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts);
+        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts,_T("ClearBuildScript"));
 
         // if the script doesn't exist, just return
         if (!Manager::Get()->GetScriptingManager()->LoadScript(script_nomacro))
@@ -527,8 +527,8 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             m_NotLoadedScripts.Add(script_nomacro);
             continue;
         }
-
-        Sqrat::Function func(Sqrat::RootTable(),funcName.ToUTF8());
+        ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
+        Sqrat::Function func(Sqrat::RootTable(vm->GetVM()),funcName.ToUTF8());
         if(func.IsNull())
         {
             //Could not find the function
@@ -538,11 +538,10 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             m_ScriptsWithErrors.Add(script_nomacro);
         }
         func(target);
-        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
-        if(sa.HasError())
+        if(vm->HasError())
         {
             wxString msg;
-            msg << _("In Script ") << script_nomacro << _(" occurred this error: ") << sa.GetError();
+            msg << _("In Script ") << script_nomacro << _(" occurred this error:\n ") << vm->getLastErrorMsg();
             Manager::Get()->GetScriptingManager()->DisplayErrors(msg);
             m_ScriptsWithErrors.Add(script_nomacro);
         }

@@ -15,7 +15,9 @@
     #include <wx/string.h>
 #endif
 
-#include "sc_base_types.h"
+#include <scripting/squirrel/squirrel.h>
+#include <scripting/squirrel/sqvm.h>
+#include "scripting/bindings/sc_base_types.h"
 
 #include <editarrayfiledlg.h>
 #include <editarrayorderdlg.h>
@@ -67,7 +69,6 @@ namespace ScriptBindings
         sq_setinstanceup(vm, 1, dlg);
         sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<EditArrayFileDlg>::Delete);
         return SC_RETURN_OK;
-        //return SqPlus::PostConstruct<EditArrayFileDlg>(v, dlg, EditArrayFileDlg_Dtor);
     }
 
     /*SQInteger EditArrayOrderDlg_Dtor(SQUserPointer up, cb_unused SQInteger size)
@@ -238,7 +239,6 @@ namespace ScriptBindings
         sq_setinstanceup(vm, 1, dlg);
         sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<EditPathDlg>::Delete);
         return SC_RETURN_OK;
-        //return SqPlus::PostConstruct<EditPathDlg>(v, dlg, EditPathDlg_Dtor);
     }
 
     /*SQInteger GenericMultiLineNotesDlg_Dtor(SQUserPointer up, cb_unused SQInteger size)
@@ -279,7 +279,6 @@ namespace ScriptBindings
         sq_setinstanceup(vm, 1, dlg);
         sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<GenericMultiLineNotesDlg>::Delete);
         return SC_RETURN_OK;
-        //return SqPlus::PostConstruct<GenericMultiLineNotesDlg>(v, dlg, GenericMultiLineNotesDlg_Dtor);
     }
 
     SQInteger ShowModalForDialogs(HSQUIRRELVM vm)

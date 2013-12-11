@@ -29,6 +29,8 @@
 #include "occurrencespanel.h"
 #include "occurrenceshighlightingconfigurationpanel.h"
 
+// TODO (bluehazzard#1#): Remove the scripting include paths from the build target
+
 // Register the plugin with Code::Blocks.
 // We are using an anonymous namespace so we don't litter the global one.
 namespace

@@ -835,11 +835,12 @@ void MainFrame::SetupDebuggerUI()
 
 void MainFrame::RegisterScriptFunctions()
 {
-    Sqrat::Class<MainFrame,Sqrat::NoConstructor<MainFrame> > main_frame(Sqrat::DefaultVM::Get(), "MainFrame");
+    ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
+    Sqrat::Class<MainFrame,Sqrat::NoConstructor<MainFrame> > main_frame(vm->GetVM(), "MainFrame");
     main_frame.Func("Open",&MainFrame::Open);
 
-    Sqrat::RootTable(Sqrat::DefaultVM::Get()).Bind("MainFrame",main_frame);
-    Sqrat::RootTable(Sqrat::DefaultVM::Get()).SetInstance("App",this);
+    Sqrat::RootTable(vm->GetVM()).Bind("MainFrame",main_frame);
+    Sqrat::RootTable(vm->GetVM()).SetInstance("App",this);
 
     //SqPlus::BindVariable(this,, SqPlus::VAR_ACCESS_READ_ONLY);
 }

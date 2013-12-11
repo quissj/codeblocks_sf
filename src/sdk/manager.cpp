@@ -499,13 +499,13 @@ CCManager* Manager::GetCCManager() const
     return CCManager::Get();
 }
 
-bool Manager::LoadResource(const wxString& file)
+wxString Manager::FindAndLoadResource(const wxString& file)
 {
     wxString resourceFile = ConfigManager::LocateDataFile(file, sdDataGlobal | sdDataUser);
     wxString memoryFile = _T("memory:") + file;
 
     if (wxFile::Access(resourceFile, wxFile::read) == false)
-        return false;
+        return wxEmptyString;
 
     // The code below forces a reload of the resource
     // Currently unused...
@@ -531,13 +531,21 @@ bool Manager::LoadResource(const wxString& file)
         }
         wxXmlResource::Get()->Load(memoryFile);
         delete[] buf;
-        return true;
+        return memoryFile;
     }
     catch (...)
     {
         delete[] buf;
-        return false;
+        return wxEmptyString;
     }
+}
+
+bool Manager::LoadResource(const wxString& file)
+{
+    if(FindAndLoadResource(file) == wxEmptyString)
+        return false;
+
+    return true;
 }
 
 wxCmdLineParser* Manager::GetCmdLineParser()

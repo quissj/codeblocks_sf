@@ -17,7 +17,7 @@
 
 #include <wx/progdlg.h>
 
-#include "sc_base_types.h"
+#include "scripting/bindings/sc_base_types.h"
 
 class ProgressDialog : public wxProgressDialog
 {
