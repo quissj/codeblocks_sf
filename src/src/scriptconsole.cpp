@@ -159,8 +159,8 @@ ScriptConsole::~ScriptConsole()
 void ScriptConsole::Log(const wxString& msg)
 {
     txtConsole->AppendText(msg);
-    /*if (msg.Last() != _T('\n'))
-        txtConsole->AppendText(_T('\n'));*/
+    if (msg.Last() != _T('\n'))
+        txtConsole->AppendText(_T('\n'));
 //    txtConsole->ScrollLines(-1);
     Manager::ProcessPendingEvents();
 }
@@ -170,7 +170,6 @@ void ScriptConsole::Error(const wxString& msg)
 {
     wxTextAttr old = txtConsole->GetDefaultStyle();
     txtConsole->SetDefaultStyle(wxTextAttr(wxColor(235,0,0)));
-     txtConsole->AppendText(_T('\n'));  //error in new line....
     txtConsole->AppendText(msg);
     if (msg.Last() != _T('\n'))
         txtConsole->AppendText(_T('\n'));

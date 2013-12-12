@@ -413,11 +413,11 @@ void CompilerGCC::OnAttach()
 
     // register compiler's script functions
     // make sure the VM is initialized
-    Manager::Get()->GetScriptingManager();
-    if (SquirrelVM::GetVMPtr())
+    ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
+    if (vm->GetVM())
     {
         ScriptBindings::gBuildLogId = m_PageIndex;
-        SqPlus::RegisterGlobal(ScriptBindings::gBuildLog, "LogBuild");
+        Sqrat::RootTable(vm->GetVM()).SetValue("LogBuild",ScriptBindings::gBuildLogId);
     }
     else
         ScriptBindings::gBuildLogId = -1;

@@ -527,8 +527,8 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             m_NotLoadedScripts.Add(script_nomacro);
             continue;
         }
-
-        Sqrat::Function func(Sqrat::RootTable(),funcName.ToUTF8());
+        ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
+        Sqrat::Function func(Sqrat::RootTable(vm->GetVM()),funcName.ToUTF8());
         if(func.IsNull())
         {
             //Could not find the function
@@ -538,7 +538,7 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             m_ScriptsWithErrors.Add(script_nomacro);
         }
         func(target);
-        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
+        ScriptBindings::StackHandler sa(vm->GetVM());
         if(sa.HasError())
         {
             wxString msg;

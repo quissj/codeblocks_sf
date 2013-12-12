@@ -100,7 +100,7 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           * @return The error string. If empty, it means "no errors".
           */
         //wxString GetErrorString(Sqrat::Exception* exception = nullptr, bool clearErrors = true);
-        wxString GetErrorString(HSQUIRRELVM vm = Sqrat::DefaultVM::Get(), bool clearErrors = true);
+        wxString GetErrorString(bool clearErrors = true);
 
         /** @brief Display error dialog.
           *
@@ -228,7 +228,7 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         	return *this;
 		}
 
-		ScriptBindings::CBsquirrelVM* GetVM()       {return vm;};
+		ScriptBindings::CBsquirrelVM* GetVM()       {return m_vm;};
 
     private:
         // needed for SqPlus bindings
@@ -261,7 +261,7 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
 
         MenuItemsManager m_MenuItemsManager;
 
-        ScriptBindings::CBsquirrelVM* vm;
+        ScriptBindings::CBsquirrelVM* m_vm;
 
         DECLARE_EVENT_TABLE()
 };

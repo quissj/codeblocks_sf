@@ -109,6 +109,8 @@ CBsquirrelVM::CBsquirrelVM(int initialStackSize,const uint32_t library_to_load) 
 
     m_lib_loaded = library_to_load;
 
+    sq_setcompilererrorhandler(m_vm, compilerErrorHandler);
+
     // FIXME (bluehazzard#1#): temporary set me as default vm
     Sqrat::DefaultVM::Set(m_vm);
 }
@@ -184,7 +186,7 @@ void CBsquirrelVM::compilerErrorHandler(HSQUIRRELVM v,
     {
         // TODO (bluehazzard#1#): Check if this is UNICODE UTF8 safe
         tmp_buffer = new SQChar [buffer_size];
-        int retvalue = snprintf(tmp_buffer,buffer_size, _SC("%s(%d:%d): %s"), source, (int) line, (int) column, desc);
+        int retvalue = snprintf(tmp_buffer,buffer_size, _SC("\nSource: %s\nline: %d\ncolumn:%d\n%s"), source, (int) line, (int) column, desc);
         if(retvalue < buffer_size)
         {
             // Buffersize was large enough

@@ -169,7 +169,7 @@ void OnScriptMenu(int id)
     if (it != s_MenuCallbacks.end())
     {
         MenuCallback& callback = it->second;
-        Sqrat::Function func(callback.object,"GetModuleMenu");
+        Sqrat::Function func(callback.object,"OnMenuClicked");
         //qPlus::SquirrelFunction<void> f(callback.object, "OnMenuClicked");
 
         if (!func.IsNull())
@@ -177,7 +177,7 @@ void OnScriptMenu(int id)
             func(callback.menuIndex);
             if(sa.HasError())
             {
-                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
+                cbMessageBox(_("In OnScriptMenu:\n") + sa.GetError(), _("Script error:"), wxICON_ERROR);
             }
         }
     }
@@ -198,11 +198,10 @@ void OnScriptModuleMenu(int id)
         Sqrat::Function func(callback.object,"OnModuleMenuClicked");
         if (!func.IsNull())
         {
-
             func(callback.menuIndex);
             if(sa.HasError())
             {
-                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
+                cbMessageBox(_("In OnScriptModuleMenu:\n") + sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -369,6 +368,7 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     //cript = SquirrelVM::CompileBuffer(s_cbScriptPlugin, "cbScriptPlugin");
     //SquirrelVM::RunScript(script);
     script.CompileString(s_cbScriptPlugin);
+    script.Run();
     if(sa.HasError())
     {
         cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n")) + sa.GetError(),

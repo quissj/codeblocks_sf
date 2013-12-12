@@ -98,18 +98,18 @@ ScriptingManager::ScriptingManager()
 
     // initialize but don't load the IO lib
     //SquirrelVM::Init((SquirrelInitFlags)(sqifAll & ~sqifIO));
-    vm = new ScriptBindings::CBsquirrelVM(1024,(ScriptBindings::VM_LIB_ALL & ~ScriptBindings::VM_LIB_IO));
+    m_vm = new ScriptBindings::CBsquirrelVM(1024,(ScriptBindings::VM_LIB_ALL & ~ScriptBindings::VM_LIB_IO));
 
-    if (!vm->GetVM())
+    if (!m_vm->GetVM())
         cbThrow(_T("Can't create scripting engine!"));
 
     // TODO (bluehazzard#1#): Errors should not be passed to the std output...
-    vm->SetPrintFunc(ScriptsPrintFunc,ScriptsPrintFunc);
-    vm->SetMeDefault();
+    m_vm->SetPrintFunc(ScriptsPrintFunc,ScriptsPrintFunc);
+    m_vm->SetMeDefault();
     RefreshTrusts();
 
     // register types
-    ScriptBindings::RegisterBindings(vm->GetVM());
+    ScriptBindings::RegisterBindings(m_vm->GetVM());
 }
 
 ScriptingManager::~ScriptingManager()
@@ -193,16 +193,16 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     s_ScriptErrors.Clear();
 
     // TODO (bluehazzard#1#): THIS IS FUCKING UGLY
-    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+    //ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
 
     // compile script
 
-    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = sq_vm->doString(buffer);
+    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = m_vm->doString(buffer);
     if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
     {
         // A compiling error occurred
         wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        err_msg << _T("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
         cbMessageBox(err_msg, _("Script compile error"), wxICON_ERROR);
         m_IncludeSet.erase(incName);
         return false;
@@ -210,7 +210,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     {
         // A runtime Error occurred
         wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << sq_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        err_msg << _T("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
         cbMessageBox(err_msg, _("Script run error"), wxICON_ERROR);
         m_IncludeSet.erase(incName);
         return false;
@@ -230,9 +230,9 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
 
     // FIXME (bluehazzard#1#): Here is a absolute mess with the error handling...
 
-    ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+    //ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
 
-    sq_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptOutput);
+    m_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptOutput);
 
     //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
     bool res = LoadBuffer(buffer);
@@ -254,9 +254,9 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
     return msg;
 }*/
 
-wxString ScriptingManager::GetErrorString(HSQUIRRELVM vm , bool clearErrors)
+wxString ScriptingManager::GetErrorString( bool clearErrors)
 {
-    ScriptBindings::StackHandler sa(vm);
+    ScriptBindings::StackHandler sa(m_vm->GetVM());
     return sa.GetError(clearErrors);
 }
 
@@ -264,7 +264,7 @@ bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
 {
 
     if(error_msg == wxEmptyString)
-        error_msg = GetErrorString(Sqrat::DefaultVM::Get(), clearErrors);
+        error_msg = GetErrorString(clearErrors);
 
     if (!error_msg.IsEmpty())
     {
@@ -464,7 +464,7 @@ void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
             return;
         call_back();
         // FIXME (bluehazzard#1#): Check the vm...
-        ScriptBindings::StackHandler sa(Sqrat::DefaultVM::Get());
+        ScriptBindings::StackHandler sa(m_vm->GetVM());
         if(sa.HasError())
         {
             DisplayErrors(sa.GetError());

@@ -939,7 +939,7 @@ bool ProjectOptionsDlg::IsScriptValid(ProjectBuildTarget* target, const wxString
     if (setopts.IsNull())
         return false;
 
-    wxString Errors = Manager::Get()->GetScriptingManager()->GetErrorString(Sqrat::DefaultVM::Get(),true);
+    wxString Errors = Manager::Get()->GetScriptingManager()->GetErrorString(true);
     if(Errors!= wxEmptyString)
     {
         Manager::Get()->GetScriptingManager()->DisplayErrors(Errors);
