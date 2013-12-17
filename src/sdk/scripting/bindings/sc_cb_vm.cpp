@@ -320,19 +320,34 @@ SQInteger StackHandler::ThrowError(SQChar* error)
 SQInteger StackHandler::ThrowError(wxString error)
 {
 
-    return sq_throwerror(m_vm,error.ToUTF8().data());
+    wxString tmp = _("Stack Handler: ") + error;
+
+    return sq_throwerror(m_vm,tmp.ToUTF8().data());
 }
 
 wxString StackHandler::GetError(bool del)
 {
     if(!Sqrat::Error::Instance().Occurred(m_vm))
         return wxEmptyString;
-    wxString ret(Sqrat::Error::Instance().Message(m_vm).c_str(),wxConvUTF8);
+
+    SQStackInfos si;
+    char stackinfo[256];
+    int stack = 1;
+    wxString stack_string(_("Call Stack: \n"));
+    wxString tmp;
+    while(SQ_SUCCEEDED(sq_stackinfos(m_vm,stack,&si)))
+    {
+        tmp.Printf(_("%i Function: %s Line: %i\n"),stack,si.funcname,si.line);
+        stack_string += tmp;
+        stack++;
+    }
+
+    stack_string += wxString::FromUTF8(Sqrat::Error::Instance().Message(m_vm).c_str());
 
     if(del)
         Sqrat::Error::Instance().Clear(m_vm);
 
-    return ret;
+    return stack_string;
 }
 
 bool StackHandler::HasError()
