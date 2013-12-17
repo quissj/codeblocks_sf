@@ -276,6 +276,7 @@ namespace ScriptBindings
         typedef void(wxColour::*WXC_SET)(const unsigned char, const unsigned char, const unsigned char, const unsigned char);
         Sqrat::Class<wxColour> wx_colour(vm,"wxColour");
                 wx_colour.
+                Ctor<unsigned char,unsigned char,unsigned char>().
                 //emptyCtor().
                 SquirrelFunc("_tostring",   &wxColour_OpToString).
                 Func("Blue",    &wxColour::Blue).

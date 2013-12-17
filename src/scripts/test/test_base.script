@@ -7,9 +7,9 @@ local sa = wxStopWatch();
 
 class script_test_base
 {
-    
-    
-    
+
+
+
 
     function Run()
     {
@@ -21,17 +21,17 @@ class script_test_base
         made_tests = 0;
         passed_tests = 0;
         failed_tests = 0;
-		sa.Start(0);
+        sa.Start(0);
     }
 
     function print_test_result()
     {
-		sa.Pause();
+        sa.Pause();
         ::print("Executed tests: " + made_tests + "\n");
         ::print("passed tests:   " + passed_tests + "\n");
         ::print("failed tests:   " + failed_tests + "\n");
         ::print("Time elapsed:   " + sa.Time() + "ms\n");
-		
+
     }
 
     function test_equal(name,to_test,result)
@@ -41,7 +41,9 @@ class script_test_base
         {
             passed_tests++;
             ::print("Test: "+name+"\t\t:PASSED\n");
-        } else {
+        }
+        else
+        {
             failed_tests++;
              ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed "+result+") \n");
         }
@@ -54,7 +56,9 @@ class script_test_base
         {
             passed_tests++;
             ::print("Test: "+name+"\t\t:PASSED\n");
-        } else {
+        }
+        else
+        {
             failed_tests++;
             ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed true) \n");
         }
@@ -67,7 +71,9 @@ class script_test_base
         {
             passed_tests++;
             ::print("Test: "+name+"\t\t:PASSED\n");
-        } else {
+        }
+        else
+        {
             failed_tests++;
             ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed false) \n");
         }
@@ -80,7 +86,9 @@ class script_test_base
         {
             passed_tests++;
             ::error("Test: " + name + "\t\t:FAILED (got " + typeof to_test + " needed " + typeof type + ") \n");
-        } else {
+        }
+        else
+        {
             failed_tests++;
             ::error("Test: "+name+"\t\t:FAILED\n");
         }
@@ -88,7 +96,7 @@ class script_test_base
 
     /*function test_string(name,to_test,result)
     {
-		::print("hall");
+        ::print("hall");
         made_tests++;
         if(to_test.tostring() == result.tostring())
         {
@@ -99,23 +107,23 @@ class script_test_base
             ::error("Test: "+name+"\t\t:FAILED\n");
         }
     }*/
-	
-	function test_string(name,to_test,result)
+
+    function test_string(name,to_test,result)
     {
         made_tests++;
-		// some workaround for some wired errors, this has to be tracked down
-		local tmp_string = to_test + " ";
-		local i = 0;
-		result += " ";
-		for(i=0; i < tmp_string.len() && i < result.len();i++)
-		{
-			if(tmp_string[i] != result[i])
-			{
-				failed_tests++;
-				::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed " + result + ") \n");
-				return;
-			}
-		}
+        // some workaround for some wired errors, this has to be tracked down
+        local tmp_string = to_test + " ";
+        local i = 0;
+        result += " ";
+        for(i=0; i < tmp_string.len() && i < result.len();i++)
+        {
+            if(tmp_string[i] != result[i])
+            {
+                failed_tests++;
+                ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed " + result + ") \n");
+                return;
+            }
+        }
 
          passed_tests++;
          ::print("Test: "+ name + "\t\t:PASSED\n");

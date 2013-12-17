@@ -86,6 +86,18 @@ static void CaptureScriptOutput(HSQUIRRELVM /*v*/, const SQChar * s, ...)
     va_end(vl);
 }
 
+static void CaptureScriptErrors(HSQUIRRELVM /*v*/, const SQChar * s, ...)
+{
+    va_list vl;
+    va_start(vl,s);
+    wxString msg;
+    PrintSquirrelToWxString(msg,s,vl);
+    va_end(vl);
+
+    s_ScriptErrors << msg;
+    Manager::Get()->GetLogManager()->LogError(_("Script error: ") + msg);
+}
+
 BEGIN_EVENT_TABLE(ScriptingManager, wxEvtHandler)
 //
 END_EVENT_TABLE()
@@ -104,7 +116,7 @@ ScriptingManager::ScriptingManager()
         cbThrow(_T("Can't create scripting engine!"));
 
     // TODO (bluehazzard#1#): Errors should not be passed to the std output...
-    m_vm->SetPrintFunc(ScriptsPrintFunc,ScriptsPrintFunc);
+    m_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptErrors);
     m_vm->SetMeDefault();
     RefreshTrusts();
 
@@ -232,7 +244,7 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
 
     //ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
 
-    m_vm->SetPrintFunc(ScriptsPrintFunc,CaptureScriptOutput);
+    m_vm->SetPrintFunc(CaptureScriptOutput,CaptureScriptErrors);
 
     //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
     bool res = LoadBuffer(buffer);

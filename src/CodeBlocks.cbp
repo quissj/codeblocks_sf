@@ -129,7 +129,7 @@
 			<Target title="sdk">
 				<Option output="devel/codeblocks" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="devel" />
-				<Option external_deps="base/tinyxml/libtxml.a;sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;sdk/scripting/lib/libsqplus.a;devel/libwxscintilla_cb.a;" />
+				<Option external_deps="base/tinyxml/libtxml.a;sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;devel/libwxscintilla_cb.a;" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option parameters="--debug-log --no-dde --no-check-associations --multiple-instance --verbose -p debug" />
@@ -172,7 +172,6 @@
 					<Add directory="sdk/propgrid" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="build_tools\autorevision\autorevision +wx +int +t . include/autorevision.h" />
 					<Add after="cmd /c if not exist devel\share\CodeBlocks mkdir devel\share\CodeBlocks" />
 					<Add after="zip -jq9 devel\share\CodeBlocks\manager_resources.zip sdk\resources\*.xrc" />
 					<Add after='cmd /c &quot;cd sdk\resources &amp; zip -0 -q ..\..\devel\share\CodeBlocks\manager_resources.zip images\*.png images\12x12\*.png images\16x16\*.png&quot;' />
@@ -1202,9 +1201,6 @@
 		<Unit filename="include/scripting/include/squirrel.h">
 			<Option target="Squirrel" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqmodule.h">
-			<Option target="sdk" />
-		</Unit>
 		<Unit filename="include/scripting/sqrat/sqrat.h">
 			<Option target="sdk" />
 		</Unit>
@@ -1254,9 +1250,6 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/sqrat/sqrat/sqratext_Ref.h">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="include/scripting/sqrat/sqratimport.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/sqstdlib/sqstdblobimpl.h">
@@ -2541,6 +2534,23 @@
 		</Unit>
 		<Unit filename="scripts/startup.script">
 			<Option target="sdk" />
+		</Unit>
+		<Unit filename="scripts/test/script-test-plugin.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
+		</Unit>
+		<Unit filename="scripts/test/test_base.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/test/wx-test.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
 		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />
