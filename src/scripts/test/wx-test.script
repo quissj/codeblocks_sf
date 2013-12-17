@@ -1,0 +1,56 @@
+
+::Include(_("test_base.script"));
+
+class wxTest extends script_test_base
+{
+    function Run()
+    {
+		
+        test_wxstring();
+    }
+
+    function test_wxstring()
+    {
+        ::print("======= Test wx String BEGINN ======= \n");
+        clear_test_result();
+		
+        local string = wxString("Hallo");	
+		test_string("tostring",string,"Hallo");
+        test_false("IsEmpty",string.IsEmpty());
+        test_equal("Length",string.Length(),5);
+        test_equal("length",string.length(),5);
+        test_equal("len",string.len(),5);
+        test_equal("size",string.size(),5);
+        test_string("Lower",string.Lower(),"hallo");
+		string.LowerCase();
+        test_string("LowerCase",string,"hallo");
+        test_string("MakeLower",string.MakeLower(),"hallo");
+        test_string("Upper",string.Upper(),"HALLO");
+		string.UpperCase();
+        test_string("UpperCase",string,"HALLO");
+        test_string("MakeUpper",string.MakeUpper(),"HALLO");
+        string = wxString("Hallo");
+        test_string("Mid",string.Mid(2,2),"ll");
+        test_string("Remove",string.Remove(2,string.len()-2),"Ha");
+        string = wxString("Hallo");
+		test_string("RemoveLast",string.RemoveLast(2),"Hal");
+        string = wxString("Hallo");
+		test_equal("Replace ret",string.Replace(_("ll"),_("xx")),1);
+		test_string("Replace value",string,"Haxxo");
+        string = wxString("Hallo");
+		test_string("AfterFirst",string.AfterFirst("l"),"lo");
+        string = wxString("Hallo");
+		test_string("AfterLast",string.AfterLast("l"),"o");
+        string = wxString("Hallo");
+		test_string("BeforeFirst",string.BeforeFirst("l"),"Ha");
+        string = wxString("Hallo");
+		test_string("BeforeLast",string.BeforeLast(_T("l")),"Hal");
+        string = wxString("Hallo");
+		test_string("Right",string.Right(2),"lo");
+        string = wxString("Hallo");
+		test_true("Matches",string.Matches(_T("Ha*o")));
+		
+        print_test_result();
+        ::print("======= Test wx String END ======= \n");
+    }
+};
