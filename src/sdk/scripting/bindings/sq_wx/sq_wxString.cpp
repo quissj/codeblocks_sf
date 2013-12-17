@@ -12,6 +12,7 @@
  #include <sqrat.h>
  #include "sc_binding_util.h"
  #include <sq_wx/sq_wx.h>
+ #include <sc_cb_vm.h>
 
  // We need at least version 2.8.5
  #if !wxCHECK_VERSION(2, 8, 5)
@@ -229,20 +230,22 @@ static SQInteger wxString_Replace(HSQUIRRELVM vm)
 
 SQInteger GetWxStringFromVM(HSQUIRRELVM vm,SQInteger stack_pos,wxString* str)
 {
+    StackHandler sa(vm);
     wxString tmp;
-    Sqrat::Var<SQChar*> search_char_arr(vm,2);
+    Sqrat::Var<SQChar*> search_char_arr(vm,stack_pos);
     if(!Sqrat::Error::Instance().Occurred(vm)) {
         // !! This only works if the value is given with "" but not with '' because of the string delimiter '\0'
         // FIXME (bluehazzard#1#): Insert a type of check if it is a SQChar* with a correct delimiter, because we use FromUTF8 to get a UNICODE character....
-        tmp.FromUTF8(search_char_arr.value);    // Get the SQChar array with the UNICODE value and convert it to a wxString
+        *str = wxString::FromUTF8(search_char_arr.value);    // Get the SQChar array with the UNICODE value and convert it to a wxString
     } else {
-        Sqrat::Var<wxString&> search_char_str(vm,2);
+        //Sqrat::Var<wxString&> search_char_str(vm,2);
+        *str = *sa.GetInstance<wxString>(stack_pos);
         if(Sqrat::Error::Instance().Occurred(vm)) {
             return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) +  _SC("|SQChar*")).c_str());
         }
-        tmp = search_char_str.value;
+        //*str = search_char_str.value;
     }
-    *str = tmp;
+    //*str = tmp;
     return SC_RETURN_OK;
 }
 
@@ -280,96 +283,75 @@ SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
 SQInteger wxString_AfterLast(HSQUIRRELVM vm)
 {
     if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString::AfterFirst wrong number of parameters"));
+        return sq_throwerror(vm, _SC("wxString::AfterLast: wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("have no base"));
+        return sq_throwerror(vm, _SC("wxString::AfterLast: have no base"));
     }
     wxString search_char;
     SQInteger result = GetWxStringFromVM(vm,2,&search_char);
     if(SQ_FAILED(result))
         return result;
-    /*
-    Sqrat::Var<*SQChar> search_char_arr(vm,2);
-    if(!Sqrat::Error::Instance().Occurred(vm)) {
-        // !! This only works if the value is given with "" but not with '' because of the string delimiter '\0'
-        // FIXME (bluehazzard#1#): Insert a type of check if it is a SQChar* with a correct delimiter, because we use FromUTF8 to get a UNICODE character....
-        search_char.FromUTF8(search_char_arr.value);    // Get the SQChar array with the UNICODE value and convert it to a wxString
-    } else {
-        Sqrat::Var<wxString&> search_char_str(vm,2);
-        if(Sqrat::Error::Instance().Occurred(vm)) {
-            return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str() + "|SQChar*");
-        }
-        search_char = search_char_str.value;
-    }*/
+
     Sqrat::Var<wxString>::push(vm, self->AfterLast(search_char[0]));
     return SC_RETURN_VALUE;
 }
 
 SQInteger wxString_BeforeFirst(HSQUIRRELVM vm)
 {
-    if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString::AfterFirst wrong number of parameters"));
+    StackHandler sa(vm);
+    if (sa.GetParamCount() < 2) {
+        return sa.ThrowError(_("wxString::BeforeFirst: wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("have no base"));
+        return sa.ThrowError(_("wxString::BeforeFirst: have no base"));
     }
     wxString search_char;
     SQInteger result = GetWxStringFromVM(vm,2,&search_char);
     if(SQ_FAILED(result))
         return result;
-    /*
-    Sqrat::Var<*SQChar> search_char_arr(vm,2);
-    if(!Sqrat::Error::Instance().Occurred(vm)) {
-        // !! This only works if the value is given with "" but not with '' because of the string delimiter '\0'
-        // FIXME (bluehazzard#1#): Insert a type of check if it is a SQChar* with a correct delimiter, because we use FromUTF8 to get a UNICODE character....
-        search_char.FromUTF8(search_char_arr.value);    // Get the SQChar array with the UNICODE value and convert it to a wxString
-    } else {
-        Sqrat::Var<wxString&> search_char_str(vm,2);
-        if(Sqrat::Error::Instance().Occurred(vm)) {
-            return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str() + "|SQChar*");
-        }
-        search_char = search_char_str.value;
-    }*/
-    Sqrat::Var<wxString>::push(vm, self->BeforeFirst(search_char[0]));
+
+    //Sqrat::Var<wxString>::push(vm, self->BeforeFirst(search_char[0]));
+    sa.PushInstanceCopy<wxString>(self->BeforeFirst(search_char[0]));
     return SC_RETURN_VALUE;
 }
 
 SQInteger wxString_BeforeLast(HSQUIRRELVM vm)
 {
-    if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString::AfterFirst wrong number of parameters"));
+    StackHandler sa(vm);
+
+    if (sa.GetParamCount() < 2) {
+        return sa.ThrowError(_("wxString::BeforeLast: wrong number of parameters"));
     }
     //First get the "this"
-    wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
+    wxString* self = sa.GetInstance<wxString>(1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("have no base"));
+        return sa.ThrowError(_("wxString::BeforeLast: have no base"));
     }
     wxString search_char;
     SQInteger result = GetWxStringFromVM(vm,2,&search_char);
     if(SQ_FAILED(result))
         return result;
-    /*
-    Sqrat::Var<*SQChar> search_char_arr(vm,2);
-    if(!Sqrat::Error::Instance().Occurred(vm)) {
-        // !! This only works if the value is given with "" but not with '' because of the string delimiter '\0'
-        // FIXME (bluehazzard#1#): Insert a type of check if it is a SQChar* with a correct delimiter, because we use FromUTF8 to get a UNICODE character....
-        search_char.FromUTF8(search_char_arr.value);    // Get the SQChar array with the UNICODE value and convert it to a wxString
-    } else {
-        Sqrat::Var<wxString&> search_char_str(vm,2);
-        if(Sqrat::Error::Instance().Occurred(vm)) {
-            return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str() + "|SQChar*");
-        }
-        search_char = search_char_str.value;
-    }*/
-    Sqrat::Var<wxString>::push(vm, self->BeforeLast(search_char[0]));
+    sa.PushInstanceCopy<wxString>(self->BeforeLast(search_char[0]));
     return SC_RETURN_VALUE;
 }
 
+
+SQInteger wxString_Matches(HSQUIRRELVM v)
+{
+    StackHandler sa(v);
+    wxString& self = *sa.GetInstance<wxString>(1);
+    wxString other;
+    if(GetWxStringFromVM(v,2,&other) != SC_RETURN_OK)
+        return SC_RETURN_FAILED;
+
+    sa.PushValue<SQInteger>(self.Matches(other));
+    return SC_RETURN_VALUE;
+}
 
 
 void bind_wxString(HSQUIRRELVM vm)
@@ -384,10 +366,10 @@ void bind_wxString(HSQUIRRELVM vm)
 
     .Func<wxString& (wxString::*)(const wxString&)>("Append",&wxString::Append)
     .Func("IsEmpty",&wxString::IsEmpty)
-    .Func("Length", &wxString::Length)
-    .Func("length", &wxString::length)
-    .Func("len",    &wxString::length)
-    .Func("size",   &wxString::length)
+    .Func("Length", &wxString::Len)
+    .Func("length", &wxString::Len)
+    .Func("len",    &wxString::Len)
+    .Func("size",   &wxString::Len)
     .Func("Lower",  &wxString::Lower)
     .Func("LowerCase",  &wxString::LowerCase)
     .Func("MakeLower",  &wxString::MakeLower)
@@ -403,7 +385,9 @@ void bind_wxString(HSQUIRRELVM vm)
     .SquirrelFunc("BeforeFirst", &wxString_BeforeFirst)
     .SquirrelFunc("BeforeLast", &wxString_BeforeLast)
     .Func("Right",   &wxString::Right)
-    .Func("Matches",   &wxString::Matches);
+    // TODO (bluehazzard#1#): In wx2.9 this is wxString not wxChar
+    .SquirrelFunc("Matches",&wxString_Matches);
+
 
 // TODO (bluehazzard#1#): Still to implement:  Not that easy with UTF8...
 //* wxString::AddChar
