@@ -10,6 +10,7 @@
  #include <sq_wx/sq_wx.h>
  #include <squirrel.h>
  #include <sqrat.h>
+ #include <wx/stopwatch.h>
 
 namespace ScriptBindings
 {
@@ -25,5 +26,13 @@ namespace ScriptBindings
     {
         SQ_WX_binding::bind_wxString(vm);
         bind_wx_util_dialogs(vm);
+
+        Sqrat::Class<wxStopWatch> stop_watch(vm,"wxStopWatch");
+        stop_watch
+        .Func("Pause",&wxStopWatch::Pause)
+        .Func("Resume",&wxStopWatch::Resume)
+        .Func("Start",&wxStopWatch::Start)
+        .Func("Time",&wxStopWatch::Time);
+        Sqrat::RootTable(vm).Bind("wxStopWatch",stop_watch);
     }
 }
