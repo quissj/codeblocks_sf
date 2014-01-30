@@ -134,7 +134,8 @@ namespace ScriptBindings
             if (config_type == OT_INTEGER)
             {
                 Sqrat::Var<SQInteger> val(vm,3);
-                Manager::Get()->GetConfigManager(_T("scripts"))->Write(*key,val.value);
+                // FIXME (bluehazzard#1#): Fix this ugly case
+                Manager::Get()->GetConfigManager(_T("scripts"))->Write(*key,static_cast<int>(val.value));
                 return SC_RETURN_OK;
             }
             else if (config_type == OT_BOOL)

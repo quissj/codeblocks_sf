@@ -82,18 +82,7 @@
 					<Add directory="include/scripting/sqstdlib" />
 				</Compiler>
 			</Target>
-			<Target title="SqPlus">
-				<Option output="sdk/scripting/lib/libsqplus" prefix_auto="0" extension_auto="1" />
-				<Option working_dir="" />
-				<Option external_deps="sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;" />
-				<Option type="2" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
-				</Compiler>
-			</Target>
+
 			<Target title="scintilla">
 				<Option output="devel/libwxscintilla_cb" prefix_auto="0" extension_auto="1" />
 				<Option working_dir="" />
@@ -140,7 +129,8 @@
 					<Add directory="include/tinyxml" />
 					<Add directory="include/scripting/bindings" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/squirrel" />
+					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -152,7 +142,6 @@
 				<Linker>
 					<Add library="txml" />
 					<Add library="wxscintilla_cb" />
-					<Add library="sqplus" />
 					<Add library="sqstdlib" />
 					<Add library="squirrel" />
 					<Add directory="devel" />
@@ -177,7 +166,8 @@
 					<Add option="-DUSE_GTK_NOTEBOOK" />
 					<Add directory="include" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/bindings" />
+					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -201,8 +191,8 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 					<Add directory="include/scripting/bindings" />
+					<Add directory="include/scripting/sqrat" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -268,7 +258,8 @@
 					<Add directory="include" />
 					<Add directory="plugins/compilergcc/depslib/src" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/sqrat" />
+					<Add directory="include/scripting/bindings" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -291,7 +282,8 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/sqrat" />
+					<Add directory="include/scripting/bindings" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -362,6 +354,9 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add directory="include" />
+					<Add directory="include/scripting/bindings" />
+					<Add directory="include/scripting/include" />
+					<Add directory="include/scripting/sqrat" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -417,7 +412,8 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
+					<Add directory="include/scripting/sqrat" />
+					<Add directory="include/scripting/bindings" />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs`" />
@@ -650,6 +646,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/editarraystringdlg.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/editkeywordsdlg.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/editor_hooks.h">
@@ -892,6 +891,9 @@
 		<Unit filename="include/projectbuildtarget.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/projectdepsdlg.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/projectfile.h">
 			<Option target="sdk" />
 		</Unit>
@@ -922,10 +924,19 @@
 		<Unit filename="include/scripting/bindings/sc_base_types.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sc_binding_util.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sc_cb_vm.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/bindings/sc_plugin.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/scriptbindings.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/include/sqdbgserver.h">
@@ -955,26 +966,56 @@
 		<Unit filename="include/scripting/include/squirrel.h">
 			<Option target="Squirrel" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SqPlusConst.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelBindingsUtils.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratAllocator.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelBindingsUtilsWin32.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratArray.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelObject.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratClass.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/SquirrelVM.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratClassType.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/sqplus.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratConst.h">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqplus/sqplusWin32.h">
-			<Option target="SqPlus" />
+		<Unit filename="include/scripting/sqrat/sqrat/sqratFunction.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratGlobalMethods.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratMemberMethods.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratObject.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratOverloadMethods.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratScript.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratTable.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratTypes.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratUtil.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratVM.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/sqrat/sqrat/sqratext_Ref.h">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/sqstdlib/sqstdblobimpl.h">
 			<Option target="Squirrel std lib" />
@@ -1083,6 +1124,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/uservarmanager.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/virtualbuildtargetsdlg.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/workspaceloader.h">
@@ -2259,6 +2303,23 @@
 		<Unit filename="scripts/startup.script">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="scripts/test/script-test-plugin.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
+		</Unit>
+		<Unit filename="scripts/test/test_base.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/test/wx-test.script">
+			<Option target="Squirrel" />
+			<Option target="sdk" />
+			<Option target="src" />
+			<Option target="Scripted wizard" />
+		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />
 		</Unit>
@@ -2363,6 +2424,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/editarraystringdlg.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/editkeywordsdlg.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/editor_hooks.cpp">
@@ -2557,6 +2621,9 @@
 		<Unit filename="sdk/projectbuildtarget.cpp">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="sdk/projectdepsdlg.cpp">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="sdk/projectfile.cpp">
 			<Option target="sdk" />
 		</Unit>
@@ -2632,12 +2699,6 @@
 		<Unit filename="sdk/resources/incremental_select_list.xrc">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_A68k.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_A68k.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_OgreCompositor.sample">
 			<Option target="scintilla" />
 		</Unit>
@@ -2650,37 +2711,16 @@
 		<Unit filename="sdk/resources/lexers/lexer_OgreMaterial.xml">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_ada.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_ada.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_angelscript.sample">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_angelscript.xml">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_bash.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_bash.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_batch.sample">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_batch.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_bibtex.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_caml.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_caml.xml">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_cg.sample">
@@ -2725,12 +2765,6 @@
 		<Unit filename="sdk/resources/lexers/lexer_f77.xml">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_fortran.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_fortran.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_glsl.sample">
 			<Option target="scintilla" />
 		</Unit>
@@ -2741,12 +2775,6 @@
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_gm.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_haskell.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_haskell.xml">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_hitasm.sample">
@@ -2771,12 +2799,6 @@
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_latex.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_lisp.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_lisp.xml">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_lua.sample">
@@ -2809,28 +2831,10 @@
 		<Unit filename="sdk/resources/lexers/lexer_nsis.xml">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_objc.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_objc.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_pascal.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_pascal.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_perl.sample">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_perl.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_postscript.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_postscript.xml">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_prg.sample">
@@ -2857,46 +2861,10 @@
 		<Unit filename="sdk/resources/lexers/lexer_rc.xml">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_ruby.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_ruby.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_smalltalk.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_smalltalk.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_sql.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_sql.xml">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_squirrel.sample">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_squirrel.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_vbscript.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_vbscript.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_verilog.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_verilog.xml">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_vhdl.sample">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/resources/lexers/lexer_vhdl.xml">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/resources/lexers/lexer_xml.sample">
@@ -2911,6 +2879,9 @@
 		<Unit filename="sdk/resources/plugins_configuration.xrc">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="sdk/resources/project_deps.xrc">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="sdk/resources/project_manager_file_types.xrc">
 			<Option target="sdk" />
 		</Unit>
@@ -2921,6 +2892,12 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/resources/select_target.xrc">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/resources/virtualbuildtargetsdlg.xrc">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sc_cb_vm.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sc_consts.cpp">
@@ -2950,22 +2927,14 @@
 		<Unit filename="sdk/scripting/bindings/scriptbindings.cpp">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SqPlus.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_util_dialogs.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelBindingsUtils.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
+			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelBindingsUtilsWin32.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="SqPlus" />
-		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelObject.cpp">
-			<Option target="SqPlus" />
-		</Unit>
-		<Unit filename="sdk/scripting/sqplus/SquirrelVM.cpp">
-			<Option target="SqPlus" />
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxString.cpp">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/sqstdlib/sqstdaux.cpp">
 			<Option target="Squirrel std lib" />
@@ -3052,6 +3021,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/uservarmanager.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/virtualbuildtargetsdlg.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/workspaceloader.cpp">
@@ -3216,9 +3188,6 @@
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexD.cxx">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexDMAP.cxx">
-			<Option target="scintilla" />
-		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexECL.cxx">
 			<Option target="scintilla" />
 		</Unit>
@@ -3255,10 +3224,10 @@
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexInno.cxx">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKVIrc.cxx">
+		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKix.cxx">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKix.cxx">
+		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKVIrc.cxx">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexLaTeX.cxx">
@@ -3355,9 +3324,6 @@
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexRuby.cxx">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexRust.cxx">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexSML.cxx">
@@ -3475,9 +3441,6 @@
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexlib/SparseState.h">
-			<Option target="scintilla" />
-		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexlib/StringCopy.h">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexlib/StyleContext.cxx">
@@ -3764,12 +3727,6 @@
 		<Unit filename="src/dlgaboutplugin.h">
 			<Option target="src" />
 		</Unit>
-		<Unit filename="src/editkeywordsdlg.cpp">
-			<Option target="src" />
-		</Unit>
-		<Unit filename="src/editkeywordsdlg.h">
-			<Option target="src" />
-		</Unit>
 		<Unit filename="src/editorconfigurationdlg.cpp">
 			<Option target="src" />
 		</Unit>
@@ -3824,12 +3781,6 @@
 		<Unit filename="src/printdlg.h">
 			<Option target="src" />
 		</Unit>
-		<Unit filename="src/projectdepsdlg.cpp">
-			<Option target="src" />
-		</Unit>
-		<Unit filename="src/projectdepsdlg.h">
-			<Option target="src" />
-		</Unit>
 		<Unit filename="src/projectmanagerui.cpp">
 			<Option target="src" />
 		</Unit>
@@ -3872,9 +3823,6 @@
 		<Unit filename="src/resources/dlg_about_plugin.xrc">
 			<Option target="src" />
 		</Unit>
-		<Unit filename="src/resources/edit_keywords.xrc">
-			<Option target="src" />
-		</Unit>
 		<Unit filename="src/resources/editor_configuration.xrc">
 			<Option target="src" />
 		</Unit>
@@ -3899,9 +3847,6 @@
 		<Unit filename="src/resources/print_dialog.xrc">
 			<Option target="src" />
 		</Unit>
-		<Unit filename="src/resources/project_deps.xrc">
-			<Option target="src" />
-		</Unit>
 		<Unit filename="src/resources/project_options.xrc">
 			<Option target="src" />
 		</Unit>
@@ -3915,9 +3860,6 @@
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/resources/start_here/start_here.html">
-			<Option target="src" />
-		</Unit>
-		<Unit filename="src/resources/virtualbuildtargetsdlg.xrc">
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/scriptconsole.cpp">
@@ -3954,12 +3896,6 @@
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/threadsdlg.h">
-			<Option target="src" />
-		</Unit>
-		<Unit filename="src/virtualbuildtargetsdlg.cpp">
-			<Option target="src" />
-		</Unit>
-		<Unit filename="src/virtualbuildtargetsdlg.h">
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/watchesdlg.cpp">
