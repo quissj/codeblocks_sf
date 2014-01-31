@@ -17,6 +17,11 @@ namespace ScriptBindings
     // Is this the best practice????
     //extern void bind_wxString(HSQUIRRELVM vm);
 
+    long long EmptyFunction()
+    {
+        return 0;
+    }
+
     /** \brief Bind wx Types (wxString,wxIntArray etc.) to the vm
      *
      * \param vm HSQUIRRELVM A Squirrel vm to witch wx is bound
@@ -32,7 +37,12 @@ namespace ScriptBindings
         .Func("Pause",&wxStopWatch::Pause)
         .Func("Resume",&wxStopWatch::Resume)
         .Func("Start",&wxStopWatch::Start)
-        .Func("Time",&wxStopWatch::Time);
+        .Func("Time",&wxStopWatch::Time)
+        #if !wxCHECK_VERSION(2, 9, 0) // Only implemented in wx 2.9.x
+        .StaticFunc("TimeInMicro",&EmptyFunction);
+        #else
+        .Func("TimeInMicro",&wxStopWatch::TimeInMicro);
+        #endif
         Sqrat::RootTable(vm).Bind("wxStopWatch",stop_watch);
     }
 }
