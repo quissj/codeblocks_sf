@@ -17,6 +17,8 @@
 
 #include "sc_base_types.h"
 
+// FIXME (bluehazzard#1#): Error Handling has to be improved...
+
 namespace ScriptBindings
 {
     ///////////////////
@@ -26,16 +28,24 @@ namespace ScriptBindings
     {
         CompileTimeAssertion<wxMinimumVersion<2,8>::eval>::Assert();
         StackHandler sa(v);
-        wxArrayString& self = *sa.GetInstance<wxArrayString>(1);
-        wxString inpstr = *sa.GetInstance<wxString>(2);
-        bool chkCase = true;
-        bool frmEnd = false;
-        if (sa.GetParamCount() >= 3)
-            chkCase = sa.GetValue<bool>(3);
-        if (sa.GetParamCount() == 4)
-            frmEnd = sa.GetValue<bool>(4);
-        sa.PushValue<SQInteger>(self.Index(inpstr.c_str(), chkCase, frmEnd));
-        return SC_RETURN_VALUE;
+        try
+        {
+            wxArrayString& self = *sa.GetInstance<wxArrayString>(1);
+            wxString inpstr = *sa.GetInstance<wxString>(2);
+
+            bool chkCase = true;
+            bool frmEnd = false;
+            if (sa.GetParamCount() >= 3)
+                chkCase = sa.GetValue<bool>(3);
+            if (sa.GetParamCount() == 4)
+                frmEnd = sa.GetValue<bool>(4);
+            sa.PushValue<SQInteger>(self.Index(inpstr.c_str(), chkCase, frmEnd));
+            return SC_RETURN_VALUE;
+        } catch(CBScriptException &e)
+        {
+            sa.ThrowError(e.Message());
+            return SC_RETURN_FAILED;
+        }
     }
 
     //////////////
@@ -259,11 +269,12 @@ namespace ScriptBindings
         Sqrat::Class<wxArrayString> array_string(vm,"wxArrayString");
                 array_string.
                 //emptyCtor().
+                //Ctor<>().
                 Func("Add",     &wxArrayString::Add ).
                 Func("Clear",   &wxArrayString::Clear ).
-//                func(&wxArrayString::Index, "Index").
                 SquirrelFunc("Index",   &wxArrayString_Index).
                 Func("GetCount",        &wxArrayString::GetCount)
+                // FIXME (bluehazzard#1#): Fix Item in wx2.9
                 #if !wxCHECK_VERSION(2, 9, 0) // Strange that this does not work with wx 2.9.x?!
                 .Func("Item",           &wxArrayString::Item)
                 #endif

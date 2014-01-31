@@ -7,13 +7,48 @@ local sa = wxStopWatch();
 
 class script_test_base
 {
-
-
-
-
     function Run()
     {
 
+    }
+
+    function format_output(name, result)
+    {
+        local name_length = name.len();
+        local needed_tabs = 0;
+        local free_space = 20 - name_length;
+        if(free_space < 0)
+        {
+            free_space = 50 - name_length;
+        }
+        if(free_space < 0)
+            free_space = 4;
+
+        needed_tabs = free_space; //% 8;
+        local output = "Test: " + name;
+        local i = 0;
+        for(;i<needed_tabs;i++)
+        {
+            output += " ";
+        }
+        output += result;
+        return output;
+    }
+
+    function passed(name)
+    {
+        sa.Pause();
+        passed_tests++;
+        ::print(format_output(name,"PASSED")+ "\n");
+        sa.Resume();
+    }
+
+    function failed(name,message)
+    {
+        sa.Pause();
+        failed_tests++;
+        ::error(format_output(name,"FAILED " + message +"\n"));//(got " + to_test + " needed "+result+") \n"));
+        sa.Resume();
     }
 
     function clear_test_result()
@@ -27,10 +62,11 @@ class script_test_base
     function print_test_result()
     {
         sa.Pause();
+        ::print("\n");
         ::print("Executed tests: " + made_tests + "\n");
         ::print("passed tests:   " + passed_tests + "\n");
         ::print("failed tests:   " + failed_tests + "\n");
-        ::print("Time elapsed:   " + sa.Time() + "ms\n");
+        ::print("Time elapsed:   " + sa.Time() + "ms ("+ sa.TimeInMicro()+"us)\n");
 
     }
 
@@ -39,13 +75,11 @@ class script_test_base
         made_tests++;
         if(to_test == result)
         {
-            passed_tests++;
-            ::print("Test: "+name+"\t\t:PASSED\n");
+            passed(name);
         }
         else
         {
-            failed_tests++;
-             ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed "+result+") \n");
+            failed(name,"(got " + to_test + " needed "+result+")");
         }
     }
 
@@ -54,13 +88,11 @@ class script_test_base
         made_tests++;
         if(to_test)
         {
-            passed_tests++;
-            ::print("Test: "+name+"\t\t:PASSED\n");
+            passed(name);
         }
         else
         {
-            failed_tests++;
-            ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed true) \n");
+            failed(name,"(got " + to_test + " needed true)");
         }
     }
 
@@ -69,13 +101,14 @@ class script_test_base
         made_tests++;
         if(!to_test)
         {
-            passed_tests++;
-            ::print("Test: "+name+"\t\t:PASSED\n");
+            //::print("Test: "+name+"\t\t:PASSED\n");
+            passed(name);
         }
         else
         {
-            failed_tests++;
-            ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed false) \n");
+            //::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed false) \n");
+            failed(name,"(got " + to_test + " needed false)");
+
         }
     }
 
@@ -84,13 +117,12 @@ class script_test_base
         made_tests++;
         if(typeof to_test == typeof type)
         {
-            passed_tests++;
-            ::error("Test: " + name + "\t\t:FAILED (got " + typeof to_test + " needed " + typeof type + ") \n");
+            passed(name);
         }
         else
         {
-            failed_tests++;
-            ::error("Test: "+name+"\t\t:FAILED\n");
+            //::error("Test: " + name + "\t\t:FAILED (got " + typeof to_test + " needed " + typeof type + ") \n");
+            failed(name,"(got " + typeof to_test + " needed " + typeof type + ")");
         }
     }
 
@@ -119,13 +151,14 @@ class script_test_base
         {
             if(tmp_string[i] != result[i])
             {
-                failed_tests++;
-                ::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed " + result + ") \n");
+
+                failed(name, "(got \"" + to_test + "\" needed \"" + result + "\")");
+                //::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed " + result + ") \n");
                 return;
             }
         }
 
-         passed_tests++;
-         ::print("Test: "+ name + "\t\t:PASSED\n");
+        passed(name);
     }
+
 };
