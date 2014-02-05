@@ -209,7 +209,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
 
     // compile script
 
-    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = m_vm->doString(buffer);
+    ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = m_vm->doString(buffer,debugName);
     if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
     {
         // A compiling error occurred
@@ -233,7 +233,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
 }
 
 
-wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
+wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer,const wxString& name)
 {
 //    wxCriticalSectionLocker c(cs);
 
@@ -247,7 +247,7 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
     m_vm->SetPrintFunc(CaptureScriptOutput,CaptureScriptErrors);
 
     //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
-    bool res = LoadBuffer(buffer);
+    bool res = LoadBuffer(buffer,name);
     //sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
@@ -268,15 +268,22 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer)
 
 wxString ScriptingManager::GetErrorString( bool clearErrors)
 {
-    ScriptBindings::StackHandler sa(m_vm->GetVM());
-    return sa.GetError(clearErrors);
+    //ScriptBindings::StackHandler sa(m_vm->GetVM());
+    return m_vm->getLastErrorMsg();
+    //return sa.GetError(clearErrors);
 }
 
 bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
 {
 
     if(error_msg == wxEmptyString)
+    {
+        if(!m_vm->HasError())   // If no error return
+            return false;
+
         error_msg = GetErrorString(clearErrors);
+    }
+
 
     if (!error_msg.IsEmpty())
     {

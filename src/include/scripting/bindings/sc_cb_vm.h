@@ -155,7 +155,14 @@ public:
      * The error is returned in an readable format. It is not differenced between compiler or tuntime error
      * \return wxString The error string
      */
-    wxString getLastErrorMsg()     {   return wxString(m_lastErrorMsg.c_str(),wxConvUTF8); };
+    wxString getLastErrorMsg();
+
+    /** \brief Reports if a error occurred on this vm
+     *
+     * The detailed error can be retrieved with getLastErrorMsg()
+     * \return bool true if a error occurred
+     */
+    bool HasError();
 
     /** \brief Sets the last error
      * \param str const Sqrat::string& The error message
@@ -169,12 +176,12 @@ public:
          * \param[in] str Sqrat::string& A sqrat string to compile and run
          * \return See \ref ERROR_STATE for the return values
         */
-    SC_ERROR_STATE doString(const Sqrat::string& str);
+    SC_ERROR_STATE doString(const Sqrat::string& str,const Sqrat::string& name);
         /**
          * \param[in] str wxString A wxWidgets string to compile and run
          * \return See \ref ERROR_STATE for the return values
         */
-    SC_ERROR_STATE doString(const wxString str);
+    SC_ERROR_STATE doString(const wxString str,const wxString name);
     /** @} */
 
     /** \brief Compiles and runs a file
@@ -253,6 +260,7 @@ class CBsquirrelVMManager : public Mgr<CBsquirrelVMManager>
         ~CBsquirrelVMManager();
         CBsquirrelVMManager(cb_unused const CBsquirrelVMManager& rhs); // prevent copy construction
         VMHashMap m_map;
+
 };
 
 
@@ -350,6 +358,13 @@ public:
      * \return bool True if a error occurred
      */
     bool HasError();
+
+    /** \brief Returns a backtrace of the current call stack
+     *
+     * \return wxString
+     *
+     */
+    wxString CreateStackInfo();
 
 protected:
 private:

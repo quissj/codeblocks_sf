@@ -41,12 +41,12 @@ public:
     Script(HSQUIRRELVM v = DefaultVM::Get()) : Object(v, true) {
     }
 
-    void CompileString(const string& script) {
+    void CompileString(const string& script,const string& name) {
         if(!sq_isnull(obj)) {
             sq_release(vm, &obj);
             sq_resetobject(&obj);
         }
-        if(SQ_FAILED(sq_compilebuffer(vm, script.c_str(), static_cast<SQInteger>(script.size() /** sizeof(SQChar)*/), _SC(""), true))) {
+        if(SQ_FAILED(sq_compilebuffer(vm, script.c_str(), static_cast<SQInteger>(script.size() /** sizeof(SQChar)*/), name.c_str(), true))) {
             Error::Instance().Throw(vm, LastErrorString(vm));
             return;
         }
@@ -55,12 +55,12 @@ public:
         sq_pop(vm, 1);
     }
 
-    bool CompileString(const string& script, string& errMsg) {
+    bool CompileString(const string& script, string& errMsg,const string& name) {
         if(!sq_isnull(obj)) {
             sq_release(vm, &obj);
             sq_resetobject(&obj);
         }
-        if(SQ_FAILED(sq_compilebuffer(vm, script.c_str(), static_cast<SQInteger>(script.size() /** sizeof(SQChar)*/), _SC(""), true))) {
+        if(SQ_FAILED(sq_compilebuffer(vm, script.c_str(), static_cast<SQInteger>(script.size() /** sizeof(SQChar)*/), name.c_str() , true))) {
             errMsg = LastErrorString(vm);
             return false;
         }

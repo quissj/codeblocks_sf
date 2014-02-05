@@ -503,11 +503,23 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     // call SetupProject()
     {
     Sqrat::Function func = Sqrat::RootTable(vm->GetVM()).GetFunction("SetupProject");
-    if (!func.Evaluate<bool>(theproject))
+    if(func.IsNull())
     {
-        cbMessageBox(wxString::Format(_("Couldn't setup project options:\n%s"),
-                                    prjdir.c_str()),
-                        _("Error"), wxICON_ERROR);
+        cbMessageBox(_("Could not get SetupProject from the wizard script."),_("Error"),wxICON_ERROR);
+        Clear();
+        return 0;
+    }
+    else if (!func.Evaluate<bool>(theproject))
+    {
+        wxString err_msg;
+        err_msg.Printf(_("Couldn't setup project options:\n%s"),prjdir.c_str());
+        if(Sqrat::Error::Instance().Occurred(vm->GetVM()))
+        {
+            err_msg.Append(_("\n\n Squirrel error:\n"));
+            err_msg.Append(wxString::FromUTF8(Sqrat::Error::Instance().Message(vm->GetVM()).c_str()));
+            Sqrat::Error::Instance().Clear(vm->GetVM());
+        }
+        cbMessageBox(err_msg,_("Error"), wxICON_ERROR);
         Clear();
         return 0;
     }

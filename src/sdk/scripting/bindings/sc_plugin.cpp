@@ -367,7 +367,7 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
 
     //cript = SquirrelVM::CompileBuffer(s_cbScriptPlugin, "cbScriptPlugin");
     //SquirrelVM::RunScript(script);
-    script.CompileString(s_cbScriptPlugin);
+    script.CompileString(s_cbScriptPlugin,"PluginBaseScript (in source code)");
     script.Run();
     if(sa.HasError())
     {

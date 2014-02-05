@@ -80,14 +80,14 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           * @param debugName A debug name. This will appear in any errors displayed.
           * @return True if the script compiled, false if not.
           */
-        bool LoadBuffer(const wxString& buffer, const wxString& debugName = _T("CommandLine"));
+        bool LoadBuffer(const wxString& buffer, const wxString& debugName/* = _T("CommandLine")*/);
 
         /** @brief Loads a string buffer and captures its output.
           *
           * @param buffer The script buffer to compile and run.
           * @return The script's output (if any).
           */
-        wxString LoadBufferRedirectOutput(const wxString& buffer);
+        wxString LoadBufferRedirectOutput(const wxString& buffer,const wxString& name);
 
         // TODO (bluehazzard#1#): Delete this if the Sqrat API doesn't change
         /** @brief Returns an accumulated error string.

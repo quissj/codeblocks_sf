@@ -519,7 +519,7 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
         }
 
         // clear previous script's context
-        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts);
+        Manager::Get()->GetScriptingManager()->LoadBuffer(clearout_buildscripts,_T("ClearBuildScript"));
 
         // if the script doesn't exist, just return
         if (!Manager::Get()->GetScriptingManager()->LoadScript(script_nomacro))
@@ -538,11 +538,10 @@ void CompilerCommandGenerator::DoBuildScripts(cbProject* project, CompileTargetB
             m_ScriptsWithErrors.Add(script_nomacro);
         }
         func(target);
-        ScriptBindings::StackHandler sa(vm->GetVM());
-        if(sa.HasError())
+        if(vm->HasError())
         {
             wxString msg;
-            msg << _("In Script ") << script_nomacro << _(" occurred this error: ") << sa.GetError();
+            msg << _("In Script ") << script_nomacro << _(" occurred this error:\n ") << vm->getLastErrorMsg();
             Manager::Get()->GetScriptingManager()->DisplayErrors(msg);
             m_ScriptsWithErrors.Add(script_nomacro);
         }

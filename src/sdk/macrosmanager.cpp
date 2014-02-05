@@ -473,7 +473,9 @@ void MacrosManager::ReplaceMacros(wxString& buffer, ProjectBuildTarget* target, 
     while (m_RE_Script.Matches(buffer))
     {
         search = m_RE_Script.GetMatch(buffer, 1);
-        replace = Manager::Get()->GetScriptingManager()->LoadBufferRedirectOutput(m_RE_Script.GetMatch(buffer, 2));
+        wxString sc_name(_T("Replace Macro Target: "));
+        sc_name.Append(target->GetTitle());
+        replace = Manager::Get()->GetScriptingManager()->LoadBufferRedirectOutput(m_RE_Script.GetMatch(buffer, 2),sc_name);
         buffer.Replace(search, replace, false);
     }
 

@@ -27,6 +27,41 @@
 #include <sqrat.h>
 #include <sc_cb_vm.h>
 #include <sc_binding_util.h>
+#include <sq_wx/sq_wx_type_handler.h>
+
+#define DEFINE_SQRAT_ENUM(N) namespace Sqrat                        \
+{                                                                   \
+template<>                                                          \
+struct Var<N> {                                                     \
+    N value;                                                        \
+    Var(HSQUIRRELVM v, SQInteger idx) {                             \
+        if (!Sqrat::Error::Instance().Occurred(v)) {                \
+            SQInteger tmp = 0;                                      \
+            sq_getinteger(v,idx,&tmp);                              \
+            value = static_cast<N>(tmp);                            \
+        }                                                           \
+    }                                                               \
+    static void push(HSQUIRRELVM v, const N value) {                \
+        sq_pushinteger(v,static_cast<SQInteger>(value));            \
+    }                                                               \
+};                                                                   \
+}
+
+DEFINE_SQRAT_ENUM(TemplateOutputType);
+DEFINE_SQRAT_ENUM(SearchDirs);
+DEFINE_SQRAT_ENUM(SupportedPlatforms);
+DEFINE_SQRAT_ENUM(TargetFilenameGenerationPolicy);
+DEFINE_SQRAT_ENUM(ModuleType);
+DEFINE_SQRAT_ENUM(PrintColourMode);
+DEFINE_SQRAT_ENUM(PrintScope);
+DEFINE_SQRAT_ENUM(PCHMode);
+DEFINE_SQRAT_ENUM(MakeCommand);
+DEFINE_SQRAT_ENUM(TargetType);
+DEFINE_SQRAT_ENUM(OptionsRelation);
+DEFINE_SQRAT_ENUM(OptionsRelationType);
+DEFINE_SQRAT_ENUM(wxPathNormalize);
+DEFINE_SQRAT_ENUM(wxPathFormat);
+
 
 
 #endif // SC_BASE_TYPES_H

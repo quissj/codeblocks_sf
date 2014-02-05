@@ -69,6 +69,7 @@ wxString StdToWxStringTranslated(SQChar* input)
  */
 static SQInteger wxString_constructor(HSQUIRRELVM vm)
 {
+    StackHandler sa(vm);
     if (sq_gettop(vm) == 1) {    //Empty constructor....
         wxString* instance = new wxString();
         sq_setinstanceup(vm, 1, instance);
@@ -99,7 +100,7 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
         return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*")).c_str());
     }
 
-    return sq_throwerror(vm, _SC("wrong number of parameters"));
+    return sa.ThrowError(_("wrong number of parameters"));
 }
 
 /** \brief The operator+ for wxString in squirrel
@@ -110,9 +111,10 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
  */
 static SQInteger wxString_add(HSQUIRRELVM vm)
 {
-
+    StackHandler sa(vm);
     if (sq_gettop(vm) == 1) {    //no parameter to add
-        sq_throwerror(vm, _SC("wxString add wrong number of parameters"));
+        return sa.ThrowError(_("wrong number of parameters"));
+        //sq_throwerror(vm, _SC("wxString add wrong number of parameters"));
     } else if (sq_gettop(vm) == 2) { // 1 Parameter
         // Lets check which type it is
 
@@ -120,7 +122,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         wxString* instance = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
         if(instance == NULL)
         {
-            return sq_throwerror(vm, _SC("have no base"));
+            return sa.ThrowError(_("have no base"));
         }
 
         wxString ret(*instance); // create the return value
@@ -159,7 +161,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         // Wrong type of parameter
         return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*|int|float")).c_str());
     }
-    return sq_throwerror(vm, _SC("wrong number of parameters"));
+    return sa.ThrowError(_("wrong number of parameters"));
 }
 
 /** \brief Compare to strings. This function is only used for > and <. For == you have to use a function like wxString::Compare()
@@ -170,16 +172,17 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
  */
 static SQInteger wxString_cmp(HSQUIRRELVM vm)
 {
+    StackHandler sa(vm);
     int ret = 0;
     if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString cmp (<,>) wrong number of parameters"));
+        sa.ThrowError(_("wxString cmp (<,>) wrong number of parameters"));
     }
     //First get the "this"
     wxString* lhs = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     wxString rhs;
     if(lhs == NULL)
     {
-        return sq_throwerror(vm, _SC("have no base"));
+        sa.ThrowError(_("have no base"));
     }
     Sqrat::Var<const wxString&> str_val(vm, 2);
     if (!Sqrat::Error::Instance().Occurred(vm)) {
@@ -194,23 +197,24 @@ static SQInteger wxString_cmp(HSQUIRRELVM vm)
         Sqrat::Var<int>::push(vm, ret);
         return SC_RETURN_VALUE;
     }
-    return sq_throwerror(vm, _SC("wrong number of parameters"));
+    return sa.ThrowError(_("wrong number of parameters"));
 }
 
 static SQInteger wxString_Replace(HSQUIRRELVM vm)
 {
+    StackHandler sa(vm);
     if (sq_gettop(vm) < 3) {
-        return sq_throwerror(vm, _SC("wxString::Replace wrong number of parameters"));
+        sa.ThrowError(_("wxString::Replace wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("have no base"));
+        sa.ThrowError(_("have no base"));
     }
 
-    bool all = false;
-    Sqrat::Var<wxString&> old_str(vm,2);
-    Sqrat::Var<wxString&> new_str(vm,3);
+    bool all = true;
+    Sqrat::Var<wxString> old_str(vm,2);
+    Sqrat::Var<wxString> new_str(vm,3);
     if(Sqrat::Error::Instance().Occurred(vm)) {
         return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str());
     }
@@ -251,13 +255,14 @@ SQInteger GetWxStringFromVM(HSQUIRRELVM vm,SQInteger stack_pos,wxString* str)
 
 SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
 {
+    StackHandler sa(vm);
     if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString::AfterFirst wrong number of parameters"));
+        return sa.ThrowError(_("wxString::AfterFirst wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("have no base"));
+        return sa.ThrowError(_("have no base"));
     }
     wxString search_char;
     SQInteger result = GetWxStringFromVM(vm,2,&search_char);
@@ -282,13 +287,14 @@ SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
 
 SQInteger wxString_AfterLast(HSQUIRRELVM vm)
 {
+    StackHandler sa(vm);
     if (sq_gettop(vm) < 2) {
-        return sq_throwerror(vm, _SC("wxString::AfterLast: wrong number of parameters"));
+        return sa.ThrowError(_("wxString::AfterLast: wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL) {
-        return sq_throwerror(vm, _SC("wxString::AfterLast: have no base"));
+        return sa.ThrowError(_("wxString::AfterLast: have no base"));
     }
     wxString search_char;
     SQInteger result = GetWxStringFromVM(vm,2,&search_char);
@@ -353,6 +359,41 @@ SQInteger wxString_Matches(HSQUIRRELVM v)
     return SC_RETURN_VALUE;
 }
 
+SQInteger wxString_GetChar(HSQUIRRELVM v)
+{
+    // FIXME (bluehazzard#1#): This is quite a dirty workaround.... but its 3am...
+    StackHandler sa(v);
+    wxString& self = *sa.GetInstance<wxString>(1);
+    int pos = sa.GetValue<int>(2);
+    if(pos >= self.length())
+        return SC_RETURN_FAILED;
+
+    SQChar tmp = self.To8BitData()[pos];//wxString(self.GetChar(static_cast<size_t>(pos))).ToAscii();
+    sa.PushValue<SQInteger>(static_cast<SQInteger>(tmp));
+    return SC_RETURN_VALUE;
+}
+
+SQInteger wxString_AddChar(HSQUIRRELVM v)
+{
+    // FIXME (bluehazzard#1#): This is quite a dirty workaround.... but its 3am...
+    StackHandler sa(v);
+    wxString& self = *sa.GetInstance<wxString>(1);
+    char character = sa.GetValue<SQChar>(2);
+    self.Append(wxString::Format(_T("%c"),character));
+    return SC_RETURN_OK;
+}
+
+SQInteger wxString_Find(HSQUIRRELVM v)
+{
+    StackHandler sa(v);
+    wxString& self = *sa.GetInstance<wxString>(1);
+    wxString other;
+    if(GetWxStringFromVM(v,2,&other) != SC_RETURN_OK)
+        return SC_RETURN_FAILED;
+
+    sa.PushValue<int>(self.Find(other));
+    return SC_RETURN_VALUE;
+}
 
 void bind_wxString(HSQUIRRELVM vm)
 {
@@ -386,8 +427,12 @@ void bind_wxString(HSQUIRRELVM vm)
     .SquirrelFunc("BeforeLast", &wxString_BeforeLast)
     .Func("Right",   &wxString::Right)
     // TODO (bluehazzard#1#): In wx2.9 this is wxString not wxChar
-    .SquirrelFunc("Matches",&wxString_Matches);
-
+    .SquirrelFunc("Matches",&wxString_Matches)
+    .SquirrelFunc("GetChar",&wxString_GetChar)
+    .SquirrelFunc("AddChar",&wxString_AddChar)
+    .SquirrelFunc("Find",&wxString_Find)
+    //.Func("GetChar",&wxString::GetChar)
+    ;
 
 // TODO (bluehazzard#1#): Still to implement:  Not that easy with UTF8...
 //* wxString::AddChar

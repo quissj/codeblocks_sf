@@ -118,11 +118,12 @@ public:
         string stack_string("Call Stack: \n");
         while(SQ_SUCCEEDED(sq_stackinfos(vm,stack,&si)))
         {
-            snprintf(stackinfo,256,"%i Function: %s Line: %i\n",stack,si.funcname,si.line);
+            snprintf(stackinfo,256,"%d Function: %s Line: %lld Source: %s\n",stack,si.funcname,si.line,si.source);
             stack_string += string(stackinfo);
             stack++;
         }
-        string err = stack_string + _SC("wrong type (") + expectedType + _SC(" expected");
+        snprintf(stackinfo,256,"%lld",idx);
+        string err = stack_string + _SC("wrong type at stack position ")+ string(stackinfo) + _SC(" (") + expectedType + _SC(" expected");
         if (SQ_SUCCEEDED(sq_typeof(vm, idx))) {
             const SQChar* actualType;
             sq_tostring(vm, -1);
