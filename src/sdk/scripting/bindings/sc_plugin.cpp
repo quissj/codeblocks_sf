@@ -63,10 +63,8 @@ wxArrayInt CreateMenu(const wxString& name)
 
     wxArrayString arr;
     arr = func.Evaluate<wxArrayString>();
-    if(sa.HasError())
+    if(Manager::Get()->GetScriptingManager()->DisplayErrors())
     {
-        // TODO (bluehazzard#1#): Add a possibility to tedeckt which script has an error...
-        cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
         return ret;
     }
 
@@ -117,9 +115,9 @@ wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeDa
 
         wxArrayString arr;
         arr = func.Evaluate<wxArrayString>(typ, data);
-        if(sa.HasError())
+        if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         {
-            cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
+            //cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             continue;
         }
 
@@ -175,9 +173,9 @@ void OnScriptMenu(int id)
         if (!func.IsNull())
         {
             func(callback.menuIndex);
-            if(sa.HasError())
+            if(Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
-                cbMessageBox(_("In OnScriptMenu:\n") + sa.GetError(), _("Script error:"), wxICON_ERROR);
+                //cbMessageBox(_("In OnScriptMenu:\n") + sa.GetError(), _("Script error:"), wxICON_ERROR);
             }
         }
     }
@@ -199,9 +197,9 @@ void OnScriptModuleMenu(int id)
         if (!func.IsNull())
         {
             func(callback.menuIndex);
-            if(sa.HasError())
+            if(Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
-                cbMessageBox(_("In OnScriptModuleMenu:\n") + sa.GetError(), _("Script error"), wxICON_ERROR);
+                //cbMessageBox(_("In OnScriptModuleMenu:\n") + sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -288,9 +286,9 @@ int ExecutePlugin(const wxString& name)
         if (!func.IsNull())
         {
             func();
-            if(sa.HasError())
+            if(Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
-                cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
+                //cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             }
         }
     }
@@ -369,7 +367,7 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     //SquirrelVM::RunScript(script);
     script.CompileString(s_cbScriptPlugin,"PluginBaseScript (in source code)");
     script.Run();
-    if(sa.HasError())
+    if(sa.HasError()/*Manager::Get()->GetScriptingManager()->DisplayErrors()*/)
     {
         cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n")) + sa.GetError(),
                     _("Script compile error"),

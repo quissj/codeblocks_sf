@@ -70,11 +70,12 @@ namespace ScriptBindings
             return;
         call_back(event.GetId());
         // FIXME (bluehazzard#1#): Check the vm...
-        StackHandler sa(Sqrat::DefaultVM::Get());
-        if(sa.HasError())
-        {
-            Manager::Get()->GetScriptingManager()->DisplayErrors(sa.GetError());
-        }
+        //StackHandler sa(Sqrat::DefaultVM::Get());
+        //if(sa.HasError())
+        //if()
+        //{
+        Manager::Get()->GetScriptingManager()->DisplayErrors();
+        //}
 
     }
 

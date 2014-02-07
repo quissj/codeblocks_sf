@@ -483,10 +483,10 @@ void ScriptingManager::OnScriptMenu(wxCommandEvent& event)
             return;
         call_back();
         // FIXME (bluehazzard#1#): Check the vm...
-        ScriptBindings::StackHandler sa(m_vm->GetVM());
-        if(sa.HasError())
+        //ScriptBindings::StackHandler sa(m_vm->GetVM());
+        if(DisplayErrors())
         {
-            DisplayErrors(sa.GetError());
+            //DisplayErrors(sa.GetError());
         }
         return;
     }
