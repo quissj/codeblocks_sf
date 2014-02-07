@@ -39,7 +39,33 @@ namespace ScriptBindings
     void gShowMessageWarn(const wxString& msg){ cbMessageBox(msg, _("Script warning"), wxICON_WARNING | wxOK); }
     void gShowMessageError(const wxString& msg){ cbMessageBox(msg, _("Script error"), wxICON_ERROR | wxOK); }
     void gShowMessageInfo(const wxString& msg){ cbMessageBox(msg, _("Script information"), wxICON_INFORMATION | wxOK); }
-    wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+    //wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+    //wxString gReplaceMacros(const wxString& buffer,bool subrequest){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
+
+    SQInteger gReplaceMacros(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+
+        if (sa.GetParamCount() == 0) {
+            return sa.ThrowError(_("ReplaceMacros: wrong number of parameters"));
+        }
+        bool subrequest = false;
+        //Sqrat::Var<wxString> to_replace(v,2);
+        wxString origin = sa.GetValue<wxString>(2);
+        if(sa.GetParamCount() >= 3)
+        {
+            subrequest = sa.GetValue<bool>(3);
+        }
+        if(sa.HasError()) {
+            return sa.ThrowError(_("ReplaceMacros: something is wrong"));
+        }
+
+        wxString ret_val(origin);
+        Manager::Get()->GetMacrosManager()->ReplaceMacros(ret_val,nullptr,subrequest);
+        sa.PushInstanceCopy(ret_val);
+
+        return SC_RETURN_VALUE;
+    }
 
     SQInteger IsNull(HSQUIRRELVM v)
     {
@@ -197,7 +223,10 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("ShowWarning",gShowMessageWarn);
         Sqrat::RootTable(vm).Func("ShowError",  gShowMessageError);
         Sqrat::RootTable(vm).Func("ShowInfo",   gShowMessageInfo);
-        Sqrat::RootTable(vm).Func("ReplaceMacros",gReplaceMacros);
+        // TODO (bluehazzard#1#): Remove this. The ReplaceMacro function uses only one parameter
+        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString&)>("ReplaceMacros",gReplaceMacros);
+        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString& ,bool)>("ReplaceMacros",gReplaceMacros);
+        Sqrat::RootTable(vm).SquirrelFunc("ReplaceMacros",gReplaceMacros);
 
         Sqrat::RootTable(vm).Func("GetProjectManager",  getPM);
         Sqrat::RootTable(vm).Func("GetEditorManager",   getEM);
