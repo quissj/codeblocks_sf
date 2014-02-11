@@ -695,7 +695,9 @@ bool CodeBlocksApp::OnInit()
             LoaderBase* loader = Manager::Get()->GetFileManager()->Load(m_Script);
 
             if (loader->GetData())
-                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()),_("CommandLine"));
+                Manager::Get()->GetScriptingManager()->LoadBuffer(cbC2U(loader->GetData()),_("Command_line_script"));
+
+            Manager::Get()->GetScriptingManager()->DisplayErrors();
 
             delete loader;
             frame->Close();
@@ -712,6 +714,7 @@ bool CodeBlocksApp::OnInit()
         if (!startup.IsEmpty())
         {
             Manager::Get()->GetScriptingManager()->LoadScript(startup);
+            Manager::Get()->GetScriptingManager()->DisplayErrors();
         }
         Manager::ProcessPendingEvents();
 
