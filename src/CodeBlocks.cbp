@@ -1321,7 +1321,7 @@
 		<Unit filename="include/sdk.h">
 			<Option compile="1" />
 			<Option weight="1" />
-			<Option target="src" />
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/sdk_common.h">
 			<Option target="sdk" />
@@ -2519,6 +2519,9 @@
 		</Unit>
 		<Unit filename="plugins/xpmanifest/windowsxplooknfeel.h">
 			<Option target="XP look &amp; feel" />
+		</Unit>
+		<Unit filename="scripts/ConvertOldToNewScript.script">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="scripts/gdb_types.script">
 			<Option target="Debugger" />

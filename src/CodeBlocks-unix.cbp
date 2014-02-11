@@ -82,7 +82,6 @@
 					<Add directory="include/scripting/sqstdlib" />
 				</Compiler>
 			</Target>
-
 			<Target title="scintilla">
 				<Option output="devel/libwxscintilla_cb" prefix_auto="0" extension_auto="1" />
 				<Option working_dir="" />
@@ -118,7 +117,7 @@
 			<Target title="sdk">
 				<Option output="devel/libcodeblocks" prefix_auto="0" extension_auto="1" />
 				<Option working_dir="devel" />
-				<Option external_deps="base/tinyxml/libtxml.a;sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;sdk/scripting/lib/libsqplus.a;devel/libwxscintilla_cb.a;" />
+				<Option external_deps="base/tinyxml/libtxml.a;sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;devel/libwxscintilla_cb.a;" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option parameters="--debug-log --multiple-instance -ni -p debug" />
@@ -937,6 +936,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/include/sqdbgserver.h">
@@ -2288,6 +2290,9 @@
 		<Unit filename="plugins/xpmanifest/windowsxplooknfeel.h">
 			<Option target="XP look &amp; feel" />
 		</Unit>
+		<Unit filename="scripts/ConvertOldToNewScript.script">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="scripts/gdb_types.script">
 			<Option target="Debugger" />
 		</Unit>
@@ -3224,10 +3229,10 @@
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexInno.cxx">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKix.cxx">
+		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKVIrc.cxx">
 			<Option target="scintilla" />
 		</Unit>
-		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKVIrc.cxx">
+		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexKix.cxx">
 			<Option target="scintilla" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/src/scintilla/lexers/LexLaTeX.cxx">
