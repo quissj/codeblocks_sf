@@ -176,7 +176,7 @@ bool ScriptingManager::LoadScript(const wxString& filename)
             f.Open(fname);
             if (!f.IsOpened())
             {
-                Manager::Get()->GetLogManager()->DebugLog(_T("Can't open script ") + filename);
+                Manager::Get()->GetLogManager()->DebugLog(_("Can't open script ") + filename);
                 return false;
             }
         }
@@ -195,7 +195,7 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     wxString incName = UnixFilename(debugName);
     if (m_IncludeSet.find(incName) != m_IncludeSet.end())
     {
-        Manager::Get()->GetLogManager()->LogWarning(F(_T("Ignoring Include(\"%s\") because it would cause recursion..."), incName.wx_str()));
+        Manager::Get()->GetLogManager()->LogWarning(F(_("Ignoring Include(\"%s\") because it would cause recursion..."), incName.wx_str()));
         return true;
     }
     m_IncludeSet.insert(incName);
@@ -210,11 +210,17 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     // compile script
 
     ScriptBindings::CBsquirrelVM::SC_ERROR_STATE ret = m_vm->doString(buffer,debugName);
+    if(ret != ScriptBindings::CBsquirrelVM::SC_NO_ERROR)
+    {
+        DisplayErrors();
+        return false;
+    }
+    /*
     if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
     {
         // A compiling error occurred
         wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        err_msg << _("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
         cbMessageBox(err_msg, _("Script compile error"), wxICON_ERROR);
         m_IncludeSet.erase(incName);
         return false;
@@ -222,11 +228,11 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     {
         // A runtime Error occurred
         wxString err_msg;
-        err_msg << _T("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
+        err_msg << _("Filename: ") << debugName << _("\nError:") << m_vm->getLastErrorMsg() << _("\nDetails:") <<  s_ScriptErrors;
         cbMessageBox(err_msg, _("Script run error"), wxICON_ERROR);
         m_IncludeSet.erase(incName);
         return false;
-    }
+    }*/
 
     m_IncludeSet.erase(incName);
     return true;
@@ -242,29 +248,21 @@ wxString ScriptingManager::LoadBufferRedirectOutput(const wxString& buffer,const
 
     // FIXME (bluehazzard#1#): Here is a absolute mess with the error handling...
 
-    //ScriptBindings::CBsquirrelVM *sq_vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+    SQPRINTFUNCTION old_printFunc = nullptr;
+    SQPRINTFUNCTION old_errorFunc = nullptr;
 
+    m_vm->GetPrintFunc(old_printFunc,old_errorFunc);
+
+    // Redirect the script output to the ::capture string
     m_vm->SetPrintFunc(CaptureScriptOutput,CaptureScriptErrors);
 
-    //sq_setprintfunc(SquirrelVM::GetVMPtr(), CaptureScriptOutput);
     bool res = LoadBuffer(buffer,name);
-    //sq_setprintfunc(SquirrelVM::GetVMPtr(), ScriptsPrintFunc);
+
+    // restore the old output
+    m_vm->SetPrintFunc(old_printFunc,old_errorFunc);
 
     return res ? ::capture : (wxString) wxEmptyString;
 }
-
-/*wxString ScriptingManager::GetErrorString(Sqrat::Exception* exception, bool clearErrors)
-{
-    wxString msg;
-    if (exception)
-        msg.FromUTF8("%s",exception.Message());
-    msg << s_ScriptErrors;
-
-    if (clearErrors)
-        s_ScriptErrors.Clear();
-
-    return msg;
-}*/
 
 wxString ScriptingManager::GetErrorString( bool clearErrors)
 {
@@ -297,6 +295,7 @@ bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
                                         true);
             dlg.ShowModal();
         }
+        Manager::Get()->GetLogManager()->DebugLog(_("Scripting error: ") + error_msg);
         return true;
     }
     return false;
@@ -371,7 +370,7 @@ bool ScriptingManager::RegisterScriptMenu(const wxString& menuPath, const wxStri
 bool ScriptingManager::UnRegisterScriptMenu(cb_unused const wxString& menuPath)
 {
     // TODO: not implemented
-    Manager::Get()->GetLogManager()->DebugLog(_T("ScriptingManager::UnRegisterScriptMenu() not implemented"));
+    Manager::Get()->GetLogManager()->DebugLog(_("ScriptingManager::UnRegisterScriptMenu() not implemented"));
     return false;
 }
 

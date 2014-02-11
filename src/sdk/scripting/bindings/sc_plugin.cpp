@@ -56,7 +56,6 @@ wxArrayInt CreateMenu(const wxString& name)
     }
     MenuItemsManager& mi = itm->second;
 
-    //SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetMenu");
     Sqrat::Function func(o,"GetMenu");
     if (func.IsNull())
         return ret;
@@ -109,7 +108,6 @@ wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeDa
     {
         Sqrat::Object& o = it->second;
         Sqrat::Function func(o,"GetModuleMenu");
-        //SqPlus::SquirrelFunction<wxArrayString&> f(o, "GetModuleMenu");
         if (func.IsNull())
             continue;
 
@@ -117,7 +115,6 @@ wxArrayInt CreateModuleMenu(const ModuleType typ, wxMenu* menu, const FileTreeDa
         arr = func.Evaluate<wxArrayString>(typ, data);
         if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         {
-            //cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
             continue;
         }
 
@@ -167,9 +164,8 @@ void OnScriptMenu(int id)
     if (it != s_MenuCallbacks.end())
     {
         MenuCallback& callback = it->second;
-        Sqrat::Function func(callback.object,"OnMenuClicked");
-        //qPlus::SquirrelFunction<void> f(callback.object, "OnMenuClicked");
 
+        Sqrat::Function func(callback.object,"OnMenuClicked");
         if (!func.IsNull())
         {
             func(callback.menuIndex);
@@ -192,7 +188,6 @@ void OnScriptModuleMenu(int id)
     if (it != s_MenuCallbacks.end())
     {
         MenuCallback& callback = it->second;
-        //SqPlus::SquirrelFunction<void> f(callback.object, "OnModuleMenuClicked");
         Sqrat::Function func(callback.object,"OnModuleMenuClicked");
         if (!func.IsNull())
         {
@@ -242,7 +237,7 @@ SQInteger RegisterPlugin(HSQUIRRELVM vm)
     Manager::Get()->GetScriptingManager()->RegisterScriptPlugin(s, CreateMenu(s));
 
     // this function returns nothing on the squirrel stack
-    return 0;
+    return SC_RETURN_OK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -281,7 +276,6 @@ int ExecutePlugin(const wxString& name)
     {
         // found; execute it
         Sqrat::Object& o = it->second;
-        //SqPlus::SquirrelFunction<int> f(o, "Execute");
         Sqrat::Function func(o,"Execute");
         if (!func.IsNull())
         {
@@ -357,11 +351,8 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     sq_setprintfunc(vm, 0,0);
 
     // compile and run script
-    //Sqrat::Object script;
     StackHandler sa(vm);
-
     Sqrat::Script script(vm);
-
 
     //cript = SquirrelVM::CompileBuffer(s_cbScriptPlugin, "cbScriptPlugin");
     //SquirrelVM::RunScript(script);
@@ -369,6 +360,7 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     script.Run();
     if(sa.HasError()/*Manager::Get()->GetScriptingManager()->DisplayErrors()*/)
     {
+        // TODO (bluehazzard#1#): DisplayErrors from ScriptingManager causes a infinite loop
         cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n")) + sa.GetError(),
                     _("Script compile error"),
                     wxICON_ERROR);

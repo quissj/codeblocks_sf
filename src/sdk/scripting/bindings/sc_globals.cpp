@@ -42,6 +42,8 @@ namespace ScriptBindings
     //wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
     //wxString gReplaceMacros(const wxString& buffer,bool subrequest){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
 
+// FIXME (bluehazzard#1#): Fix the scripts, because replace macros only use one parameter, for compatibility this is implemented
+
     SQInteger gReplaceMacros(HSQUIRRELVM v)
     {
         StackHandler sa(v);

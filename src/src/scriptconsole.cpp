@@ -190,7 +190,7 @@ void ScriptConsole::OnbtnExecuteClick(cb_unused wxCommandEvent& event)
     }
 
     Log(_T("> ") + cmd);
-    if (Manager::Get()->GetScriptingManager()->LoadBuffer(cmd, _T("ScriptConsole")))
+    if (Manager::Get()->GetScriptingManager()->LoadBuffer(cmd, _("ScriptConsole")))
     {
         if (txtCommand->FindString(cmd) == wxNOT_FOUND)
             txtCommand->Insert(cmd, 1); // right after the blank entry

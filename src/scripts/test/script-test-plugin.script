@@ -32,21 +32,10 @@ class Scripting_TestPlugin extends cbScriptPlugin
     }
 
     // optional to create context menu entries
-    function GetModuleMenu(who, data)
+    /*function GetModuleMenu(who, data)
     {
-        local entries = ::wxArrayString();
 
-        if (who == mtEditorManager)
-        {
-            local f = wxFileName();
-            f.Assign(data.GetFolder(), ::wxPATH_NATIVE);
-            entries.Add(_T("Work with ") + f.GetFullName(), 1);
-
-            entries.Add(_T("Sample entry"), 1);
-        }
-
-        return entries;
-    }
+    }*/
 
     // optional to support ExecutePlugin(pluginNameString)
     function Execute()
@@ -70,12 +59,7 @@ class Scripting_TestPlugin extends cbScriptPlugin
     // optional calback for context menu items clicking
     function OnModuleMenuClicked(index)
     {
-        if (index == 0)
-            ::ShowMessage(_T("Working with file"));
-        else if (index == 1)
-            ::ShowMessage(_T("Sample entry not working yet"));
-        else
-            ::ShowMessage(_T("?!? Functionality not implemented yet"));
+
     }
 
     function StartTest()

@@ -2,6 +2,7 @@
 
 #include <globals.h>
 #include <cbexception.h>
+#include <logmanager.h>
 #include <wx/msgdlg.h>
 #include <squirrel.h>
 #include <sqstdblob.h>
@@ -108,7 +109,6 @@ CBsquirrelVM::CBsquirrelVM(int initialStackSize,const uint32_t library_to_load) 
 
     m_lib_loaded = library_to_load;
 
-    //sq_setcompilererrorhandler(m_vm, compilerErrorHandler);
     sq_enabledebuginfo(m_vm,true);
 
     SetErrorHandler(runtimeErrorHandler,compilerErrorHandler);
@@ -159,15 +159,13 @@ SQInteger CBsquirrelVM::runtimeErrorHandler(HSQUIRRELVM v)
     if(sq_vm == NULL)
     {
         // Something funny happened.
-        // In reality this shouldn't happen never...
-// FIXME (bluehazzard#1#): Use CodeBlocks errors
-        wxMessageBox(_T("Could not find squirrel VM! This is a Program Error. Please report it to the developers!"),_T("Squirrel Error!!"),wxOK|wxICON_ERROR);
+        Manager::Get()->GetLogManager()->LogError(_("Could not find squirrel VM in runtimeErrorHandler! This is a Program Error. Please report it to the developers!"));
         return SQ_ERROR;
     }
     const SQChar *sErr = 0;
-    wxString ErrorMessage(_T("Squirrel Runtime Error:\n"));
+    wxString ErrorMessage(_("Squirrel Runtime Error:\n"));
     ErrorMessage.Append(sa.CreateStackInfo());
-    ErrorMessage.Append(_T("\nError:\n"));
+    ErrorMessage.Append(_("\nError:\n"));
     if(sq_gettop(v) >= 1)
     {
         if(SQ_SUCCEEDED(sq_getstring(v, 2, &sErr)))
@@ -205,7 +203,7 @@ void CBsquirrelVM::compilerErrorHandler(HSQUIRRELVM v,
             {
                 // Something funny happened.
                 // In reality this shouldn't happen never...
-                wxMessageBox(_T("Could not find squirrel VM! This is a Program Error. Please report it to the developers!"),_T("Squirrel Error!!"),wxOK|wxICON_ERROR);
+                Manager::Get()->GetLogManager()->LogError(_("Could not find squirrel VM in compilerErrorHandler! This is a Program Error. Please report it to the developers!"));
                 return;
             }
             sq_vm->m_lastErrorMsg = tmp_buffer;
@@ -307,7 +305,7 @@ wxString CBsquirrelVM::getLastErrorMsg()
 
     if(Sqrat::Error::Instance().Occurred(m_vm))
     {
-        ErrorMessage.Append(_T("\nSqrat Error:\n"));
+        ErrorMessage.Append(_("\nSqrat Error:\n"));
         ErrorMessage.Append(wxString::FromUTF8(Sqrat::Error::Instance().Message(m_vm).c_str()));
         Sqrat::Error::Instance().Clear(m_vm);
     }
@@ -365,11 +363,10 @@ SQInteger StackHandler::ThrowError(wxString error)
 wxString StackHandler::CreateStackInfo()
 {
     SQStackInfos si;
-    int stack = 1;
+    int stack = 0;
     wxString stack_string(_("Call Stack: \n"));
     wxString tmp;
-// TODO (bluehazzard#1#): Look if this can be done better (the problem is that wxString expects a wchar in printf and there are only chars, at least i think this is the problem)
-
+    // TODO (bluehazzard#1#): Look if this can be done better (the problem is that wxString expects a wchar in printf and there are only chars, at least i think this is the problem)
     while(SQ_SUCCEEDED(sq_stackinfos(m_vm,stack,&si)))
     {
         tmp.Printf(_("%i Function: %s Line: %i Source: %s\n")
@@ -388,17 +385,8 @@ wxString StackHandler::GetError(bool del)
     if(!Sqrat::Error::Instance().Occurred(m_vm))
         return wxEmptyString;
 
-    SQStackInfos si;
-    int stack = 1;
-    wxString stack_string(_("Call Stack: \n"));
-    wxString tmp;
-    while(SQ_SUCCEEDED(sq_stackinfos(m_vm,stack,&si)))
-    {
-        tmp.Printf(_("%i Function: %s Line: %i Source: %s\n"),stack,si.funcname,si.line,si.source);
-        stack_string += tmp;
-        stack++;
-    }
-
+    wxString stack_string = CreateStackInfo();
+    stack_string += _("\nSqrat Error\n");
     stack_string += wxString::FromUTF8(Sqrat::Error::Instance().Message(m_vm).c_str());
 
     if(del)
