@@ -4,6 +4,9 @@ local made_tests = 0;
 local passed_tests = 0;
 local failed_tests = 0;
 local sa = wxStopWatch();
+local global_made_tests = 0;
+local global_passed_tests = 0;
+local global_failed_tests = 0;
 
 class script_test_base
 {
@@ -39,6 +42,7 @@ class script_test_base
     {
         sa.Pause();
         passed_tests++;
+        global_passed_tests++;
         ::print(format_output(name,"PASSED")+ "\n");
         sa.Resume();
     }
@@ -47,6 +51,7 @@ class script_test_base
     {
         sa.Pause();
         failed_tests++;
+        global_failed_tests++;
         ::error(format_output(name,"FAILED " + message +"\n"));//(got " + to_test + " needed "+result+") \n"));
         sa.Resume();
     }
@@ -57,6 +62,24 @@ class script_test_base
         passed_tests = 0;
         failed_tests = 0;
         sa.Start(0);
+    }
+
+    function clear_global_test_results()
+    {
+        global_made_tests = 0;
+        global_passed_tests = 0;
+        global_failed_tests = 0;
+    }
+
+    function print_global_test_result()
+    {
+        //sa.Pause();
+        ::print("\n");
+        ::print("Global executed tests: " + global_made_tests + "\n");
+        ::print("Global passed tests:   " + global_passed_tests + "\n");
+        ::print("Global failed tests:   " + global_failed_tests + "\n");
+        //::print("Time elapsed:   " + sa.Time() + "ms ("+ sa.TimeInMicro()+"us)\n");
+
     }
 
     function print_test_result()
@@ -73,6 +96,7 @@ class script_test_base
     function test_equal(name,to_test,result)
     {
         made_tests++;
+        global_made_tests++;
         if(to_test == result)
         {
             passed(name);
@@ -86,6 +110,7 @@ class script_test_base
     function test_true(name,to_test)
     {
         made_tests++;
+        global_made_tests++;
         if(to_test)
         {
             passed(name);
@@ -99,6 +124,7 @@ class script_test_base
     function test_false(name,to_test)
     {
         made_tests++;
+        global_made_tests++;
         if(!to_test)
         {
             //::print("Test: "+name+"\t\t:PASSED\n");
@@ -115,6 +141,7 @@ class script_test_base
     function test_type(name,to_test,type)
     {
         made_tests++;
+        global_made_tests++;
         if(typeof to_test == typeof type)
         {
             passed(name);
@@ -143,6 +170,7 @@ class script_test_base
     function test_string(name,to_test,result)
     {
         made_tests++;
+        global_made_tests++;
         // some workaround for some wired errors, this has to be tracked down
         local tmp_string = to_test + " ";
         local i = 0;

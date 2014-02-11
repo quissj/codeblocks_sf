@@ -168,7 +168,6 @@ bool ScriptingManager::LoadScript(const wxString& filename)
             f.Open(fname);
             found = f.IsOpened();
         }
-
         if (!found)
         {
             // check in standard script dirs
@@ -213,8 +212,10 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
     if(ret != ScriptBindings::CBsquirrelVM::SC_NO_ERROR)
     {
         DisplayErrors();
+        m_IncludeSet.erase(incName);
         return false;
     }
+    m_IncludeSet.erase(incName);
     /*
     if(ret == ScriptBindings::CBsquirrelVM::SC_COMPILE_ERROR)
     {
@@ -234,7 +235,6 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer, const wxString& debugN
         return false;
     }*/
 
-    m_IncludeSet.erase(incName);
     return true;
 }
 

@@ -13,8 +13,10 @@
  #include <wx/numdlg.h>
  #include <wx/colordlg.h>
  #include <wx/textdlg.h>
+ #include <wx/filedlg.h>
  #include <sc_cb_vm.h>
  #include <sc_binding_util.h>
+
 
 /** \defgroup sq_dialogs Squirrel User dialogs
  *  \ingroup Squirrel
@@ -42,6 +44,17 @@ namespace ScriptBindings
     wxString wx_GetTextFromUser(const wxString& message, const wxString& caption, const wxString& default_value)
     {
         return wxGetTextFromUser(message, caption, default_value);
+    }
+    wxArrayString wx_GetFileFromUser(const wxString& message, const wxString& caption, const wxString& default_value,const wxString& wildcart,long style)
+    {
+        wxFileDialog* filedlg;
+        filedlg = new wxFileDialog(nullptr,message,default_value,wxEmptyString,wildcart,style);
+        wxArrayString ret;
+        if(filedlg->ShowModal() == wxID_OK)
+        {
+            filedlg->GetPaths(ret);
+        }
+        return ret;
     }
 
 
@@ -95,10 +108,27 @@ namespace ScriptBindings
          *  - __return__ The Value entered by the user or _value_
          */
 
+         /** \ingroup sq_dialogs
+         *### wxGetFileFromUser(message, caption, default_value,wildcart,style)
+         *
+         *  - __message__        Message to inform the user [wxString]
+         *  - __caption__        ... [wxString]
+         *  - __default_value__  The Default file/path [wxString]
+         *  - __wildcart__       The wildcart to filter the files [wxString]
+         *  - __style__          The styles: wxFD_DEFAULT_STYLE, wxFD_OPEN, wxFD_SAVE, wxFD_OVERWRITE_PROMPT, wxFD_FILE_MUST_EXIST, wxFD_MULTIPLE, wxFD_CHANGE_DIR, wxFD_PREVIEW
+         *
+         *
+         *  This function displays an dialog  with the possibility to ask for one or multiple files to be saved or loaded
+         *
+         *  - __return__ A wxArrayString with the given files (empty if the user canceled the dialog)
+         */
+
+
         Sqrat::RootTable()
         .SquirrelFunc(_SC("wxGetColourFromUser"),&wx_GetColourFromUser)
         .Func(_SC("wxGetNumberFromUser"),&wx_GetNumberFromUser)
         .Func(_SC("wxGetPasswordFromUser"),&wx_GetPasswordFromUser)
-        .Func(_SC("wxGetTextFromUser"),&wx_GetTextFromUser);
+        .Func(_SC("wxGetTextFromUser"),&wx_GetTextFromUser)
+        .Func(_SC("wxGetFileFromUser"),&wx_GetFileFromUser);
     }
 }

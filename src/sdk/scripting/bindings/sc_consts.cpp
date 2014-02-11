@@ -72,6 +72,17 @@ namespace ScriptBindings
         BIND_INT_CONSTANT(wxICON_WARNING);
         BIND_INT_CONSTANT(wxICON_ERROR);
 
+
+        // FileDialog styles , , , , , , ,
+        BIND_INT_CONSTANT(wxFD_DEFAULT_STYLE);
+        BIND_INT_CONSTANT(wxFD_OPEN);
+        BIND_INT_CONSTANT(wxFD_SAVE);
+        BIND_INT_CONSTANT(wxFD_OVERWRITE_PROMPT);
+        BIND_INT_CONSTANT(wxFD_FILE_MUST_EXIST);
+        BIND_INT_CONSTANT(wxFD_MULTIPLE);
+        BIND_INT_CONSTANT(wxFD_CHANGE_DIR);
+        BIND_INT_CONSTANT(wxFD_PREVIEW);
+
         // wxPathFormat
         BIND_INT_CONSTANT(wxPATH_NATIVE);
         BIND_INT_CONSTANT(wxPATH_UNIX);

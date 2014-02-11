@@ -75,8 +75,21 @@ namespace ScriptBindings
     // wxPoint //
     /////////////
 
-    // wxPoint operator==
+    // wxPoint operator >= <= > <
     SQInteger wxPoint_OpCmp(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        wxPoint& self = *sa.GetInstance<wxPoint>(1);
+        wxPoint& other = *sa.GetInstance<wxPoint>(2);
+        int ret = 0;
+        if(self != other)
+            ret = 1;
+        sa.PushValue<SQInteger>(ret);
+        return SC_RETURN_VALUE;
+    }
+
+    // wxPoint compare
+    SQInteger wxPoint_Cmp(HSQUIRRELVM v)
     {
         StackHandler sa(v);
         wxPoint& self = *sa.GetInstance<wxPoint>(1);
@@ -84,6 +97,18 @@ namespace ScriptBindings
         sa.PushValue<bool>(self==other);
         return SC_RETURN_VALUE;
     }
+
+
+    SQInteger wxPoint_OpTostring(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        wxPoint& self = *sa.GetInstance<wxPoint>(1);
+        wxString output;
+        output.Printf(_("[%d,%d]"),self.x,self.y);
+        sa.PushValue<const SQChar*>(output.mb_str(wxConvUTF8));
+        return SC_RETURN_VALUE;
+    }
+
     SQInteger wxPoint_x(HSQUIRRELVM v)
     {
         StackHandler sa(v);
@@ -99,166 +124,24 @@ namespace ScriptBindings
         return SC_RETURN_VALUE;
     }
 
-    //////////////
-    // wxString //
-    //////////////
-
-    //! Is implemented in separate file
-/*
-    // the _() function for scripts
-    wxString static_(const SQChar* str)
+    SQInteger wxSize_OpTostring(HSQUIRRELVM v)
     {
-        return wxGetTranslation(cbC2U(str));
+        StackHandler sa(v);
+        wxSize& self = *sa.GetInstance<wxSize>(1);
+        wxString output;
+        output.Printf(_("[%d,%d]"),self.GetX(),self.GetY());
+        sa.PushValue<const SQChar*>(output.mb_str(wxConvUTF8));
+        return SC_RETURN_VALUE;
     }
 
-    // the _T() function for scripts
-    wxString static_T(const SQChar* str)
-    {
-        return cbC2U(str);
-    }
-
-    // wxString operator+
-    SQInteger wxString_OpAdd(HSQUIRRELVM v)
+    SQInteger wxSize_Cmp(HSQUIRRELVM v)
     {
         StackHandler sa(v);
-        wxString result;
-        wxString& str1 = *SqPlus::GetInstance<wxString,false>(v, 1);
-        if (sa.GetType(2) == OT_INTEGER)
-        {
-#ifdef _SQ64
-            result.Printf(_T("%s%ld"), str1.c_str(), sa.GetInt(2));
-#else
-            result.Printf(_T("%s%d"), str1.c_str(), sa.GetInt(2));
-#endif
-        }
-        else if (sa.GetType(2) == OT_FLOAT)
-            result.Printf(_T("%s%f"), str1.c_str(), sa.GetFloat(2));
-        else if (sa.GetType(2) == OT_USERPOINTER)
-            result.Printf(_T("%s%p"), str1.c_str(), sa.GetUserPointer(2));
-        else if (sa.GetType(2) == OT_STRING)
-            result.Printf(_T("%s%s"), str1.c_str(), cbC2U(sa.GetString(2)).c_str());
-        else
-            result = str1 + *SqPlus::GetInstance<wxString,false>(v, 2);
-        return SqPlus::ReturnCopy(v, result);
+        wxSize& self  = *sa.GetInstance<wxSize>(1);
+        wxSize& other = *sa.GetInstance<wxSize>(2);
+        sa.PushValue<bool>(self==other);
+        return SC_RETURN_VALUE;
     }
-
-    SQInteger wxString_OpCmp(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& str1 = *SqPlus::GetInstance<wxString,false>(v, 1);
-        if (sa.GetType(2) == OT_STRING)
-            return sa.Return((SQInteger)str1.Cmp(cbC2U(sa.GetString(2))));
-        return sa.Return((SQInteger)str1.Cmp(*SqPlus::GetInstance<wxString,false>(v, 2)));
-    }
-
-    SQInteger wxString_OpToString(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        return sa.Return((const SQChar*)self.mb_str(wxConvUTF8));
-    }
-
-    SQInteger wxString_AddChar(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        int idx = sa.GetInt(2);
-        char tmp[8] = {};
-        sprintf(tmp, "%c", idx);
-        self += cbC2U(tmp);
-        return sa.Return();
-    }
-    SQInteger wxString_GetChar(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        int idx = sa.GetInt(2);
-        return sa.Return((SQInteger)(((const char*)cbU2C(self))[idx]));
-    }
-    SQInteger wxString_Matches(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        wxString& other = *SqPlus::GetInstance<wxString,false>(v, 2);
-        return sa.Return(self.Matches(other));
-    }
-    SQInteger wxString_AfterFirst(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        SQInteger search_char = static_cast<SQInteger>( sa.GetInt(2) );
-        if ( !search_char ) // Probably it's a wxString
-        {
-            wxString& temp = *SqPlus::GetInstance<wxString,false>(v, 2);
-            #if wxCHECK_VERSION(2, 9, 0)
-            search_char = static_cast<SQInteger>( temp.GetChar(0).GetValue() );
-            #else
-            search_char = static_cast<SQInteger>( temp.GetChar(0) );
-            #endif
-        }
-        return SqPlus::ReturnCopy( v, self.AfterFirst( static_cast<wxChar>( search_char ) ) );
-    }
-    SQInteger wxString_AfterLast(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        SQInteger search_char = static_cast<SQInteger>( sa.GetInt(2) );
-        if ( !search_char ) // Probably it's a wxString
-        {
-            wxString& temp = *SqPlus::GetInstance<wxString,false>(v, 2);
-            #if wxCHECK_VERSION(2, 9, 0)
-            search_char = static_cast<SQInteger>( temp.GetChar(0).GetValue() );
-            #else
-            search_char = static_cast<SQInteger>( temp.GetChar(0) );
-            #endif
-        }
-        return SqPlus::ReturnCopy( v, self.AfterLast( static_cast<wxChar>( search_char ) ) );
-    }
-    SQInteger wxString_BeforeFirst(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        SQInteger search_char = static_cast<SQInteger>( sa.GetInt(2) );
-        if ( !search_char ) // Probably it's a wxString
-        {
-            wxString& temp = *SqPlus::GetInstance<wxString,false>(v, 2);
-            #if wxCHECK_VERSION(2, 9, 0)
-            search_char = static_cast<SQInteger>( temp.GetChar(0).GetValue() );
-            #else
-            search_char = static_cast<SQInteger>( temp.GetChar(0) );
-            #endif
-        }
-        return SqPlus::ReturnCopy( v, self.BeforeFirst( static_cast<wxChar>( search_char ) ) );
-    }
-    SQInteger wxString_BeforeLast(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        SQInteger search_char = static_cast<SQInteger>( sa.GetInt(2) );
-        if ( !search_char ) // Probably it's a wxString
-        {
-            wxString& temp = *SqPlus::GetInstance<wxString,false>(v, 2);
-            #if wxCHECK_VERSION(2, 9, 0)
-            search_char = static_cast<SQInteger>( temp.GetChar(0).GetValue() );
-            #else
-            search_char = static_cast<SQInteger>( temp.GetChar(0) );
-            #endif
-        }
-        return SqPlus::ReturnCopy( v, self.BeforeLast( static_cast<wxChar>( search_char ) ) );
-    }
-    SQInteger wxString_Replace(HSQUIRRELVM v)
-    {
-        StackHandler sa(v);
-        wxString& self = *SqPlus::GetInstance<wxString,false>(v, 1);
-        wxString from = *SqPlus::GetInstance<wxString,false>(v, 2);
-        wxString to = *SqPlus::GetInstance<wxString,false>(v, 3);
-        bool all = true;
-        if (sa.GetParamCount() == 4)
-            all = sa.GetBool(4);
-        return sa.Return((SQInteger)self.Replace(from, to, all));
-    }
-*/
-
 ////////////////////////////////////////////////////////////////////////////////
 
     void Register_wxTypes(HSQUIRRELVM vm)
@@ -363,10 +246,11 @@ namespace ScriptBindings
         /////////////
         Sqrat::Class<wxPoint> wx_point(vm,"wxPoint");
         wx_point.
-                //emptyCtor().
             Ctor().
             Ctor<int,int>().
-            SquirrelFunc("_cmp",    &wxPoint_OpCmp).
+            SquirrelFunc("_cmp",      &wxPoint_OpCmp).
+            SquirrelFunc("Cmp",       &wxPoint_Cmp).
+            SquirrelFunc("_tostring", &wxPoint_OpTostring).
             Var("x",    &wxPoint::x).
             Var("y",    &wxPoint::y);
         Sqrat::RootTable(vm).Bind("wxPoint",wx_point);
@@ -381,6 +265,8 @@ namespace ScriptBindings
         wx_size.
                 Ctor().
                 Ctor<int,int>().
+                SquirrelFunc("_tostring", &wxSize_OpTostring).
+                SquirrelFunc("Cmp", &wxSize_Cmp).
                 Func("GetWidth",    &wxSize::GetWidth).
                 Func("GetHeight",   &wxSize::GetHeight).
                 Func<WXS_SET>("Set",&wxSize::Set).

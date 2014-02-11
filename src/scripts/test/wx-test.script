@@ -10,7 +10,10 @@ class wxTest extends script_test_base
         test_wxcolor();
         test_wxarray_string();
         test_wxfilename();
+        test_wxpoint();
+        test_wxsize();
         test_dialogs();
+        print_global_test_result();
     }
 
     function test_test()
@@ -152,43 +155,92 @@ class wxTest extends script_test_base
         }
         ::print("Use path: " + path + "\n");
         filename.Assign(_T(path),wxPATH_NATIVE);
+        test_string("tostring",filename,path);
         test_string("Assign",filename,path);
         test_equal("GetDirCount",filename.GetDirCount(),2);
         test_equal("GetDirs",filename.GetDirs().GetCount(),2);
 
         filename.Clear();
         test_string("Clear",filename,"");
-        filename.AssignCwd(_T(" "));
-        ::print("Test: AssignCwd = " + filename " \n");
+        filename.AssignCwd(" ");
+        ::print("Test: AssignCwd = " + filename + " \n");
         passed("AssignCwd ????");
         filename.Clear();
         filename.AssignHomeDir();
-        ::print("Test: AssignHomeDir = " + filename " \n");
+        ::print("Test: AssignHomeDir = " + filename +" \n");
         passed("AssignHomeDir ????");
         filename.Clear();
-        filename.Assign(path+"tips.txt");
+        filename.Assign(path + "tips.txt",wxPATH_NATIVE);
         test_string("GetExt",filename.GetExt(),"txt");
-        test_string("GetFullName",filename.GetExt(),"tips.txt");
-        test_string("GetFullPath",filename.GetFullPath(),path+"tips.txt");
-        ::print("Test: GetLongPath = " + filename.GetLongPath() " \n");
+        test_string("GetFullName",filename.GetFullName(),"tips.txt");
+        test_string("GetFullPath",filename.GetFullPath(wxPATH_NATIVE), path + "tips.txt");
+        ::print("Test: GetLongPath = " + filename.GetLongPath() +" \n");
         passed("GetLongPath ????");
         test_string("GetName",filename.GetName(),"tips");
-        ::print("Test: GetPath = " + filename.GetPath(0,wxPATH_NATIVE) " \n");
+        ::print("Test: GetPath = " + filename.GetPath(0,wxPATH_NATIVE) + " \n");
         passed("GetPath ????");
-        ::print("Test: GetShortPath = " + filename.GetShortPath() " \n");
+        ::print("Test: GetShortPath = " + filename.GetShortPath() + " \n");
         passed("GetShortPath ????");
-        ::print("Test: GetVolume = " + filename.GetVolume() " \n");
+        ::print("Test: GetVolume = " + filename.GetVolume() + " \n");
         passed("GetVolume ????");
         test_true("HasExt",filename.HasExt());
         test_true("HasName",filename.HasName());
-        test_true("HasVolume",filename.HasVolume());
-        test_false("IsAbsolute",filename.IsAbsolute());
+        if(PLATFORM != PLATFORM_MSW)
+            test_false("HasVolume",filename.HasVolume());
+        else
+            test_true("HasVolume",filename.HasVolume());
+
+        test_false("IsAbsolute",filename.IsAbsolute(wxPATH_NATIVE));
         test_true("IsOk",filename.IsOk());
-        test_true("IsRelative",filename.IsRelative());
+        test_true("IsRelative",filename.IsRelative(wxPATH_NATIVE));
         test_false("IsDir",filename.IsDir());
 
         print_test_result();
         ::print("======= Test wxFileName END  ======= \n");
+    }
+
+    function test_wxpoint()
+    {
+        ::print("======= Test wxPoint BEGINN ======= \n");
+        clear_test_result();
+
+        local point1 = wxPoint();
+        local point2 = wxPoint(10,10);
+        local point3 = wxPoint(10,5);
+        point1.x = 10;
+        point1.y = 10;
+        test_false("compare",point1 > point2);
+        test_true("compare",point1 > point3);
+        test_true("Cmp",point1.Cmp(point2));
+        test_false("Cmp",point1.Cmp(point3));
+        test_string("_tostring",point1,"[10,10]");
+
+        print_test_result();
+        ::print("======= Test wxPoint END  ======= \n");
+    }
+
+    function test_wxsize()
+    {
+        ::print("======= Test wxSize BEGINN ======= \n");
+        clear_test_result();
+
+        local point1 = wxSize();
+        local point2 = wxSize(10,10);
+        local point3 = wxSize(10,5);
+        point1.Set(10,10);
+        test_string("_tostring",point1,"[10,10]");
+        test_true("Cmp",point1.Cmp(point2));
+        test_false("Cmp",point1.Cmp(point3));
+        test_equal("GetWidth",point3.GetWidth(),10);
+        test_equal("GetHeight",point3.GetHeight(),5);
+        point3.SetWidth(23);
+        point3.SetHeight(66);
+        test_equal("SetWidth",point3.GetWidth(),23);
+        test_equal("SetHeight",point3.GetHeight(),66);
+
+
+        print_test_result();
+        ::print("======= Test wxSize END  ======= \n");
     }
 
     function test_dialogs()
