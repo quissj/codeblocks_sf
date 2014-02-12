@@ -100,11 +100,13 @@ class script_test_base
         if(to_test == result)
         {
             passed(name);
+            return true;
         }
         else
         {
             failed(name,"(got " + to_test + " needed "+result+")");
         }
+        return false;
     }
 
     function test_true(name,to_test)
@@ -114,11 +116,13 @@ class script_test_base
         if(to_test)
         {
             passed(name);
+            return true;
         }
         else
         {
             failed(name,"(got " + to_test + " needed true)");
         }
+        return false;
     }
 
     function test_false(name,to_test)
@@ -127,15 +131,15 @@ class script_test_base
         global_made_tests++;
         if(!to_test)
         {
-            //::print("Test: "+name+"\t\t:PASSED\n");
             passed(name);
+            return true;
         }
         else
         {
-            //::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed false) \n");
-            failed(name,"(got " + to_test + " needed false)");
 
+            failed(name,"(got " + to_test + " needed false)");
         }
+        return false;
     }
 
     function test_type(name,to_test,type)
@@ -145,12 +149,13 @@ class script_test_base
         if(typeof to_test == typeof type)
         {
             passed(name);
+            return true;
         }
         else
         {
-            //::error("Test: " + name + "\t\t:FAILED (got " + typeof to_test + " needed " + typeof type + ") \n");
             failed(name,"(got " + typeof to_test + " needed " + typeof type + ")");
         }
+        return false;
     }
 
     /*function test_string(name,to_test,result)
@@ -181,12 +186,12 @@ class script_test_base
             {
 
                 failed(name, "(got \"" + to_test + "\" needed \"" + result + "\")");
-                //::error("Test: " + name + "\t\t:FAILED (got " + to_test + " needed " + result + ") \n");
-                return;
+                return false;
             }
         }
 
         passed(name);
+        return true;
     }
 
 };
