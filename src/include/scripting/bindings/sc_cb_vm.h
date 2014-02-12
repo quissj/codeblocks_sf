@@ -336,13 +336,13 @@ public:
      * \param error SQChar a error description
      * \return SQInteger
      */
-    SQInteger ThrowError(SQChar* error);
+    SQInteger ThrowError(const SQChar* error);
 
     /** \brief Throws an squirrel error
      * \param error SQChar a error description
      * \return SQInteger
      */
-    SQInteger ThrowError(wxString error);
+    SQInteger ThrowError(const wxString error);
 
     /** \brief Returns the error message of the last occurred error or an empty string
      *

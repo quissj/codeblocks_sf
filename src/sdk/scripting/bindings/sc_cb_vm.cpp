@@ -346,13 +346,13 @@ SQObjectType StackHandler::GetType(int pos)
     return sq_gettype(m_vm,pos);
 }
 
-SQInteger StackHandler::ThrowError(SQChar* error)
+SQInteger StackHandler::ThrowError(const SQChar* error)
 {
     return sq_throwerror(m_vm,error);
 }
 
 
-SQInteger StackHandler::ThrowError(wxString error)
+SQInteger StackHandler::ThrowError(const wxString error)
 {
 
     wxString tmp = _("Stack Handler: ") + error + _("\n")+ CreateStackInfo();
