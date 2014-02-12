@@ -1174,6 +1174,9 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/include/sqdbgserver.h">
 			<Option target="Squirrel" />
 		</Unit>
