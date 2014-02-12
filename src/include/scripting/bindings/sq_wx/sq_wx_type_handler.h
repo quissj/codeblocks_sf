@@ -16,11 +16,25 @@ struct Var<wxString> {
                 value = *ptr;
             } else {
                 Sqrat::Error::Instance().Clear(v);
-                const SQChar* str;
-                sq_tostring(v, idx);
-                sq_getstring(v, -1, &str);
-                value = wxString::FromUTF8(str);
-                sq_pop(v, 1);
+                switch(sq_gettype(v,idx))
+                {
+                case OT_INTEGER:    // It is a const char ''
+                    {
+                        SQInteger val;
+                        sq_getinteger(v,idx,&val);
+                        value.Printf(_("%c"),static_cast<char>(val));
+                        break;
+                    }
+                default:
+                    {
+                        const SQChar* str;
+                        sq_tostring(v, idx);
+                        sq_getstring(v, -1, &str);
+                        value = wxString::FromUTF8(str);
+                        sq_pop(v, 1);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -30,7 +44,7 @@ struct Var<wxString> {
 };
 
 
-// FIXME (bluehazzard#1#): cleanup
+// FIXME (bluehazzard#1#): Does this work?
 template<>
 struct Var<const wxString&> {
     const wxString& value;
