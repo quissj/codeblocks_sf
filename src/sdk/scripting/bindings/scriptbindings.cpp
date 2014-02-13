@@ -632,7 +632,7 @@ namespace ScriptBindings
                 Func("AddBuildTarget",      &ProjectFile::AddBuildTarget).
                 Func("RenameBuildTarget",   &ProjectFile::RenameBuildTarget).
                 Func("RemoveBuildTarget",   &ProjectFile::RemoveBuildTarget).
-                Func( "GetbuildTargets",    &ProjectFile::GetbuildTargets).
+                Func( "GetbuildTargets",    &ProjectFile::GetBuildTargets).
                 Func("GetBaseName",         &ProjectFile::GetBaseName).
                 Func("GetObjName",          &ProjectFile::GetObjName).
                 Func("SetObjName",          &ProjectFile::SetObjName).
