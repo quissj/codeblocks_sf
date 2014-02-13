@@ -734,6 +734,9 @@
 			<Add directory="sdk/wxscintilla/include" />
 			<Add directory="sdk/wxpropgrid/include" />
 			<Add directory="include/tinyxml" />
+			<Add directory="include/scripting/bindings" />
+			<Add directory="include/scripting/sqrat" />
+			<Add directory="include/scripting/include" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="$(#WX.include)" />
