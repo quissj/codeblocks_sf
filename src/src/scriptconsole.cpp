@@ -127,7 +127,7 @@ ScriptConsole::ScriptConsole(wxWindow* parent,wxWindowID id)
     {
 
         s_Console = this;
-        ScriptBindings::CBsquirrelVM *vm = ScriptBindings::CBsquirrelVMManager::Get()->GetVM(Sqrat::DefaultVM::Get());
+        ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
         if(vm == nullptr)
         {
             // We have no vm registered...

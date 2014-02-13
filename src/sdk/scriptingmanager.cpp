@@ -109,7 +109,7 @@ ScriptingManager::ScriptingManager()
     RefreshTrusts();
 
     // register types
-    ScriptBindings::RegisterBindings();
+    ScriptBindings::RegisterBindings(vm->GetVM());
 }
 
 ScriptingManager::~ScriptingManager()

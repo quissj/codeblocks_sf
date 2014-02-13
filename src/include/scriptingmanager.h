@@ -227,6 +227,9 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         	cbThrow(_T("Can't assign a ScriptingManager* !!!"));
         	return *this;
 		}
+
+		ScriptBindings::CBsquirrelVM* GetVM()       {return vm;};
+
     private:
         // needed for SqPlus bindings
         ScriptingManager(cb_unused const ScriptingManager& rhs); // prevent copy construction

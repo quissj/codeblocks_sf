@@ -10,7 +10,7 @@
 
 namespace ScriptBindings
 {
-    void RegisterBindings();
+    void RegisterBindings(HSQUIRRELVM vm);
 }
 
 #endif // SCRIPTBINDINGS_H
