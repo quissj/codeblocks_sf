@@ -28,7 +28,7 @@
 #include <logmanager.h>
 #include <macrosmanager.h>
 #include <scriptingmanager.h>
-#include <sqrat.h>
+#include <scripting/sqrat/sqrat.h>
 #include <scripting/bindings/sc_base_types.h>
 
 #include "debugger_defs.h"
