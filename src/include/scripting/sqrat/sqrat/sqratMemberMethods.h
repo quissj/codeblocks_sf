@@ -29,7 +29,7 @@
 #if !defined(_SCRAT_MEMBER_METHODS_H_)
 #define _SCRAT_MEMBER_METHODS_H_
 
-#include <squirrel.h>
+#include <scripting/squirrel/squirrel.h>
 #include "sqratTypes.h"
 
 namespace Sqrat {

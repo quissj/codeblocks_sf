@@ -7,7 +7,7 @@
  * $HeadURL$
  */
 
- #include <squirrel.h>
+ #include <scripting/squirrel/squirrel.h>
  #include <sqrat.h>
  #include <sq_wx/sq_wx.h>
  #include <wx/numdlg.h>

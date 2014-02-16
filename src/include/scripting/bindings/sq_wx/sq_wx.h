@@ -6,7 +6,7 @@
 #ifndef SQ_WX_H
 #define SQ_WX_H
 
-#include <squirrel.h>
+#include <scripting/squirrel/squirrel.h>
 
 namespace ScriptBindings
 {

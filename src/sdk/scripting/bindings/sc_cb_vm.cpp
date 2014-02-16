@@ -4,7 +4,7 @@
 #include <cbexception.h>
 #include <logmanager.h>
 #include <wx/msgdlg.h>
-#include <squirrel.h>
+#include <scripting/squirrel/squirrel.h>
 #include <sqstdblob.h>
 #include <sqstdio.h>
 #include <sqstdmath.h>

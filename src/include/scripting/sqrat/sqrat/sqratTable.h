@@ -28,7 +28,7 @@
 #if !defined(_SCRAT_TABLE_H_)
 #define _SCRAT_TABLE_H_
 
-#include <squirrel.h>
+#include <scripting/squirrel/squirrel.h>
 #include <string.h>
 
 #include "sqratObject.h"
@@ -111,7 +111,7 @@ public:
 
     template <typename T>
     SQInteger GetValue(const SQChar* name, T& out_entry)
-    {   
+    {
         sq_pushobject(vm, obj);
         sq_pushstring(vm, name, -1);
         if (SQ_FAILED(sq_get(vm, -2)))
@@ -131,7 +131,7 @@ public:
 
     template <typename T>
     SQInteger GetValue(int index, T& out_entry)
-    {   
+    {
         sq_pushobject(vm, obj);
         sq_pushinteger(vm, index);
         if (SQ_FAILED(sq_get(vm, -2)))

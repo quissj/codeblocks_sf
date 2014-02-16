@@ -28,8 +28,8 @@
 #if !defined(_SCRAT_SCRIPT_H_)
 #define _SCRAT_SCRIPT_H_
 
-#include <squirrel.h>
-#include <sqstdio.h>
+#include <scripting/squirrel/squirrel.h>
+#include <scripting/squirrel/sqstdio.h>
 #include <string.h>
 
 #include "sqratObject.h"

@@ -67,7 +67,6 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
 					<Add directory="include/scripting/squirrel" />
 				</Compiler>
 			</Target>
@@ -80,7 +79,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fno-inline" />
-					<Add directory="include/scripting/include" />
+					<Add directory="include/scripting/squirrel" />
 					<Add directory="include/scripting/sqstdlib" />
 				</Compiler>
 			</Target>
@@ -340,9 +339,6 @@
 					<Add option="-DBUILDING_PLUGIN" />
 					<Add directory="include" />
 					<Add directory="plugins/compilergcc/depslib/src" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqrat" />
-					<Add directory="include/scripting/bindings" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />
@@ -379,8 +375,6 @@
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />
@@ -611,8 +605,6 @@
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/sqplus" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />
@@ -1169,33 +1161,6 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/include/sqdbgserver.h">
-			<Option target="Squirrel" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqrdbg.h">
-			<Option target="Squirrel" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdaux.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdblob.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdio.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdmath.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdstring.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/sqstdsystem.h">
-			<Option target="Squirrel std lib" />
-		</Unit>
-		<Unit filename="include/scripting/include/squirrel.h">
-			<Option target="Squirrel" />
-		</Unit>
 		<Unit filename="include/scripting/sqrat/sqrat.h">
 			<Option target="sdk" />
 		</Unit>
@@ -1265,6 +1230,10 @@
 		<Unit filename="include/scripting/squirrel/sqcompiler.h">
 			<Option target="Squirrel" />
 		</Unit>
+		<Unit filename="include/scripting/squirrel/sqdbgserver.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
 		<Unit filename="include/scripting/squirrel/sqfuncproto.h">
 			<Option target="Squirrel" />
 		</Unit>
@@ -1286,14 +1255,46 @@
 		<Unit filename="include/scripting/squirrel/sqpcheader.h">
 			<Option target="Squirrel" />
 		</Unit>
+		<Unit filename="include/scripting/squirrel/sqrdbg.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
 		<Unit filename="include/scripting/squirrel/sqstate.h">
 			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdaux.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdblob.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdio.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdmath.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdstring.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/sqstdsystem.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqstring.h">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/sqtable.h">
 			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="include/scripting/squirrel/squirrel.h">
+			<Option target="Squirrel" />
+			<Option target="Squirrel std lib" />
 		</Unit>
 		<Unit filename="include/scripting/squirrel/squserdata.h">
 			<Option target="Squirrel" />

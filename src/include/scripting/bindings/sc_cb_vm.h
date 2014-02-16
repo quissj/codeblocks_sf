@@ -2,8 +2,8 @@
 #ifndef SC_CB_VM_H
 #define SC_CB_VM_H
 
-#include <squirrel.h>
-#include <sqrat.h>
+#include <scripting/squirrel/squirrel.h>
+#include <scripting/sqrat/sqrat.h>
 #include "manager.h"
 #include <wx/hashmap.h>
 #include <wx/string.h>

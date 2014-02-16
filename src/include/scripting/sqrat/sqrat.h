@@ -28,7 +28,7 @@
 #if !defined(_SCRAT_MAIN_H_)
 #define _SCRAT_MAIN_H_
 
-#include <squirrel.h>
+#include <scripting/squirrel/squirrel.h>
 
 #include "sqrat/sqratTable.h"
 #include "sqrat/sqratClass.h"

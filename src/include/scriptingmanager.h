@@ -18,8 +18,8 @@
 #include "manager.h"
 #include "menuitemsmanager.h"
 #include <wx/intl.h>
-#include <sc_cb_vm.h>
-#include <sqrat/sqratUtil.h>
+#include <scripting/bindings/sc_cb_vm.h>
+#include <scripting/sqrat/sqrat/sqratUtil.h>
 
 
 void PrintSquirrelToWxString(wxString &msg,const SQChar *s, va_list& vl);
