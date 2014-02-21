@@ -15,8 +15,227 @@
 
 #include <map>
 
-namespace ScriptBindings {
-namespace ScriptPluginWrapper {
+namespace ScriptBindings
+{
+
+cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false),
+    m_menu_manager(true),             // Destroy the menu if this plugin is removed...
+    m_object(obj)
+{
+
+    // TODO register the RegisterCBEvent function here.
+
+}
+
+cbScriptPlugin::~cbScriptPlugin()
+{
+    if(m_AttachedToMainWindow)
+    {
+        Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
+        m_AttachedToMainWindow = false;
+    }
+}
+
+void cbScriptPlugin::OnMenu(wxMenuEvent &evt)
+{
+    if(wxGetKeyState(WXK_SHIFT))
+    {
+        // The sift key is pressed. We should now open the script in an editor window...
+        // TODO (bluehazzard#1#): implement open script in editor...
+    }
+    cb_menu_id_to_idx::iterator itr =  m_menu_to_idx_map.find(evt.GetId());
+    if(itr ==m_menu_to_idx_map.end())
+    {
+        //Wrong menu id
+        // could not find any corresponding index
+    }
+
+    Sqrat::Function func(m_object,"OnMenuClicked");
+    if (!func.IsNull())
+    {
+        func(itr->second);
+        if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+        {
+            //Error
+        }
+    }
+}
+
+void cbScriptPlugin::OnModulMenu(wxMenuEvent &evt)
+{
+    if(wxGetKeyState(WXK_SHIFT))
+    {
+        // The sift key is pressed. We should now open the script in an editor window...
+        // TODO (bluehazzard#1#): implement open script in editor...
+    }
+    cb_menu_id_to_idx::iterator itr =  m_modul_menu_to_idx_map.find(evt.GetId());
+    if(itr ==m_modul_menu_to_idx_map.end())
+    {
+        //Wrong menu id
+        // could not find any corresponding index
+    }
+
+    Sqrat::Function func(m_object,"OnModuleMenuClicked");
+    if (!func.IsNull())
+    {
+        func(itr->second);
+        if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+        {
+            //Error
+        }
+    }
+}
+
+
+
+void cbScriptPlugin::OnCBEvt(CodeBlocksEvent& evt)
+{
+    cb_evt_func_map::iterator itm = m_cb_evt_map.find(evt.GetEventType());
+
+    if (itm == m_cb_evt_map.end())
+        return; // not a registered event?
+
+    Sqrat::Function func(m_object,itm->second.mb_str());
+    if (!func.IsNull())
+    {
+        func(evt);
+        Manager::Get()->GetScriptingManager()->DisplayErrors();
+    }
+    else
+    {
+        // Could not find the registered event callback
+        Manager::Get()->GetLogManager()->LogWarning(_("Scripting error: Could not find event callback \"") + itm->second + _("\" in ") + GetName() );
+    }
+}
+
+
+int cbScriptPlugin::RegisterCBEvent(wxEventType evt, wxString func)
+{
+    cb_evt_func_map::iterator itm = m_cb_evt_map.find(evt);
+    if (itm == m_cb_evt_map.end())
+    {
+        itm = m_cb_evt_map.insert(m_cb_evt_map.end(), std::make_pair(evt, func));
+        Manager::Get()->RegisterEventSink(evt, new cbEventFunctor<cbScriptPlugin, CodeBlocksEvent>(this, &cbScriptPlugin::OnCBEvt));
+    }
+    else
+    {
+        itm->second = func;
+    }
+    return 0;
+}
+
+int cbScriptPlugin::CreateMenus()
+{
+    Sqrat::Function func(m_object,"GetMenu");
+    if (func.IsNull())
+        return 0;       // This plugin does not need menus
+
+    wxArrayString menu_arr;
+    menu_arr = func.Evaluate<wxArrayString>();
+    if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+    {
+        return 0;
+    }
+
+    if (menu_arr.GetCount())
+    {
+        if(m_AttachedToMainWindow == false)
+        {
+            Manager::Get()->GetAppWindow()->PushEventHandler(this);
+            m_AttachedToMainWindow = true;
+        }
+        for (size_t i = 0; i < menu_arr.GetCount(); ++i)
+        {
+            int id = wxNewId();
+            id = m_menu_manager.CreateFromString(menu_arr[i], id);
+            if(id == 0)
+            {
+                Manager::Get()->GetLogManager()->LogWarning(_("Could not create menu \"") + menu_arr[i] +_("\" in script ")+ GetName());
+                continue;
+            }
+
+            wxMenuItem* item = Manager::Get()->GetAppFrame()->GetMenuBar()->FindItem(id);
+            if (item)
+            {
+                item->SetHelp(_("Press SHIFT while clicking this menu item to edit the assigned script in the editor"));
+
+                Connect(id, wxEVT_COMMAND_MENU_SELECTED,
+                        (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
+                        &cbScriptPlugin::OnMenu,nullptr,this);
+
+                Manager::Get()->GetLogManager()->Log(_("Registered event for menu \"") +
+                                                     menu_arr[i] + _("\" for script ") + GetName() + _(" with id: ") + F(_("%d"),id) );
+
+                m_menu_to_idx_map.insert(m_menu_to_idx_map.end(), std::make_pair(id, i));
+
+            }
+        }
+    }
+}
+
+int cbScriptPlugin::Execute()
+{
+    Sqrat::Function func(m_object,"Execute");
+    if (!func.IsNull())
+    {
+        func();
+        if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+        {
+            return -1;
+        }
+        return 1;
+    }
+    return -2;
+}
+
+void cbScriptPlugin::BuildModuleMenu(cb_optional const ModuleType type, cb_optional wxMenu* menu, cb_optional const FileTreeData* data)
+{
+    Sqrat::Function func(m_object,"GetModuleMenu");
+    if (func.IsNull())
+        return;       // This plugin does not need menus
+
+    wxArrayString menu_arr;
+    menu_arr = func.Evaluate<wxArrayString>(type,data);
+    if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+    {
+        return;
+    }
+
+    if (menu_arr.GetCount()==1) // exactly one menu entry
+    {
+        int id = wxNewId();
+        menu->Append(id, menu_arr[0]);
+
+        Connect(id, -1, wxEVT_COMMAND_MENU_SELECTED,
+                (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
+                &cbScriptPlugin::OnModulMenu);
+        Manager::Get()->GetLogManager()->Log(_("Registered event for menu \"") + menu_arr[0] + _("\" for script ") + GetName());
+
+        m_modul_menu_to_idx_map.insert(m_modul_menu_to_idx_map.end(), std::make_pair(id, 0));
+
+    }
+    else if (menu_arr.GetCount()>1) // more menu entries -> create sub-menu
+    {
+        wxMenu* sub = new wxMenu;
+        for (size_t i = 0; i < menu_arr.GetCount(); ++i)
+        {
+            int id = wxNewId();
+            sub->Append(id, menu_arr[i]);
+            Connect(id, -1, wxEVT_COMMAND_MENU_SELECTED,
+                    (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
+                    &cbScriptPlugin::OnModulMenu);
+            Manager::Get()->GetLogManager()->Log(_("Registered event for menu \"") + menu_arr[0] + _("\" for script ") + GetName());
+
+            m_modul_menu_to_idx_map.insert(m_modul_menu_to_idx_map.end(), std::make_pair(id, i));
+
+        }
+        menu->Append(-1, GetName() , sub);
+    }
+}
+
+
+namespace ScriptPluginWrapper
+{
 
 // struct and map for mapping script plugins to menu callbacks
 struct MenuCallback
@@ -211,30 +430,18 @@ SQInteger RegisterPlugin(HSQUIRRELVM vm)
     Sqrat::Object o(obj,vm);
     //o.AttachToStackObject(2);
 
-    Sqrat::Function func(o,"GetPluginInfo");
+    cbScriptPlugin* plugin = new cbScriptPlugin(o);
 
+    Sqrat::Function func(o,"GetPluginInfo");
     // first verify that there is a member function to retrieve the plugin info
     if (func.IsNull())
         return sq_throwerror(vm, "Not a script plugin!");
 
     // ask for its registration name
     PluginInfo info = func.Evaluate<PluginInfo>();
-    wxString s = info.name;
 
-    // look if a script plugin with the same name already exists
-    ScriptPlugins::iterator it = s_ScriptPlugins.find(s);
-    if (it != s_ScriptPlugins.end())
-    {
-        // already exists; release the old one
-        s_ScriptPlugins.erase(it);
-        Manager::Get()->GetLogManager()->Log(_("Script plugin unregistered: ") + s);
-    }
-
-    // finally, register this script plugin
-    it = s_ScriptPlugins.insert(s_ScriptPlugins.end(), std::make_pair(s, o));
-    Manager::Get()->GetLogManager()->Log(_("Script plugin registered: ") + s);
-
-    Manager::Get()->GetScriptingManager()->RegisterScriptPlugin(s, CreateMenu(s));
+    plugin->SetInfo(info);
+    Manager::Get()->GetScriptingManager()->RegisterScriptPlugin(plugin->GetName(), plugin);
 
     // this function returns nothing on the squirrel stack
     return SC_RETURN_OK;
@@ -251,17 +458,13 @@ SQInteger GetPlugin(HSQUIRRELVM v)
     //const wxString& name = *SqPlus::GetInstance<wxString,false>(v, 2);
     const wxString& name = *sa.GetInstance<wxString>(2);
 
-    // search for it in the registered script plugins list
-    ScriptPlugins::iterator it = s_ScriptPlugins.find(name);
-    if (it != s_ScriptPlugins.end())
-    {
-        // found; return the squirrel object
-        sa.PushValue<HSQOBJECT>(it->second.GetObject());
-        return SC_RETURN_VALUE;
-    }
+    cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(name);
+    if(plugin == nullptr)
+        return SC_RETURN_OK;
 
-    // not found; return nothing
-    return SC_RETURN_OK;
+    // search for it in the registered script plugins list
+    sa.PushValue<HSQOBJECT>(plugin->GetObject());
+    return SC_RETURN_VALUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,24 +472,40 @@ SQInteger GetPlugin(HSQUIRRELVM v)
 ////////////////////////////////////////////////////////////////////////////////
 int ExecutePlugin(const wxString& name)
 {
-    StackHandler sa(Sqrat::DefaultVM::Get());
-    // look for script plugin
-    ScriptPlugins::iterator it = s_ScriptPlugins.find(name);
-    if (it != s_ScriptPlugins.end())
+    return Manager::Get()->GetScriptingManager()->ExecutePlugin(name);
+
+}
+
+SQInteger RegisterCBEvent(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    if(sa.GetParamCount() < 4)
+        return sa.ThrowError(_("RegisterCBEvent: to few parameter"));
+
+    HSQOBJECT obj;
+    sq_getstackobj(vm,2,&obj);
+    Sqrat::Object o(obj,vm);
+
+
+    Sqrat::Function func(o,"GetPluginInfo");
+    if (func.IsNull())
+        return sq_throwerror(vm, "Not a script plugin!");
+
+    // ask for its registration name
+    PluginInfo info = func.Evaluate<PluginInfo>();
+
+    cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(info.name);
+    if(plugin == nullptr)
     {
-        // found; execute it
-        Sqrat::Object& o = it->second;
-        Sqrat::Function func(o,"Execute");
-        if (!func.IsNull())
-        {
-            func();
-            if(Manager::Get()->GetScriptingManager()->DisplayErrors())
-            {
-                //cbMessageBox(sa.GetError(), _("Script error"), wxICON_ERROR);
-            }
-        }
+        return sa.ThrowError(_("RegisterCBEvent: Could not find: ") + info.name + _(" to register a c::b event"));
     }
-    return -1;
+
+    wxEventType type = sa.GetValue<wxEventType>(3);
+    wxString func_name = sa.GetValue<wxString>(4);
+
+    plugin->RegisterCBEvent(type,func_name);
+
+    return SC_RETURN_OK;
 }
 
 }; // namespace ScriptPluginWrapper
@@ -338,6 +557,7 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     Sqrat::RootTable(vm).Func("ExecutePlugin",&ScriptPluginWrapper::ExecutePlugin);
     Sqrat::RootTable(vm).SquirrelFunc("GetPlugin",&ScriptPluginWrapper::GetPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("RegisterPlugin",&ScriptPluginWrapper::RegisterPlugin);
+    Sqrat::RootTable(vm).SquirrelFunc("RegisterCBEvent",&ScriptPluginWrapper::RegisterCBEvent);
 
     // load base script plugin
 
@@ -362,8 +582,8 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     {
         // TODO (bluehazzard#1#): DisplayErrors from ScriptingManager causes a infinite loop
         cbMessageBox(wxString::Format(_("Failed to register script plugins framework.\n\n")) + sa.GetError(),
-                    _("Script compile error"),
-                    wxICON_ERROR);
+                     _("Script compile error"),
+                     wxICON_ERROR);
     }
 
     // restore the printfunc
