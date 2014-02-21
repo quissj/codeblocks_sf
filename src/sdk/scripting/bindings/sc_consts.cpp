@@ -9,7 +9,13 @@
 
 #include <sdk_precomp.h>
 #ifndef CB_PRECOMP
+
     #include <wx/string.h>
+    #include <wx/filedlg.h>
+
+    #include <compileoptionsbase.h>
+    #include <cbproject.h>
+    #include <cbplugin.h>
     #include <globals.h>
     #include <settings.h>
 #endif
@@ -73,7 +79,7 @@ namespace ScriptBindings
         BIND_INT_CONSTANT(wxICON_ERROR);
 
 
-        // FileDialog styles , , , , , , ,
+        // FileDialog styles
         BIND_INT_CONSTANT(wxFD_DEFAULT_STYLE);
         BIND_INT_CONSTANT(wxFD_OPEN);
         BIND_INT_CONSTANT(wxFD_SAVE);
@@ -286,5 +292,113 @@ namespace ScriptBindings
         BIND_WXSTR_CONSTANT_NAMED(FileFilters::RESOURCEBIN_DOT_EXT, "DOT_EXT_RESOURCEBIN");
         BIND_WXSTR_CONSTANT_NAMED(FileFilters::XML_DOT_EXT, "DOT_EXT_XML");
         BIND_WXSTR_CONSTANT_NAMED(FileFilters::SCRIPT_DOT_EXT, "DOT_EXT_SCRIPT");
+
+        // cbEvents
+        BIND_INT_CONSTANT(cbEVT_APP_STARTUP_DONE);
+        BIND_INT_CONSTANT(cbEVT_APP_START_SHUTDOWN);
+        BIND_INT_CONSTANT(cbEVT_APP_ACTIVATED);
+        BIND_INT_CONSTANT(cbEVT_APP_DEACTIVATED);
+        // plugin events
+        BIND_INT_CONSTANT(cbEVT_PLUGIN_ATTACHED);
+        BIND_INT_CONSTANT(cbEVT_PLUGIN_RELEASED);
+        BIND_INT_CONSTANT(cbEVT_PLUGIN_INSTALLED);
+        BIND_INT_CONSTANT(cbEVT_PLUGIN_UNINSTALLED);
+        BIND_INT_CONSTANT(cbEVT_PLUGIN_LOADING_COMPLETE);
+        // editor events
+        BIND_INT_CONSTANT(cbEVT_EDITOR_CLOSE);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_OPEN);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_SWITCHED);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_ACTIVATED);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_DEACTIVATED);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_BEFORE_SAVE);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_SAVE);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_MODIFIED);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_TOOLTIP);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_TOOLTIP_CANCEL);
+        BIND_INT_CONSTANT(cbEVT_EDITOR_UPDATE_UI);
+        // project events
+        BIND_INT_CONSTANT(cbEVT_PROJECT_NEW);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_CLOSE);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_OPEN);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_SAVE);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_ACTIVATE);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_BEGIN_ADD_FILES);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_END_ADD_FILES);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_BEGIN_REMOVE_FILES);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_END_REMOVE_FILES);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_FILE_ADDED);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_FILE_REMOVED);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_FILE_CHANGED);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_POPUP_MENU);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_TARGETS_MODIFIED);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_RENAMED);
+        BIND_INT_CONSTANT(cbEVT_PROJECT_OPTIONS_CHANGED);
+        BIND_INT_CONSTANT(cbEVT_WORKSPACE_CHANGED);
+        BIND_INT_CONSTANT(cbEVT_WORKSPACE_LOADING_COMPLETE);
+        // build targets events
+        BIND_INT_CONSTANT(cbEVT_BUILDTARGET_ADDED);
+        BIND_INT_CONSTANT(cbEVT_BUILDTARGET_REMOVED);
+        BIND_INT_CONSTANT(cbEVT_BUILDTARGET_RENAMED);
+        BIND_INT_CONSTANT(cbEVT_BUILDTARGET_SELECTED);
+        // pipedprocess events
+        BIND_INT_CONSTANT(cbEVT_PIPEDPROCESS_STDOUT);
+        BIND_INT_CONSTANT(cbEVT_PIPEDPROCESS_STDERR);
+        BIND_INT_CONSTANT(cbEVT_PIPEDPROCESS_TERMINATED);
+        // thread-pool events
+        BIND_INT_CONSTANT(cbEVT_THREADTASK_STARTED);
+        BIND_INT_CONSTANT(cbEVT_THREADTASK_ENDED);
+        BIND_INT_CONSTANT(cbEVT_THREADTASK_ALLDONE);
+        // request app to dock/undock a window
+        BIND_INT_CONSTANT(cbEVT_ADD_DOCK_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_REMOVE_DOCK_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_SHOW_DOCK_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_HIDE_DOCK_WINDOW);
+        // force update current view layout
+        BIND_INT_CONSTANT(cbEVT_UPDATE_VIEW_LAYOUT);
+        // ask which is the current view layout
+        BIND_INT_CONSTANT(cbEVT_QUERY_VIEW_LAYOUT);
+        // request app to switch view layout
+        BIND_INT_CONSTANT(cbEVT_SWITCH_VIEW_LAYOUT);
+        // app notifies that a new layout has been applied
+        BIND_INT_CONSTANT(cbEVT_SWITCHED_VIEW_LAYOUT);
+        // app notifies that a docked window has been hidden/shown
+        BIND_INT_CONSTANT(cbEVT_DOCK_WINDOW_VISIBILITY);
+        // app notifies that the menubar is started being (re)created
+        BIND_INT_CONSTANT(cbEVT_MENUBAR_CREATE_BEGIN);
+        // app notifies that the menubar (re)creation ended
+        BIND_INT_CONSTANT(cbEVT_MENUBAR_CREATE_END);
+        // compiler-related events
+        BIND_INT_CONSTANT(cbEVT_COMPILER_STARTED);
+        BIND_INT_CONSTANT(cbEVT_COMPILER_FINISHED);
+        BIND_INT_CONSTANT(cbEVT_COMPILER_SET_BUILD_OPTIONS);
+        BIND_INT_CONSTANT(cbEVT_CLEAN_PROJECT_STARTED);
+        BIND_INT_CONSTANT(cbEVT_CLEAN_WORKSPACE_STARTED);
+        BIND_INT_CONSTANT(cbEVT_COMPILER_SETTINGS_CHANGED);
+        // request app to compile a single file
+        BIND_INT_CONSTANT(cbEVT_COMPILE_FILE_REQUEST);
+        // debugger-related events
+        BIND_INT_CONSTANT(cbEVT_DEBUGGER_STARTED);
+        BIND_INT_CONSTANT(cbEVT_DEBUGGER_PAUSED);
+        BIND_INT_CONSTANT(cbEVT_DEBUGGER_FINISHED);
+
+        // logger-related events
+        BIND_INT_CONSTANT(cbEVT_ADD_LOG_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_REMOVE_LOG_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_HIDE_LOG_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_SWITCH_TO_LOG_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_GET_ACTIVE_LOG_WINDOW);
+        BIND_INT_CONSTANT(cbEVT_SHOW_LOG_MANAGER);
+        BIND_INT_CONSTANT(cbEVT_HIDE_LOG_MANAGER);
+        BIND_INT_CONSTANT(cbEVT_LOCK_LOG_MANAGER);
+        BIND_INT_CONSTANT(cbEVT_UNLOCK_LOG_MANAGER);
+
+        //cbAUiNotebook related events
+        BIND_INT_CONSTANT(cbEVT_CBAUIBOOK_LEFT_DCLICK);
+
+        // code-completion related events
+        BIND_INT_CONSTANT(cbEVT_COMPLETE_CODE);
+        BIND_INT_CONSTANT(cbEVT_SHOW_CALL_TIP);
+
+        BIND_INT_CONSTANT(cbEVT_SETTINGS_CHANGED);
     }
 };

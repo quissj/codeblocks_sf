@@ -166,7 +166,9 @@ namespace ScriptBindings
                         #else
                         if ( !mbar->ProcessEvent(evt) )
                         {
-                            wxString msg; msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
+                            // TODO (bluehazzard#1#): Report the error to squirrel
+                            wxString msg;
+                            msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
                             cbMessageBox(msg, _("Script error"), wxICON_WARNING);
                         }
                         #endif
