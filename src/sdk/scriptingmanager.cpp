@@ -317,7 +317,7 @@ bool ScriptingManager::UnRegisterScriptPlugin(const wxString& name)
 
     delete itr->second;
     m_registered_plugins.erase(itr);
-    Manager::Get()->GetLogManager()->Log(_("Script plugin unregistered: ") + itr->first);
+    Manager::Get()->GetLogManager()->Log(_("Script plugin unregistered: ") + name);
     return true;
 }
 

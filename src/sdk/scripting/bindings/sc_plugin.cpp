@@ -29,6 +29,7 @@ cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false
 
 cbScriptPlugin::~cbScriptPlugin()
 {
+    Manager::Get()->RemoveAllEventSinksFor(this);
     if(m_AttachedToMainWindow)
     {
         Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
@@ -455,15 +456,15 @@ SQInteger GetPlugin(HSQUIRRELVM v)
     StackHandler sa(v);
 
     // get the script plugin's name
-    //const wxString& name = *SqPlus::GetInstance<wxString,false>(v, 2);
     const wxString& name = *sa.GetInstance<wxString>(2);
 
+    // search for it in the registered script plugins list
     cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(name);
     if(plugin == nullptr)
         return SC_RETURN_OK;
 
-    // search for it in the registered script plugins list
     sa.PushValue<HSQOBJECT>(plugin->GetObject());
+
     return SC_RETURN_VALUE;
 }
 
