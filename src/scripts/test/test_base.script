@@ -47,6 +47,12 @@ class script_test_base
         sa.Resume();
     }
 
+    function made_passed(name)
+    {
+        global_made_tests++;
+        passed(name);
+    }
+
     function failed(name,message)
     {
         sa.Pause();
@@ -54,6 +60,12 @@ class script_test_base
         global_failed_tests++;
         ::error(format_output(name,"FAILED " + message +"\n"));//(got " + to_test + " needed "+result+") \n"));
         sa.Resume();
+    }
+
+    function made_failed(name,message)
+    {
+        global_made_tests++;
+        failed(name,message);
     }
 
     function clear_test_result()

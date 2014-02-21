@@ -34,27 +34,27 @@ class wxTest extends script_test_base
 
         local string = wxString("Hallo");
         if(test_string("tostring",string,"Hallo") == true)
-            passed("constructor(SQchar)");
+            made_passed("constructor(SQchar)");
         else
-            failed("constructor(SQchar)","see previous result");
+            made_failed("constructor(SQchar)","see previous result");
 
         local string2 = wxString(string);
         if(test_string("tostring",string2,"Hallo") == true)
-            passed("constructor(wxString)");
+            made_passed("constructor(wxString)");
         else
-            failed("constructor(wxString)","see previous result");
+            made_failed("constructor(wxString)","see previous result");
 
         string2 = wxString(42);
         if(test_string("tostring",string2,"42") == true)
-            passed("constructor(42)");
+            made_passed("constructor(42)");
         else
-            failed("constructor(42)","see previous result");
+            made_failed("constructor(42)","see previous result");
 
         string2 = wxString(42.42);
         if(test_string("tostring",string2,"42.42") == true)
-            passed("constructor(42.42)");
+            made_passed("constructor(42.42)");
         else
-            failed("constructor(42.42)","see previous result");
+            made_failed("constructor(42.42)","see previous result");
 
         test_false("IsEmpty",string.IsEmpty());
         test_equal("Length",string.Length(),5);
@@ -106,27 +106,27 @@ class wxTest extends script_test_base
 
         local string = wxString("!5Aa ЉЩщӃ ウインカリ");
         if(test_string("tostring",string,"!5Aa ЉЩщӃ ウインカリ") == true)
-            passed("constructor(SQchar)");
+            made_passed("constructor(SQchar)");
         else
-            failed("constructor(SQchar)","see previous result");
+            made_failed("constructor(SQchar)","see previous result");
 
         local string2 = wxString(string);
         if(test_string("tostring",string2,"!5Aa ЉЩщӃ ウインカリ") == true)
-            passed("constructor(wxString)");
+            made_passed("constructor(wxString)");
         else
-            failed("constructor(wxString)","see previous result");
+            made_failed("constructor(wxString)","see previous result");
 
         string2 = wxString(42);
         if(test_string("tostring",string2,"42") == true)
-            passed("constructor(42)");
+            made_passed("constructor(42)");
         else
-            failed("constructor(42)","see previous result");
+            made_failed("constructor(42)","see previous result");
 
         string2 = wxString(42.42);
         if(test_string("tostring",string2,"42.42") == true)
-            passed("constructor(42.42)");
+            made_passed("constructor(42.42)");
         else
-            failed("constructor(42.42)","see previous result");
+            made_failed("constructor(42.42)","see previous result");
 
         test_false("IsEmpty",string.IsEmpty());
         test_equal("Length",string.Length(),15);
@@ -189,10 +189,10 @@ class wxTest extends script_test_base
             array = wxArrayString();
         } catch  (err)
         {
-            failed("constructor"," ");
+            made_failed("constructor"," ");
             return;
         }
-        passed("constructor");
+        made_passed("constructor");
 
 
         array.Add(_T("String1"),1);
@@ -224,10 +224,10 @@ class wxTest extends script_test_base
             filename = wxFileName();
         } catch  (err)
         {
-            failed("constructor"," ");
+            made_failed("constructor"," ");
             return;
         }
-        passed("constructor");
+        made_passed("constructor");
 
         local path;
         if(PLATFORM == PLATFORM_MSW )
@@ -240,7 +240,7 @@ class wxTest extends script_test_base
         }
         else
         {
-            failed("Assign","Your operating system is not supported in this test script. Please add a test case. Thank you.");
+            made_failed("Assign","Your operating system is not supported in this test script. Please add a test case. Thank you.");
             return;
         }
         ::print("Use path: " + path + "\n");
@@ -254,25 +254,25 @@ class wxTest extends script_test_base
         test_string("Clear",filename,"");
         filename.AssignCwd(" ");
         ::print("Test: AssignCwd = " + filename + " \n");
-        passed("AssignCwd ????");
+        made_passed("AssignCwd ????");
         filename.Clear();
         filename.AssignHomeDir();
         ::print("Test: AssignHomeDir = " + filename +" \n");
-        passed("AssignHomeDir ????");
+        made_passed("AssignHomeDir ????");
         filename.Clear();
         filename.Assign(path + "tips.txt",wxPATH_NATIVE);
         test_string("GetExt",filename.GetExt(),"txt");
         test_string("GetFullName",filename.GetFullName(),"tips.txt");
         test_string("GetFullPath",filename.GetFullPath(wxPATH_NATIVE), path + "tips.txt");
         ::print("Test: GetLongPath = " + filename.GetLongPath() +" \n");
-        passed("GetLongPath ????");
+        made_passed("GetLongPath ????");
         test_string("GetName",filename.GetName(),"tips");
         ::print("Test: GetPath = " + filename.GetPath(0,wxPATH_NATIVE) + " \n");
-        passed("GetPath ????");
+        made_passed("GetPath ????");
         ::print("Test: GetShortPath = " + filename.GetShortPath() + " \n");
-        passed("GetShortPath ????");
+        made_passed("GetShortPath ????");
         ::print("Test: GetVolume = " + filename.GetVolume() + " \n");
-        passed("GetVolume ????");
+        made_passed("GetVolume ????");
         test_true("HasExt",filename.HasExt());
         test_true("HasName",filename.HasName());
         if(PLATFORM != PLATFORM_MSW)
