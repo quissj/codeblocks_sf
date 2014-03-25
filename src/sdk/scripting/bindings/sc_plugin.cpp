@@ -20,7 +20,8 @@ namespace ScriptBindings
 
 cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false),
     m_menu_manager(true),             // Destroy the menu if this plugin is removed...
-    m_object(obj)
+    m_object(obj),
+    m_script_file(wxEmptyString)
 {
 
     // TODO register the RegisterCBEvent function here.
@@ -42,7 +43,8 @@ void cbScriptPlugin::OnMenu(wxMenuEvent &evt)
     if(wxGetKeyState(WXK_SHIFT))
     {
         // The sift key is pressed. We should now open the script in an editor window...
-        // TODO (bluehazzard#1#): implement open script in editor...
+        Manager::Get()->GetEditorManager()->Open(GetScriptFile());
+        return;
     }
     cb_menu_id_to_idx::iterator itr =  m_menu_to_idx_map.find(evt.GetId());
     if(itr ==m_menu_to_idx_map.end())
@@ -67,7 +69,8 @@ void cbScriptPlugin::OnModulMenu(wxMenuEvent &evt)
     if(wxGetKeyState(WXK_SHIFT))
     {
         // The sift key is pressed. We should now open the script in an editor window...
-        // TODO (bluehazzard#1#): implement open script in editor...
+        Manager::Get()->GetEditorManager()->Open(GetScriptFile());
+        return;
     }
     cb_menu_id_to_idx::iterator itr =  m_modul_menu_to_idx_map.find(evt.GetId());
     if(itr ==m_modul_menu_to_idx_map.end())
@@ -225,6 +228,7 @@ void cbScriptPlugin::BuildModuleMenu(cb_optional const ModuleType type, cb_optio
             Connect(id, -1, wxEVT_COMMAND_MENU_SELECTED,
                     (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
                     &cbScriptPlugin::OnModulMenu);
+
             Manager::Get()->GetLogManager()->Log(_("Registered event for menu \"") + menu_arr[0] + _("\" for script ") + GetName());
 
             m_modul_menu_to_idx_map.insert(m_modul_menu_to_idx_map.end(), std::make_pair(id, i));
@@ -254,7 +258,15 @@ SQInteger RegisterPlugin(HSQUIRRELVM vm)
     Sqrat::Function func(o,"GetPluginInfo");
     // first verify that there is a member function to retrieve the plugin info
     if (func.IsNull())
+    {
+        delete plugin;
         return sq_throwerror(vm, "Not a script plugin!");
+    }
+
+
+    SQStackInfos si;
+    sq_stackinfos(vm,1,&si);
+    plugin->SetScriptFile(wxString(si.source,wxConvUTF8));
 
     // ask for its registration name
     PluginInfo info = func.Evaluate<PluginInfo>();

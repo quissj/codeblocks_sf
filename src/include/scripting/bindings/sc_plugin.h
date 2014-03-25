@@ -91,6 +91,12 @@ public:
         return m_object;
     };
 
+    wxString GetScriptFile()                {return m_script_file;};
+    void SetScriptFile(wxString file)
+    {
+        m_script_file = file;
+    };
+
 
     friend SQInteger ScriptPluginWrapper::RegisterPlugin(HSQUIRRELVM vm);
 
@@ -114,6 +120,7 @@ private:
     bool m_AttachedToMainWindow;
     MenuItemsManager m_menu_manager;
     Sqrat::Object m_object;
+    wxString m_script_file;
 
 };
 
