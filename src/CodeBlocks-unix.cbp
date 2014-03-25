@@ -2295,6 +2295,9 @@
 		<Unit filename="scripts/startup.script">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="scripts/test/event-test-plugin.script">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="scripts/test/script-test-plugin.script">
 			<Option target="Squirrel" />
 			<Option target="sdk" />
@@ -2305,6 +2308,9 @@
 			<Option target="Squirrel" />
 			<Option target="sdk" />
 			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/test/user-dialog-test-plugin.script">
+			<Option target="sdk" />
 		</Unit>
 		<Unit filename="scripts/test/wx-test.script">
 			<Option target="Squirrel" />
