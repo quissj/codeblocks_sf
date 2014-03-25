@@ -65,11 +65,6 @@ namespace ScriptBindings
         return wxDirSelector(message,default_path,style,wxDefaultPosition,nullptr);
     }
 
-    int wx_MessageBox(const wxString& message, const wxString& caption,long style)
-    {
-        return wxMessageBox(message,caption,style);
-    }
-
     void bind_wx_util_dialogs(HSQUIRRELVM vm)
     {
         /** \ingroup sq_dialogs
@@ -190,6 +185,6 @@ namespace ScriptBindings
         .Func(_SC("wxGetFileFromUser"),&wx_GetFileFromUser)
         .Func(_SC("wxBell"),&wxBell)
         .Func(_SC("wxDirSelector"),&wx_GetDirFromUser)
-        .Func(_SC("wxMessageBox"),&wx_MessageBox);
+
     }
 }
