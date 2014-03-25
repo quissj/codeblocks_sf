@@ -7,6 +7,8 @@
 #define SQ_WX_H
 
 #include <scripting/squirrel/squirrel.h>
+#include <sqrat.h>
+#include <sq_wx/sq_wx_type_handler.h>
 
 namespace ScriptBindings
 {

@@ -22,13 +22,8 @@
 
 #include <filefilters.h>
 #include <sqrat.h>
-//#include "sc_base_types.h"
+#include "sc_binding_util.h"
 
-// helper macros to bind constants
-#define BIND_INT_CONSTANT(a) Sqrat::ConstTable(vm).Const(_SC(#a), a)
-#define BIND_INT_CONSTANT_NAMED(a,n) Sqrat::ConstTable(vm).Const(_SC(n), a)
-// NOTE (bluehazzard#1#): This can break the API, but the old API was wrong, because constants should be constants and don't get modified...
-#define BIND_WXSTR_CONSTANT_NAMED(a,n) Sqrat::ConstTable(vm).Const(_SC(n),a.ToUTF8())
 
 namespace ScriptBindings
 {
@@ -64,30 +59,6 @@ namespace ScriptBindings
 
         // path separator for filenames
         BIND_WXSTR_CONSTANT_NAMED(s_PathSep, "wxFILE_SEP_PATH");
-
-        // dialog buttons
-        BIND_INT_CONSTANT(wxOK);
-        BIND_INT_CONSTANT(wxYES_NO);
-        BIND_INT_CONSTANT(wxCANCEL);
-        BIND_INT_CONSTANT(wxID_OK);
-        BIND_INT_CONSTANT(wxID_YES);
-        BIND_INT_CONSTANT(wxID_NO);
-        BIND_INT_CONSTANT(wxID_CANCEL);
-        BIND_INT_CONSTANT(wxICON_QUESTION);
-        BIND_INT_CONSTANT(wxICON_INFORMATION);
-        BIND_INT_CONSTANT(wxICON_WARNING);
-        BIND_INT_CONSTANT(wxICON_ERROR);
-
-
-        // FileDialog styles
-        BIND_INT_CONSTANT(wxFD_DEFAULT_STYLE);
-        BIND_INT_CONSTANT(wxFD_OPEN);
-        BIND_INT_CONSTANT(wxFD_SAVE);
-        BIND_INT_CONSTANT(wxFD_OVERWRITE_PROMPT);
-        BIND_INT_CONSTANT(wxFD_FILE_MUST_EXIST);
-        BIND_INT_CONSTANT(wxFD_MULTIPLE);
-        BIND_INT_CONSTANT(wxFD_CHANGE_DIR);
-        BIND_INT_CONSTANT(wxFD_PREVIEW);
 
         // wxPathFormat
         BIND_INT_CONSTANT(wxPATH_NATIVE);

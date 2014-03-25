@@ -495,12 +495,6 @@ const ScriptingManager::TrustedScripts& ScriptingManager::GetTrustedScripts()
 }
 
 
-
-void ScriptingManager::OnScriptPluginMenu(wxCommandEvent& event)
-{
-    ScriptBindings::ScriptPluginWrapper::OnScriptMenu(event.GetId());
-}
-
 int ScriptingManager::ExecutePlugin(wxString Name)
 {
     scripted_plugin_map::iterator itr =  m_registered_plugins.find(Name);
@@ -520,7 +514,7 @@ cbScriptPlugin* ScriptingManager::GetPlugin(wxString Name)
 void ScriptingManager::CreateModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data)
 {
     scripted_plugin_map::iterator itr;
-    for(itr = m_registered_plugins.begin(); itr != m_registered_plugins.end();itr++)
+    for(itr = m_registered_plugins.begin(); itr != m_registered_plugins.end();++itr)
     {
         itr->second->BuildModuleMenu(type,menu,data);
     }

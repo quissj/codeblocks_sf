@@ -1383,25 +1383,10 @@ void PluginManager::AskPluginsForModuleMenu(const ModuleType type, wxMenu* menu,
         }
     }
 
-    // script plugins now
-    wxArrayInt ids = ScriptBindings::ScriptPluginWrapper::CreateModuleMenu(type, menu, data);
-    for (size_t i = 0; i < ids.GetCount(); ++i)
-    {
-        Connect(ids[i], -1, wxEVT_COMMAND_MENU_SELECTED,
-                (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction)
-                &PluginManager::OnScriptModuleMenu);
-    }
+    Manager::Get()->GetScriptingManager()->CreateModuleMenu(type,menu,data);
+
 }
 
-void PluginManager::OnScriptMenu(wxCommandEvent& event)
-{
-    ScriptBindings::ScriptPluginWrapper::OnScriptMenu(event.GetId());
-}
-
-void PluginManager::OnScriptModuleMenu(wxCommandEvent& event)
-{
-    ScriptBindings::ScriptPluginWrapper::OnScriptModuleMenu(event.GetId());
-}
 
 cbMimePlugin* PluginManager::GetMIMEHandlerForFile(const wxString& filename)
 {

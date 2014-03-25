@@ -315,7 +315,7 @@ class ConvertOldToNewScript_Plugin extends cbScriptPlugin
 
         for(i=0;i < file_count;i++)
         {
-            local editor = GetEditorManager().Open(files_to_convert.Item(0));
+            local editor = GetEditorManager().Open(files_to_convert.Item(i));
             local text = editor.GetText();
             foreach(value in replace_list)
             {

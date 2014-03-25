@@ -131,9 +131,6 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         PluginManager();
         ~PluginManager();
 
-        void OnScriptMenu(wxCommandEvent& event);
-        void OnScriptModuleMenu(wxCommandEvent& event);
-
         /// @return True if the plugin should be loaded, false if not.
         bool ReadManifestFile(const wxString& pluginFilename,
                                 const wxString& pluginName = wxEmptyString,

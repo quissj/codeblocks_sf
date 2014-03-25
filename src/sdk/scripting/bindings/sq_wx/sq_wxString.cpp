@@ -7,12 +7,13 @@
  * $HeadURL$
  */
 
+#include <sq_wx/sq_wx.h>
 #include <wx/wx.h>
 #include <wx/string.h>
-#include <sqrat.h>
+//#include <sqrat.h>
 #include "sc_binding_util.h"
-#include <sq_wx/sq_wx.h>
-#include <sc_cb_vm.h>
+#include "sc_cb_vm.h"
+//#include <sq_wx/sq_wx_type_handler.h>
 
 // We need at least version 2.8.5
 #if !wxCHECK_VERSION(2, 8, 5)
@@ -147,7 +148,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         wxString ret(*instance); // create the return value
 
         // Test if we add wxString
-        Sqrat::Var<const wxString&> copy(vm, 2);
+        Sqrat::Var<wxString> copy(vm, 2);
         if (!Sqrat::Error::Instance().Occurred(vm))
         {
             ret.Append(copy.value);

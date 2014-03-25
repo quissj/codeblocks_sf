@@ -5,6 +5,7 @@
 #include <logmanager.h>
 #include <wx/msgdlg.h>
 #include <scripting/squirrel/squirrel.h>
+#include <sq_wx/sq_wx.h>
 #include <sqstdblob.h>
 #include <sqstdio.h>
 #include <sqstdmath.h>

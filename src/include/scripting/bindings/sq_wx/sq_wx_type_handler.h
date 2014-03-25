@@ -22,7 +22,7 @@ struct Var<wxString> {
                     {
                         SQInteger val;
                         sq_getinteger(v,idx,&val);
-                        value.Printf(_("%c"),static_cast<char>(val));
+                        value.Printf(wxT("%c"),static_cast<char>(val));
                         break;
                     }
                 default:
@@ -38,41 +38,17 @@ struct Var<wxString> {
             }
         }
     }
+
     static void push(HSQUIRRELVM v, const wxString& value) {
         ClassType<wxString>::PushInstanceCopy(v, value);
     }
 };
 
-
-// FIXME (bluehazzard#1#): Does this work?
-template<>
-struct Var<const wxString&> {
-    const wxString& value;
-    wxString tmp_value;
-    Var(HSQUIRRELVM v, SQInteger idx) : value(tmp_value){
-        if (!Sqrat::Error::Instance().Occurred(v)) {
-            wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
-            if (ptr != NULL) {
-                tmp_value.Append((*ptr).c_str());
-            } else {
-                Sqrat::Error::Instance().Clear(v);
-                const SQChar* str;
-                sq_tostring(v, idx);
-                sq_getstring(v, -1, &str);
-                tmp_value = wxString::FromUTF8(str);
-                sq_pop(v, 1);
-            }
-        }
-    }
-    static void push(HSQUIRRELVM v, const wxString& value) {
-        ClassType<wxString>::PushInstanceCopy(v, value);
-    }
-};
-
-/*
 template<>
 struct Var<wxString&> {
-    wxString& value;
+
+    wxString value;
+
     Var(HSQUIRRELVM v, SQInteger idx) {
         if (!Sqrat::Error::Instance().Occurred(v)) {
             wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
@@ -89,25 +65,41 @@ struct Var<wxString&> {
         }
     }
     static void push(HSQUIRRELVM v, const wxString& value) {
-        ClassType<wxString>::PushInstanceCopy(v, &value);
+        ClassType<wxString>::PushInstanceCopy(v, value);
     }
-};*/
+};
 
-/*
-template<class T>
-struct Var<T&> {
-    T& value;
-    Var(HSQUIRRELVM vm, SQInteger idx) : value(*ClassType<T>::GetInstance(vm, idx)) {
+template<>
+struct Var<const wxString&> {
+
+    wxString value;
+
+    Var(HSQUIRRELVM v, SQInteger idx) {
+        if (!Sqrat::Error::Instance().Occurred(v)) {
+            wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
+            if (ptr != NULL) {
+                value = *ptr;
+            } else {
+                Sqrat::Error::Instance().Clear(v);
+                const SQChar* str;
+                sq_tostring(v, idx);
+                sq_getstring(v, -1, &str);
+                value = wxString::FromUTF8(str);
+                sq_pop(v, 1);
+            }
+        }
     }
-    static void push(HSQUIRRELVM vm, T& value) {
-        ClassType<T>::PushInstance(vm, &value);
+
+    static void push(HSQUIRRELVM v, const wxString& value) {
+        ClassType<wxString>::PushInstanceCopy(v, value);
     }
-};*/
+};
+
 
 template<>
 struct Var<wxString*> {
     wxString* value;
-    Var(HSQUIRRELVM v, SQInteger idx) {
+    Var(HSQUIRRELVM v, SQInteger idx){
         if (!Sqrat::Error::Instance().Occurred(v)) {
             value = ClassType<wxString>::GetInstance(v, idx);
             if (value != NULL) {
@@ -122,6 +114,7 @@ struct Var<wxString*> {
         ClassType<wxString>::PushInstanceCopy(v, *value);
     }
 };
+
 /*
 template<class T>
 struct Var<T* const> {
@@ -130,16 +123,6 @@ struct Var<T* const> {
     }
     static void push(HSQUIRRELVM vm, T* const value) {
         ClassType<T>::PushInstance(vm, value);
-    }
-};*/
-/*
-template<class T>
-struct Var<const T&> {
-    const T& value;
-    Var(HSQUIRRELVM vm, SQInteger idx) : value(*ClassType<T>::GetInstance(vm, idx)) {
-    }
-    static void push(HSQUIRRELVM vm, const T& value) {
-        ClassType<T>::PushInstanceCopy(vm, value);
     }
 };
 
