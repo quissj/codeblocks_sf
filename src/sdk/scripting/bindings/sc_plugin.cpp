@@ -175,6 +175,7 @@ int cbScriptPlugin::CreateMenus()
             }
         }
     }
+    return 0;
 }
 
 int cbScriptPlugin::Execute()
@@ -239,8 +240,34 @@ void cbScriptPlugin::BuildModuleMenu(cb_optional const ModuleType type, cb_optio
 }
 
 
+cbScriptPlugin* GetPluginFromObject(StackHandler& sa,Sqrat::Object obj)
+{
+    Sqrat::Function func(obj,"GetPluginInfo");
+    if (func.IsNull())
+    {
+        sa.ThrowError(_("GetPluginFromObject: the object is not a plugin (the GetPluginInfo() is missing)"));
+        return nullptr;
+    }
+
+    PluginInfo info = func.Evaluate<PluginInfo>();
+    cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(info.name);
+    if(plugin == nullptr)
+    {
+        sa.ThrowError(_("GetPluginFromObject: Could not find: ") + info.name + _(" in the registered plugins"));
+        return nullptr;
+    }
+    return plugin;
+}
+
+
 namespace ScriptPluginWrapper
 {
+
+/** \defgroup sq_plugin The Squirrel plugin interface
+ *  \ingroup Squirrel
+ *  \brief Functions to register a plugin an cb events
+ *
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // register a script plugin (script-bound function)
@@ -307,6 +334,9 @@ int ExecutePlugin(const wxString& name)
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//Register a CB Event handler for this script
+////////////////////////////////////////////////////////////////////////////////
 SQInteger RegisterCBEvent(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
@@ -314,21 +344,11 @@ SQInteger RegisterCBEvent(HSQUIRRELVM vm)
         return sa.ThrowError(_("RegisterCBEvent: to few parameter"));
 
     HSQOBJECT obj;
-    sq_getstackobj(vm,2,&obj);
-    Sqrat::Object o(obj,vm);
-
-
-    Sqrat::Function func(o,"GetPluginInfo");
-    if (func.IsNull())
-        return sq_throwerror(vm, "Not a script plugin!");
-
-    // ask for its registration name
-    PluginInfo info = func.Evaluate<PluginInfo>();
-
-    cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(info.name);
+    sq_getstackobj(vm,1,&obj);
+    cbScriptPlugin *plugin = GetPluginFromObject(sa,Sqrat::Object(obj,vm));
     if(plugin == nullptr)
     {
-        return sa.ThrowError(_("RegisterCBEvent: Could not find: ") + info.name + _(" to register a c::b event"));
+        return SQ_ERROR;
     }
 
     wxEventType type = sa.GetValue<wxEventType>(3);
@@ -379,6 +399,20 @@ const char* s_cbScriptPlugin =
     "        LogDebug(info.name + _T(\": module menu clicked: \") + index);\n"
     "    }\n"
     "}\n";
+
+/**
+ *  \ingroup sq_plugin
+ *  \brief Function bound to squirrel:
+ *
+ *  ### Plugin management functions bound to squirrel
+ *   | Name            | parameter                     | description     | info       |
+ *   | :--------------:| :---------------------------: | :--------------:| :---------:|
+ *   | ExecutePlugin   | wxString name  |  search for a plugin with the _name_ and execute it |   x   |
+ *   | GetPlugin       | wxString name  |  return the squirrel class of the plugin _name_  |   x   |
+ *   | RegisterPlugin  | cbScriptPlugin plugin  |   A instance of the script plugin to be registered  |   x   |
+ *   | RegisterCBEvent | cbScriptPlugin plugin, wxEventType type, wxString function | Register a function with the name _function_ for the _type_ event for the _plugin_ (for ex _this_) |   x   |
+ *
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // register the script plugin framework

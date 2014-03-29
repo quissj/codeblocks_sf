@@ -252,7 +252,7 @@ local replace_list = [
         // path separator for filenames
         ["::wxFILE_SEP_PATH", "wxFILE_SEP_PATH"],
 
-        ["base" , "_base"]  // base is a keyword in squirrel 3.x.x
+        //["base" , "_base"]  // base is a keyword in squirrel 3.x.x
     ];
 
 class ConvertOldToNewScript_Plugin extends cbScriptPlugin
@@ -260,6 +260,7 @@ class ConvertOldToNewScript_Plugin extends cbScriptPlugin
     // mandatory to setup the plugin's info
     constructor()
     {
+		info = PluginInfo();
         info.name = _T("ConvertOldToNewScript_Plugin");
         info.title = _T("Converts old scripts (sqplus compatible) to new scripts (sqrat)");
         info.version = _T("0.1a");
@@ -304,6 +305,11 @@ class ConvertOldToNewScript_Plugin extends cbScriptPlugin
     {
 
     }
+	
+	function ReplaceExact(text,key_word,replace)
+	{
+		
+	}
 
     function StartConverting()
     {

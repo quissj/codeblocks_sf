@@ -17,6 +17,7 @@ class CBEvent_TestPlugin extends cbScriptPlugin
     // mandatory to setup the plugin's info
     constructor()
     {
+        info = PluginInfo();
         info.name = _T("CBEvent_TestPlugin");
         info.title = _T("Test the c::b events in the scripting engine of C::B");
         info.version = _T("0.1a");

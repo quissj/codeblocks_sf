@@ -36,10 +36,10 @@ typedef void(*FreePluginProc)(cbPlugin*);
 /** Information about the plugin */
 struct PluginInfo
 {
-    wxString name;
-    wxString title;
-    wxString version;
-    wxString description;
+    wxString name;              /**< The name of the plugin */
+    wxString title;             /**< The title of the plugin */
+    wxString version;           /**< The plugin version*/
+    wxString description;       /**< A description*/
     wxString author;
     wxString authorEmail;
     wxString authorWebsite;
@@ -47,7 +47,7 @@ struct PluginInfo
     wxString license;
 };
 
-// struct with info about each pluing
+// struct with info about each plugin
 struct PluginElement
 {
     PluginInfo info; // plugin's info struct

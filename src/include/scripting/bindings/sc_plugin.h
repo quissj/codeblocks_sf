@@ -32,19 +32,42 @@ void OnScriptModuleMenu(int id);
 class cbScriptPlugin : public wxEvtHandler
 {
 public:
+
     cbScriptPlugin(Sqrat::Object obj);
     ~cbScriptPlugin();
 
+
+    /** \brief Event function called on a click in a menu
+     *
+     * This function calls the specific handler function in the script
+     * \param evt wxMenuEvent& the Menu event
+     * \return void
+     *
+     */
     void OnMenu(wxMenuEvent &evt);
+
+    /** \brief Event function called on a click in a menu
+     *
+     * This function calls the specific handler function in the script
+     * \param evt wxMenuEvent& the Menu event
+     * \return void
+     *
+     */
     void OnModulMenu(wxMenuEvent &evt);
 
     virtual void BuildModuleMenu(cb_optional const ModuleType type, cb_optional wxMenu* menu, cb_optional const FileTreeData* data = nullptr);
+
     virtual void BuildMenu(cb_optional wxMenuBar* menuBar)
     {
         CreateMenus();
     };
 
 
+    /** \brief Return the PluginInfo object
+     *
+     * \return PluginInfo
+     *
+     */
     PluginInfo  GetInfo()
     {
         return m_info;
@@ -123,7 +146,13 @@ private:
     wxString m_script_file;
 
 };
-
+/** \brief Get a pointer to the registered Plugin presented in the object
+ *
+ * \param obj Sqrat::Object
+ * \return cbScriptPlugin*  if _nullptr_ is returned a error occurred and the function has thrown a error to the vm. The squirrel function has to return SQ_ERROR
+ *
+ */
+cbScriptPlugin* GetPluginFromObject(StackHandler& sa,Sqrat::Object obj);
 
 }
 

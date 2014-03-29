@@ -17,6 +17,7 @@ class Scripting_TestPlugin extends cbScriptPlugin
     // mandatory to setup the plugin's info
     constructor()
     {
+        info = PluginInfo();
         info.name = _T("Scripting_TestPlugin");
         info.title = _T("Test the scripting engine of C::B");
         info.version = _T("0.1a");

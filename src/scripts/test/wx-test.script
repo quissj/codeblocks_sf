@@ -93,6 +93,10 @@ class wxTest extends script_test_base
         test_string("Right",string.Right(2),"lo");
         string = wxString("Hallo");
         test_true("Matches",string.Matches(_T("Ha*o")));
+        string = wxString("long_string_to_test_replace");
+        test_string("insert",string.insert(4,"_new"),"long_new_string_to_test_replace" );
+        test_string("replace(start, len,string)",string.replace(5,3,"old"),"long_old_string_to_test_replace");
+        test_string("replace(start, len,string,start2,len2)",string.replace(5,3,"old_new_string",4,3),"long_new_string_to_test_replace");
 
         print_test_result();
         ::print("======= Test wx String END ======= \n");

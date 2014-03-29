@@ -473,6 +473,8 @@ SQInteger wxString_Find(HSQUIRRELVM v)
  *   | GetChar         |   x    |    x  |   x   |
  *   | AddChar         |   x    |    x  |   x   |
  *   | Find            |   x    |    x  |   x   |
+ *   | insert          |  size_t nPos, const wxString &str    |    x  |   x   |
+ *   | replace          |  size_t nStart, size_t nLen, const wxString &str   |    x  |   x   |
  *
  * ### Global function for wxSting
  *   | Name            | parameter              | description     | info       |
@@ -515,6 +517,9 @@ void bind_wxString(HSQUIRRELVM vm)
     .Func("Mid",    &wxString::Mid)
     .Func<wxString& (wxString::*) (size_t pos, size_t len)>("Remove",    &wxString::Remove)
     .Func("RemoveLast",         &wxString::RemoveLast)
+    .Func<wxString& (wxString::*) (size_t , const wxString&)>("insert",&wxString::insert)
+    .Overload<wxString& (wxString::*) (size_t, size_t, const wxString&)>("replace",&wxString::replace)
+    .Overload<wxString& (wxString::*) (size_t,size_t,const wxString&,size_t,size_t)>("replace",&wxString::replace)
     .SquirrelFunc("Replace",    &wxString_Replace)
     .SquirrelFunc("AfterFirst", &wxString_AfterFirst)
     .SquirrelFunc("AfterLast",  &wxString_AfterLast)

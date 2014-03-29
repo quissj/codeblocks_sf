@@ -184,7 +184,7 @@ namespace ScriptBindings
         .Func(_SC("wxGetTextFromUser"),&wx_GetTextFromUser)
         .Func(_SC("wxGetFileFromUser"),&wx_GetFileFromUser)
         .Func(_SC("wxBell"),&wxBell)
-        .Func(_SC("wxDirSelector"),&wx_GetDirFromUser)
+        .Func(_SC("wxDirSelector"),&wx_GetDirFromUser);
 
     }
 }
