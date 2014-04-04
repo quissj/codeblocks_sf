@@ -112,7 +112,7 @@ public:
         return instance;
     }
     static string FormatTypeError(HSQUIRRELVM vm, SQInteger idx, const string& expectedType) {
-        SQStackInfos si;
+        /*SQStackInfos si;
         char stackinfo[256];
         int stack = 1;
         string stack_string("Call Stack: \n");
@@ -122,8 +122,11 @@ public:
             stack_string += string(stackinfo);
             stack++;
         }
-        snprintf(stackinfo,256,"%d",idx);
-        string err = stack_string + _SC("wrong type at stack position ")+ string(stackinfo) + _SC(" (") + expectedType + _SC(" expected");
+
+        snprintf(stackinfo,256,"%d",idx);*/
+
+        //string err = stack_string + _SC("wrong type at stack position ")+ string(stackinfo) + _SC(" (") + expectedType + _SC(" expected");
+        string err = _SC("wrong type (") + expectedType + _SC(" expected");
         if (SQ_SUCCEEDED(sq_typeof(vm, idx))) {
             const SQChar* actualType;
             sq_tostring(vm, -1);

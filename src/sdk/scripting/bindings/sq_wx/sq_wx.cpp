@@ -31,6 +31,7 @@ namespace ScriptBindings
     {
         SQ_WX_binding::bind_wxString(vm);
         bind_wx_util_dialogs(vm);
+        bind_wxDialog(vm);
 
         Sqrat::Class<wxStopWatch> stop_watch(vm,"wxStopWatch");
         stop_watch

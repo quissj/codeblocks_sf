@@ -1,0 +1,104 @@
+
+/*
+ * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * $Revision$
+ * $Id$
+ * $HeadURL$
+ */
+
+// user-dialog-test
+// Script plugins must extend cbScriptPlugin
+class user_dialog_test_Plugin extends cbScriptPlugin
+{
+    // mandatory to setup the plugin's info
+    constructor()
+    {
+        info = PluginInfo();
+
+        info.name = _T("xrc_test");
+        info.title = _T("Test the xrc system");
+        info.version = _T("0.1a");
+        info.license = _T("GPL");
+    }
+
+    // optional to create menubar items
+    function GetMenu()
+    {
+        local entries = ::wxArrayString();
+        entries.Add(_T("Plugins/Test XRC"), 1);
+        return entries;
+    }
+
+    // optional to create context menu entries
+    /*function GetModuleMenu(who, data)
+    {
+
+    }*/
+
+    // optional to support ExecutePlugin(pluginNameString)
+    function Execute()
+    {
+        StartTest();
+        return 0;
+    }
+
+    // optional calback for menubar items clicking
+    function OnMenuClicked(index)
+    {
+        if (index == 0)
+        {
+            StartTest();
+
+        }
+
+    }
+
+    // optional calback for context menu items clicking
+    function OnModuleMenuClicked(index)
+    {
+
+    }
+
+    function OnClick(evt)
+    {
+        print("Got a event from type " + evt.GetEventType() + " from id " + evt.GetId() + " at time " + evt.GetTimestamp() + "\n" );
+    }
+    
+    function OnMouseClick(evt)
+    {
+        print("mouse clicked \n");
+    }
+    
+    function OnMouseMoved(evt)
+    {
+        print("mouse moved\n")
+    }
+
+    function StartTest()
+    {
+        print("Start xrc test\n");
+        print("load dialog.xrc\n");
+        local dialog = ::wxDialog();
+        local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+        local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
+        if(retcode != RESOURCE_LOADED_SUCCESFULLY)
+        {
+            error("could not load the xrc file: " + path_to_xrc + " retcode: " + retcode);
+            return;
+        }
+        dialog.RegisterEventHandler(wxEVT_BUTTON,XRCID("clickme_btn"),this,"OnClick");
+        dialog.RegisterEventHandler(wxEVT_LEFT_DOWN,XRCID("test_dialog"),this,"OnMouseClick");
+        dialog.RegisterEventHandler(wxEVT_MOTION,XRCID("test_dialog"),this,"OnMouseMoved");
+        local retcode = dialog.ShowModal();
+        print("dialog exited with " + retcode);
+        
+    };
+}
+
+// this call actually registers the script plugin with Code::Blocks
+RegisterPlugin(user_dialog_test_Plugin());
+
+// if you want to call this plugin's Execute() function, use this in a script:
+// ExecutePlugin(_T("Scripting_TestPlugin"));

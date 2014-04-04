@@ -15,6 +15,8 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     // mandatory to setup the plugin's info
     constructor()
     {
+        info = PluginInfo();
+
         info.name = _T("user_dialog_test");
         info.title = _T("Test the user dialogs");
         info.version = _T("0.1a");

@@ -256,6 +256,15 @@ wxString ScriptingManager::GetErrorString( bool clearErrors)
     //return sa.GetError(clearErrors);
 }
 
+bool ScriptingManager::DisplayErrorsAndText(wxString pre_error, bool clearErrors)
+{
+    if(!m_vm->HasError())   // If no error return
+        return false;
+
+    pre_error.Append(GetErrorString(clearErrors));
+    return DisplayErrors(pre_error,clearErrors);
+}
+
 bool ScriptingManager::DisplayErrors(wxString error_msg, bool clearErrors)
 {
 

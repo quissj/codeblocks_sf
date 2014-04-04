@@ -199,17 +199,16 @@ class wxTest extends script_test_base
         made_passed("constructor");
 
 
-        array.Add(_T("String1"),1);
-        array.Add(_T("String2"),2);
-        test_equal("Add",array.Add(_T("String3"),1),3);
-// FIXME (bluehazzard#1#): specialize the var<wsString> and remove the _T
+        array.Add("String1",1);
+        array.Add("String2",2);
+        test_equal("Add",array.Add("String3",1),3);
         test_equal("GetCount",array.GetCount(),4);
-        test_equal("Index(\"String1\")", array.Index(_T("String1")),0);
-        test_equal("Index(\"String10\")", array.Index(_T("String10")),-1);
-        test_equal("Index(\"string1\",true,false)", array.Index(_T("string10"),true,false),-1);
-        test_equal("Index(\"string1\",false,false)", array.Index(_T("string1"),false),0);
-        test_equal("Index(\"string2\",false,false)", array.Index(_T("string2"),false,false),1);
-        test_equal("Index(\"string2\",false,true)", array.Index(_T("string2"),false,true),2);
+        test_equal("Index(\"String1\")", array.Index("String1"),0);
+        test_equal("Index(\"String10\")", array.Index("String10"),-1);
+        test_equal("Index(\"string1\",true,false)", array.Index("string10",true,false),-1);
+        test_equal("Index(\"string1\",false,false)", array.Index("string1",false),0);
+        test_equal("Index(\"string2\",false,false)", array.Index("string2",false,false),1);
+        test_equal("Index(\"string2\",false,true)", array.Index("string2",false,true),2);
         test_string("Item", array.Item(2),"String2");
         array.Clear();
         test_equal("Clear",array.GetCount(),0);

@@ -118,6 +118,18 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
           */
         bool DisplayErrors(wxString error_msg = wxEmptyString, bool clearErrors = true);
 
+        /** @brief Display error dialog.
+          *
+          * Displays an error dialog containing exception info and any other
+          * script errors. If error_msg isempty the GetErrorString String is called
+          * internally and if no error is found no error is displayed and the function returns _false_
+          * @param pre_error Text printed previous the error
+          * @param clearErrors If true (default), when this function returns all
+          *        accumulated error messages are cleared.
+          * @return _true_ if a error occurred, _false_ otherwise
+          */
+        bool DisplayErrorsAndText(wxString pre_error, bool clearErrors = true);
+
         /** @brief Injects script output.
           *
           * This function is for advanced uses. It's used when some code sets a different

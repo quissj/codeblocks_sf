@@ -1161,6 +1161,9 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wxDialog.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>
@@ -2560,6 +2563,9 @@
 			<Option target="src" />
 			<Option target="Scripted wizard" />
 		</Unit>
+		<Unit filename="scripts/test/xrc-test-plugin.script">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />
 		</Unit>
@@ -3159,6 +3165,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxDialog.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxString.cpp">
