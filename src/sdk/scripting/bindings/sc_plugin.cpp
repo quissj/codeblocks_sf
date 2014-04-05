@@ -36,6 +36,8 @@ cbScriptPlugin::~cbScriptPlugin()
         Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
         m_AttachedToMainWindow = false;
     }
+
+    m_menu_manager.Clear();
 }
 
 void cbScriptPlugin::OnMenu(wxMenuEvent &evt)
@@ -305,6 +307,11 @@ SQInteger RegisterPlugin(HSQUIRRELVM vm)
     return SC_RETURN_OK;
 }
 
+bool UnRegisterPlugin(wxString name)
+{
+    return Manager::Get()->GetScriptingManager()->UnRegisterScriptPlugin(name);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // get a script plugin squirrel object (script-bound function)
 ////////////////////////////////////////////////////////////////////////////////
@@ -420,6 +427,7 @@ const char* s_cbScriptPlugin =
 void Register_ScriptPlugin(HSQUIRRELVM vm)
 {
     Sqrat::RootTable(vm).Func("ExecutePlugin",&ScriptPluginWrapper::ExecutePlugin);
+    Sqrat::RootTable(vm).Func("UnRegisterPlugin",&ScriptPluginWrapper::UnRegisterPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("GetPlugin",&ScriptPluginWrapper::GetPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("RegisterPlugin",&ScriptPluginWrapper::RegisterPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("RegisterCBEvent",&ScriptPluginWrapper::RegisterCBEvent);
