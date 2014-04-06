@@ -27,7 +27,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     function GetMenu()
     {
         local entries = ::wxArrayString();
-        entries.Add(_T("Plugins/Test XRC"), 1);
+        entries.Add(_T("Plugins/Test Scripting/Test XRC"), 1);
         return entries;
     }
 
@@ -65,12 +65,12 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         print("Got a event from type " + evt.GetEventType() + " from id " + evt.GetId() + " at time " + evt.GetTimestamp() + "\n" );
     }
-    
+
     function OnMouseClick(evt)
     {
         print("mouse clicked \n");
     }
-    
+
     function OnMouseMoved(evt)
     {
         print("mouse moved\n")
@@ -93,7 +93,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         dialog.RegisterEventHandler(wxEVT_MOTION,XRCID("test_dialog"),this,"OnMouseMoved");
         local retcode = dialog.ShowModal();
         print("dialog exited with " + retcode);
-        
+
     };
 }
 

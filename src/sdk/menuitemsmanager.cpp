@@ -211,10 +211,16 @@ int MenuItemsManager::CreateFromString(const wxString& menuPath, int id)
                 }
                 else
                 {
-                    wxMenu* sub_menu = menu->FindItem(cur_menu_id)->GetSubMenu();
+                    wxMenu* parent_menu = nullptr;
+                    wxMenu* sub_menu = menu->FindItem(cur_menu_id,&parent_menu)->GetSubMenu();
 
                     if(sub_menu == nullptr) // A error?
-                        cbMessageBox(_("Sub menu is a nullptr"),_("create menu error"));
+                    {
+                        if(parent_menu == nullptr)
+                            cbMessageBox(_("Could not insert the menu (sub_menu and parent_menu = nullptr"),_("Error"));
+                        else
+                            menu = parent_menu;
+                    }
                     else
                         menu = sub_menu;
                 }

@@ -28,7 +28,7 @@ class CBEvent_TestPlugin extends cbScriptPlugin
     function GetMenu()
     {
         local entries = ::wxArrayString();
-        entries.Add(_T("Plugins/Test Event Scripting"), 1);
+        entries.Add(_T("Plugins/Test Scripting/Test Event Scripting"), 1);
         return entries;
     }
 

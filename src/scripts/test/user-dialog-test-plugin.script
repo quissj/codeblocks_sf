@@ -27,7 +27,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     function GetMenu()
     {
         local entries = ::wxArrayString();
-        entries.Add(_T("Plugins/User Dialogs"), 1);
+        entries.Add(_T("Plugins/Test Scripting/User Dialogs"), 1);
         return entries;
     }
 
@@ -92,10 +92,6 @@ class user_dialog_test_Plugin extends cbScriptPlugin
 		print("wxBell\n");
         ::wxBell();
 		print(" -> system bell ringing \n");
-
-		print("wxMessageBox Dialog\n");
-        local message_box = ::wxMessageBox("hello","test",wxOK|wxICON_QUESTION);
-		print(" -> returned value: " + message_box + "\n");
 
 		print("wxDirSelector Dialog\n");
         local dir_selector = ::wxDirSelector("Directory selector","",wxDD_DEFAULT_STYLE);
