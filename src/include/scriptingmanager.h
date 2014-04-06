@@ -284,6 +284,13 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
          */
 		void CreateModuleMenu(const ModuleType type, wxMenu* menu, const FileTreeData* data);
 
+		unsigned int GetPluginCount()       {return m_registered_plugins.size();};
+
+		cbScriptPlugin* GetPlugin(unsigned int index);
+
+		bool UnInstallScriptPlugin(const wxString& name, bool del_files = true);
+        bool InstallScriptPlugin(const wxString& file);
+
     private:
         // needed for SqPlus bindings
         ScriptingManager(cb_unused const ScriptingManager& rhs); // prevent copy construction

@@ -330,6 +330,19 @@ bool ScriptingManager::UnRegisterScriptPlugin(const wxString& name)
     return true;
 }
 
+bool ScriptingManager::UnInstallScriptPlugin(const wxString& name, bool del_files)
+{
+    // TODO (bluehazzard#1#): Implement uninstall plugin
+
+    return UnRegisterScriptPlugin(name);
+}
+
+bool ScriptingManager::InstallScriptPlugin(const wxString& file)
+{
+    // TODO (bluehazzard#1#): Implement install plugin
+    return false;
+}
+
 bool ScriptingManager::RegisterScriptMenu(const wxString& menuPath, const wxString& scriptOrFunc, bool isFunction)
 {
     // attach this event handler in the main window (one-time run)
@@ -527,4 +540,20 @@ void ScriptingManager::CreateModuleMenu(const ModuleType type, wxMenu* menu, con
     {
         itr->second->BuildModuleMenu(type,menu,data);
     }
+}
+
+cbScriptPlugin* ScriptingManager::GetPlugin(unsigned int index)
+{
+    unsigned int i = 0;
+    scripted_plugin_map::iterator itr;
+    for(itr = m_registered_plugins.begin(); itr != m_registered_plugins.end();++itr)
+    {
+        if(i == index)
+        {
+            return itr->second;
+        }
+        i++;
+    }
+
+    return nullptr;
 }
