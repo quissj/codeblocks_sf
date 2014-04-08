@@ -402,7 +402,7 @@ SQInteger wxString_GetChar(HSQUIRRELVM v)
     // FIXME (bluehazzard#1#): This is quite a dirty workaround.... but its 3am...
     StackHandler sa(v);
     wxString& self = *sa.GetInstance<wxString>(1);
-    int pos = sa.GetValue<int>(2);
+    unsigned int pos = sa.GetValue<unsigned int>(2);
     if(pos >= self.length())
         return SC_RETURN_FAILED;
 

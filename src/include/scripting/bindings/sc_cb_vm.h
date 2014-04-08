@@ -332,6 +332,11 @@ public:
         Sqrat::ClassType<VALUE_TYPE>::PushInstanceCopy(m_vm, value);
     }
 
+    template<typename VALUE_TYPE> void PushInstance(VALUE_TYPE* value)
+    {
+        Sqrat::ClassType<VALUE_TYPE>::PushInstance(m_vm, value);
+    }
+
     /** \brief Throws an squirrel error
      * \param error SQChar a error description
      * \return SQInteger

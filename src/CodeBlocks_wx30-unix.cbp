@@ -962,6 +962,9 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wxBaseControls.h">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wxDialog.h">
 			<Option target="sdk" />
 		</Unit>
@@ -2968,10 +2971,16 @@
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxBaseControls.cpp">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxDialog.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxString.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_constants.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/sqstdlib/sqstdaux.cpp">

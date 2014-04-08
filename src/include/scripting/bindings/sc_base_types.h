@@ -8,6 +8,8 @@
 
 #include <wx/string.h>
 #include <wx/arrstr.h>
+#include <wx/animate.h>
+#include <wx/checkbox.h>
 
 #include <globals.h>
 #include <settings.h>
@@ -61,6 +63,8 @@ DEFINE_SQRAT_ENUM(OptionsRelation);
 DEFINE_SQRAT_ENUM(OptionsRelationType);
 DEFINE_SQRAT_ENUM(wxPathNormalize);
 DEFINE_SQRAT_ENUM(wxPathFormat);
+DEFINE_SQRAT_ENUM(wxAnimationType);
+DEFINE_SQRAT_ENUM(wxCheckBoxState);
 
 
 

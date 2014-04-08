@@ -1,9 +1,10 @@
 #ifndef SQ_WXDIALOG
 #define SQ_WXDIALOG
 
-#include "sc_binding_util.h"
-#include "sc_cb_vm.h"
-#include "sc_base_types.h"
+#include <sq_wx/sq_wxBaseControls.h>
+#include <sc_binding_util.h>
+#include <sc_cb_vm.h>
+#include <sc_base_types.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <wx/xrc/xmlres.h>
@@ -20,11 +21,10 @@ namespace ScriptBindings
 
     SQInteger sq_wxDialog_constructor(HSQUIRRELVM vm);
 
+
     void bind_wxDialog(HSQUIRRELVM vm);
 
-
-
-    class sq_wxDialog : public wxEvtHandler
+    class sq_wxDialog : public cb_wxBaseManagedWindow<wxDialog>
     {
     public:
 
@@ -34,7 +34,7 @@ namespace ScriptBindings
         int LoadFromXRCFile(wxString file,wxString name);
         int LoadFromXRCPool(wxString name);
 
-        void RegisterEventHandler(wxEventType type,int id,Sqrat::Object obj,wxString handler);
+        //void RegisterEventHandler(wxEventType type,int id,Sqrat::Object obj,wxString handler);
 
         /** \brief Shows a Modal dialog.
          *
@@ -50,29 +50,19 @@ namespace ScriptBindings
 
         bool IsModal();
 
+        bool IsLoaded()     {return (GetManagedWindow() != nullptr); };
+
         void Centre();
 
         friend SQInteger sq_wxDialog_constructor(HSQUIRRELVM vm);
 
+
     protected:
-        virtual bool TryBefore(wxEvent& event);
-        void OnEvt(wxEvent& event);
+
+        //void OnEvt(wxEvent& event);
 
     private:
 
-        struct evt_func
-        {
-            wxString func_name;
-            Sqrat::Object env;
-        };
-
-        typedef std::map<int,evt_func>                  evt_id_func_map;
-        typedef std::map<wxEventType,evt_id_func_map>   evt_type_id_map;
-        evt_type_id_map m_evt_map;
-
-        Sqrat::Object m_object;
-        HSQUIRRELVM m_vm;
-        wxDialog* m_dialog;
 
     };
 }

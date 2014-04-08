@@ -43,6 +43,9 @@ inline int wxCALLBACK sortByTitle(long item1, long item2, cb_unused long sortDat
 {
     const PluginElement* elem1 = (const PluginElement*)item1;
     const PluginElement* elem2 = (const PluginElement*)item2;
+    if(elem1 == NULL ||
+       elem2 == NULL)
+        return -1;
 
     return elem1->info.title.CompareTo(elem2->info.title);
 }
@@ -163,6 +166,7 @@ void PluginsConfigurationDlg::FillList()
     }
 
 
+    // Script plugins
     ScriptingManager* script_man = Manager::Get()->GetScriptingManager();
     unsigned int plugin_count = script_man->GetPluginCount();
     for(unsigned int i = 0; i < plugin_count ;i++)
@@ -193,7 +197,8 @@ void PluginsConfigurationDlg::FillList()
     list->SetColumnWidth(3, wxLIST_AUTOSIZE);
     list->SetColumnWidth(4, wxLIST_AUTOSIZE);
 
-    //list->SortItems(sortByTitle, 0);
+
+    list->SortItems(sortByTitle, 0);  // if we enable this it will crash?
 }
 
 // class destructor
@@ -332,8 +337,6 @@ void PluginsConfigurationDlg::OnUninstall(cb_unused wxCommandEvent& event)
                 }
             }
         }
-
-
     }
 
     FillList();

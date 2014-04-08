@@ -10,6 +10,7 @@
 #include <sqrat.h>
 #include <sq_wx/sq_wx_type_handler.h>
 #include <sq_wx/sq_wxDialog.h>
+#include <sq_wx/sq_wxBaseControls.h>
 
 namespace ScriptBindings
 {
@@ -20,6 +21,7 @@ namespace ScriptBindings
 
     void bind_wx_util_dialogs(HSQUIRRELVM vm);
     void bind_wx_types(HSQUIRRELVM vm);
+    void bind_wxConstants(HSQUIRRELVM vm);
 }
 
 #endif // SQ_WX_H
