@@ -36,6 +36,63 @@ namespace SQ_WX_binding
  *  instead.
  */
 
+ /**
+ *  \ingroup sq_wxstring
+ *  \brief Function bound to squirrel:
+ *
+ *  ### wxString Function bound to squirrel
+ *   | Name            | parameter                     | description               | info       |
+ *   | :-------------- | :---------------------------  | :------------------------ | :--------- |
+ *   | wxString()      | wxString, SQchar,int,float    |  create a wxString object |        x   |
+ *   | Append          |                          x    |                        x  |        x   |
+ *   | IsEmpty         |                          x    |                        x  |        x   |
+ *   | Length          |                          x    |                        x  |        x   |
+ *   | len             |                          x    |                        x  |        x   |
+ *   | size            |                          x    |                        x  |        x   |
+ *   | Lower           |                          x    |                        x  |        x   |
+ *   | LowerCase       |                          x    |                        x  |        x   |
+ *   | MakeLower       |                          x    |                        x  |        x   |
+ *   | Upper           |                          x    |                        x  |        x   |
+ *   | MakeUpper       |                          x    |                        x  |        x   |
+ *   | Mid             |                          x    |                        x  |        x   |
+ *   | Remove          |                          x    |                        x  |        x   |
+ *   | RemoveLast      |                          x    |                        x  |        x   |
+ *   | Replace         |                          x    |                        x  |        x   |
+ *   | AfterFirst      |                          x    |                        x  |        x   |
+ *   | BeforeFirst     |                          x    |                        x  |        x   |
+ *   | BeforeLast      |                          x    |                        x  |        x   |
+ *   | Right           |                          x    |                        x  |        x   |
+ *   | Matches         |                          x    |                        x  |        x   |
+ *   | GetChar         |                          x    |                        x  |        x   |
+ *   | AddChar         |                          x    |                        x  |        x   |
+ *   | Find            |                          x    |                        x  |        x   |
+ *   | insert          |  size_t nPos, string          |                        x  |        x   |
+ *   | replace         |  size_t nStart, size_t nLen, string   x  |             x  |        x   |
+ *   | ToInt           |  int base                     | returns a table with two entries: the _value_ and a bool _success_ which is true on success    |   x   |
+ *   | ToDouble        |                               | returns a table with two entries: the _value_ and a bool _success_ which is true on success    |   x   |
+ *
+ * ### Global function for wxSting
+ *   | Name            | parameter              | description     | info       |
+ *   | :-------------- | :--------------------  | :-------------- | :--------- |
+ *   | _T()            | string                 | converts a normal string to a wxString object. Needed only for compatibility |   x   |
+ *   | wxT()           | string                 | same as _T      |   x   |
+ *   | _()             | string                 | search for the translation of the string and return a wxString object.  |   x   |
+ *
+ * ### Example for ToInt/ToDouble
+ *
+ * ~~~~~~~~~
+ *  local string = wxString("42");
+ *  local ret_val = string.ToInt(10);
+ *  if(!ret_val.success)
+ *      error("Could not convert string to int");
+ *
+ *  print("String to int result: " + ret_val.value +"\n" );
+ * ~~~~~~~~~
+ *
+ */
+
+
+
 /** \brief  Converts a wxString to a sqrat/squirrel string.
  *          Takes care of the UNICODE conversion. Scripts use internally UTF8, wxString uses the system specified Encoding
  *
@@ -82,14 +139,16 @@ wxString StdToWxStringTranslated(SQChar* input)
 static SQInteger wxString_constructor(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
-    if (sq_gettop(vm) == 1)      //Empty constructor....
+    try
+    {
+    if (sa.GetParamCount() == 1)      //Empty constructor....
     {
         wxString* instance = new wxString();
         sq_setinstanceup(vm, 1, instance);
         sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
         return SC_RETURN_OK;
     }
-    else if (sq_gettop(vm) == 2)     // 1 Parameter
+    else if (sa.GetParamCount() == 2)     // 1 Parameter
     {
         // Lets check which type it is
         //copy Constructor?
@@ -114,7 +173,12 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
         }
         // Wrong ctr parameter
         Sqrat::Error::Instance().Clear(vm);
-        return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*")).c_str());
+        return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*")).c_str());
+    }
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
     }
 
     return sa.ThrowError(_("wrong number of parameters"));
@@ -129,10 +193,11 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
 static SQInteger wxString_add(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
+    try
+    {
     if (sa.GetParamCount() == 1)      //no parameter to add
     {
         return sa.ThrowError(_("wrong number of parameters"));
-        //sq_throwerror(vm, _SC("wxString add wrong number of parameters"));
     }
     else if (sa.GetParamCount() == 2)     // 1 Parameter
     {
@@ -186,6 +251,11 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         wxString error_msg;
         return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*|int|float")).c_str());
     }
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
     return sa.ThrowError(_("wrong number of parameters"));
 }
 
@@ -198,6 +268,8 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
 static SQInteger wxString_OpCmp(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
+    try
+    {
     int ret = 0;
     if (sa.GetParamCount() < 2)
     {
@@ -225,13 +297,20 @@ static SQInteger wxString_OpCmp(HSQUIRRELVM vm)
         Sqrat::Var<int>::push(vm, ret);
         return SC_RETURN_VALUE;
     }
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
     return sa.ThrowError(_("wrong number of parameters"));
 }
 
 static SQInteger wxString_Replace(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
-    if (sq_gettop(vm) < 3)
+    try
+    {
+    if (sa.GetParamCount() < 3)
     {
         sa.ThrowError(_("wxString::Replace wrong number of parameters"));
     }
@@ -247,21 +326,26 @@ static SQInteger wxString_Replace(HSQUIRRELVM vm)
     Sqrat::Var<wxString> new_str(vm,3);
     if(Sqrat::Error::Instance().Occurred(vm))
     {
-        return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str());
+        return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str());
     }
 
-    if(sq_gettop(vm) == 4)
+    if(sa.GetParamCount() == 4)
     {
         Sqrat::Var<bool> all_val(vm,4);
         if(Sqrat::Error::Instance().Occurred(vm))
         {
-            return sq_throwerror(vm, Sqrat::Error::FormatTypeError(vm, 2, _SC("bool")).c_str());
+            return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, _SC("bool")).c_str());
         }
 
         all = all_val.value;
     }
     Sqrat::Var<int>::push(vm, self->Replace(old_str.value, new_str.value, all));
     return SC_RETURN_VALUE;
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
 }
 
 SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
@@ -401,6 +485,9 @@ SQInteger wxString_GetChar(HSQUIRRELVM v)
 {
     // FIXME (bluehazzard#1#): This is quite a dirty workaround.... but its 3am...
     StackHandler sa(v);
+    try
+    {
+
     wxString& self = *sa.GetInstance<wxString>(1);
     unsigned int pos = sa.GetValue<unsigned int>(2);
     if(pos >= self.length())
@@ -409,6 +496,11 @@ SQInteger wxString_GetChar(HSQUIRRELVM v)
     SQChar tmp = self.To8BitData()[pos];//wxString(self.GetChar(static_cast<size_t>(pos))).ToAscii();
     sa.PushValue<SQInteger>(static_cast<SQInteger>(tmp));
     return SC_RETURN_VALUE;
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
 }
 
 SQInteger wxString_AddChar(HSQUIRRELVM v)
@@ -443,47 +535,65 @@ SQInteger wxString_Find(HSQUIRRELVM v)
     }
 }
 
-/**
- *  \ingroup sq_wxstring
- *  \brief Function bound to squirrel:
- *
- *  ### wxString Function bound to squirrel
- *   | Name            | parameter                     | description     | info       |
- *   | :--------------:| :---------------------------: | :--------------:| :---------:|
- *   | wxString()      | wxString, SQchar,int,float    |  create a wxString object |   x   |
- *   | Append          |   x    |    x  |   x   |
- *   | IsEmpty         |   x    |    x  |   x   |
- *   | Length          |   x    |    x  |   x   |
- *   | len             |   x    |    x  |   x   |
- *   | size            |   x    |    x  |   x   |
- *   | Lower           |   x    |    x  |   x   |
- *   | LowerCase       |   x    |    x  |   x   |
- *   | MakeLower       |   x    |    x  |   x   |
- *   | Upper           |   x    |    x  |   x   |
- *   | MakeUpper       |   x    |    x  |   x   |
- *   | Mid             |   x    |    x  |   x   |
- *   | Remove          |   x    |    x  |   x   |
- *   | RemoveLast      |   x    |    x  |   x   |
- *   | Replace         |   x    |    x  |   x   |
- *   | AfterFirst      |   x    |    x  |   x   |
- *   | BeforeFirst     |   x    |    x  |   x   |
- *   | BeforeLast      |   x    |    x  |   x   |
- *   | Right           |   x    |    x  |   x   |
- *   | Matches         |   x    |    x  |   x   |
- *   | GetChar         |   x    |    x  |   x   |
- *   | AddChar         |   x    |    x  |   x   |
- *   | Find            |   x    |    x  |   x   |
- *   | insert          |  size_t nPos, const wxString &str    |    x  |   x   |
- *   | replace          |  size_t nStart, size_t nLen, const wxString &str   |    x  |   x   |
- *
- * ### Global function for wxSting
- *   | Name            | parameter              | description     | info       |
- *   | :--------------:| :--------------------: | :--------------:| :---------:|
- *   | _T()            | SQchar                 | converts a normal string to a wxString object. Needed only for compatibility |   x   |
- *   | wxT()           | SQchar                 | same as _T      |   x   |
- *   | _()             | SQchar                 | search for the translation of the string and return a wxString object.  |   x   |
- *
- */
+
+SQInteger wxString_ToInt(HSQUIRRELVM v)
+{
+    StackHandler sa(v);
+    try
+    {
+    wxString& self = *sa.GetInstance<wxString>(1);
+    int base = 10;
+    if(sa.GetParamCount() == 2)
+        base = sa.GetValue<int>(2);
+
+    long tmp = 0;
+    bool ret = self.ToLong(&tmp,base);
+
+    Sqrat::Table ret_table(v);
+    ret_table.SetValue<bool>("success",ret);
+    if(ret)
+        ret_table.SetValue<int>("value",(int) tmp); // TODO (bluehazzard#1#): not nice... check overflow
+    else
+        ret_table.SetValue<int>("value", 0);
+
+    sa.PushValue(ret_table);
+    return SC_RETURN_VALUE;
+
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
+}
+
+SQInteger wxString_ToDouble(HSQUIRRELVM v)
+{
+    StackHandler sa(v);
+    try
+    {
+    wxString& self = *sa.GetInstance<wxString>(1);
+
+
+    double tmp = 0;
+    bool ret = self.ToDouble(&tmp);
+
+    Sqrat::Table ret_table(v);
+    ret_table.SetValue<bool>("success",ret);
+    if(ret)
+        ret_table.SetValue<float>("value",(float) tmp); // TODO (bluehazzard#1#): not nice... check overflow
+    else
+        ret_table.SetValue<float>("value", NAN);
+
+    sa.PushValue(ret_table);
+    return SC_RETURN_VALUE;
+
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
+}
+
 
 
 /** \brief Bind wxString to the Squirrel vm
@@ -530,7 +640,9 @@ void bind_wxString(HSQUIRRELVM vm)
     .SquirrelFunc("Matches",&wxString_Matches)
     .SquirrelFunc("GetChar",&wxString_GetChar)
     .SquirrelFunc("AddChar",&wxString_AddChar)
-    .SquirrelFunc("Find",&wxString_Find)
+    .SquirrelFunc("Find",   &wxString_Find)
+    .SquirrelFunc("ToInt",  &wxString_ToInt)
+    .SquirrelFunc("ToDouble",&wxString_ToDouble)
     ;
     RootTable(vm).Bind(_SC("wxString"),bwxString);
 

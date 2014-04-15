@@ -146,23 +146,33 @@ namespace ScriptBindings
     }
 ////////////////////////////////////////////////////////////////////////////////
 
+    SQInteger wxArrayString_Item(HSQUIRRELVM vm)
+    {
+        StackHandler sa(vm);
+        wxArrayString* inst = sa.GetInstance<wxArrayString>(1);
+        int pos = sa.GetValue<int>(2);
+
+        if(inst->GetCount() == 0 || inst->GetCount() < pos)
+            return sa.ThrowError("wxArrayString: GetCount < pos");
+
+        sa.PushValue<wxString>(inst->Item(pos));
+        return SC_RETURN_VALUE;
+    }
+
     void Register_wxTypes(HSQUIRRELVM vm)
     {
         ///////////////////
         // wxArrayString //
         ///////////////////
         Sqrat::Class<wxArrayString> array_string(vm,"wxArrayString");
-                array_string.
+                array_string
                 //emptyCtor().
                 //Ctor<>().
-                Func("Add",     &wxArrayString::Add ).
-                Func("Clear",   &wxArrayString::Clear ).
-                SquirrelFunc("Index",   &wxArrayString_Index).
-                Func("GetCount",        &wxArrayString::GetCount)
-                // FIXME (bluehazzard#1#): Fix Item in wx2.9
-                #if !wxCHECK_VERSION(2, 9, 0) // Strange that this does not work with wx 2.9.x?!
-                .Func("Item",           &wxArrayString::Item)
-                #endif
+                .Func("Add",     &wxArrayString::Add )
+                .Func("Clear",   &wxArrayString::Clear )
+                .SquirrelFunc("Index",   &wxArrayString_Index)
+                .Func("GetCount",        &wxArrayString::GetCount)
+                .SquirrelFunc("Item",    &wxArrayString_Item)
                 ;
         Sqrat::RootTable(vm).Bind("wxArrayString",array_string);
 

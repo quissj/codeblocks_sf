@@ -30,11 +30,7 @@ sq_wxDialog::sq_wxDialog(HSQUIRRELVM vm) :  cb_wxBaseManagedWindow(vm)
 
 sq_wxDialog::~sq_wxDialog()
 {
-    if(GetManagedWindow() != nullptr)
-    {
-        GetManagedWindow()->Destroy();
-        // TODO (bluehazzard#1#): Possible delete the dialog
-    }
+
 }
 
 int sq_wxDialog::LoadFromXRCFile(wxString file,wxString name)
@@ -50,6 +46,7 @@ int sq_wxDialog::LoadFromXRCPool(wxString name)
 {
     if(GetManagedWindow() != nullptr)
         return RESOURCE_ALREADY_LOADED;
+
    SetManagedWindow(wxXmlResource::Get()->LoadDialog(NULL,name));
 
     if(GetManagedWindow() == nullptr)

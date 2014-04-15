@@ -29,6 +29,7 @@ namespace ScriptBindings
 {
     //wxString s_PathSep = wxFILE_SEP_PATH;
 
+
     void Register_Constants(HSQUIRRELVM vm)
     {
         // platform constants

@@ -16,6 +16,7 @@ namespace ScriptBindings
 {
     namespace SQ_WX_binding
     {
+
         void bind_wxString(HSQUIRRELVM vm);
     }
 

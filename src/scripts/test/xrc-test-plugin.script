@@ -68,12 +68,44 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         print("Content of text control: " + value + "\n");
         local button = dialog.GetControl("clickme_btn").GetLabel();
         print("Content of button control: " + button + "\n");
+        
+        local gauge_val = value.ToInt(10);
+        
+        if(gauge_val.success)
+            dialog.GetControl("controls_horizontal_gauge").SetValue(gauge_val.value);
+    
+        print("gauge range: " + dialog.GetControl("controls_horizontal_gauge").GetRange() + "\n");
+
+        
     }
     
     function OnCheckbox(evt)
     {
         local state = dialog.GetControl("controls_unchecked_checkbox").Get3StateValue();
         print("checkbox clicked: state:" +state +"\n");
+    }    
+    
+    function OnChoiceBox(evt)
+    {
+        local sel = dialog.GetControl("controls_choice").GetCurrentSelection();
+        local txt = dialog.GetControl("controls_choice").GetString(sel);
+        print("checkbox clicked: state:" + sel +" in text: "+ txt +"\n");
+    }
+    
+    
+    
+    function OnComboBox(evt)
+    {
+        local sel = dialog.GetControl("controls_combobox").GetSelection();
+        local txt = dialog.GetControl("controls_combobox").GetString(sel);
+        print("ComboBox clicked: state:" + sel +" in text: "+ txt +"\n");
+    }
+    
+    function OnComboBoxText(evt)
+    {
+        local txt = "hallo";
+        txt = dialog.GetControl("controls_combobox").GetValue();
+        print("ComboBox clicked state: in text" + txt + "\n");
     }
 
     function OnMouseClick(evt)
@@ -85,14 +117,56 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         print("mouse moved\n")
     }
+    
+    function OnRadioBox(evt)
+    {
+        local sel = dialog.GetControl("controls_radiobox").GetSelection();
+        local string = dialog.GetControl("controls_radiobox").GetString(sel);
+        print("RadioBox selection: " + sel + " " + string + "\n");
+        if(sel == 1)
+             dialog.GetControl("controls_radiobox").Show(4,false);
+        else
+            dialog.GetControl("controls_radiobox").Show(4,true);
+        if(sel == 2)
+             dialog.GetControl("controls_radiobox").Enable(3,false);
+        else
+            dialog.GetControl("controls_radiobox").Enable(3,true);
+    }
+    
+    function OnURLClick(evt)
+    {
+        local url = dialog.GetControl("controls_hyperlink").GetURL();
+        print("Url: " + url + "\n");
+        dialog.GetControl("controls_hyperlink").SetVisitedColour(wxColour(255,0,0));
+        //dialog.GetControl("controls_hyperlink").SetVisited(true);
+        dialog.GetControl("controls_hyperlink").SetHoverColour(wxColour(128,128,0));
+    }
+    
+    function OnChoice(evt)
+    {
+        local sel = dialog.GetControl("controls_choice").GetCurrentSelection();
+        local text = dialog.GetControl("controls_choice").GetString(sel);
+        print("choice: " + text + "\n");
+    }
+    
+    function OnListBox(evt)
+    {
+        local sel = dialog.GetControl("m_listBox1").GetSelections();
+        local txt = "listbox selected: ";
+        foreach(val in sel)
+            txt += val + " ";
+        print(txt + "\n");
+    }
 
     function StartTest()
     {
         print("Start xrc test\n");
         print("load dialog.xrc\n");
+        
         if(dialog.IsLoaded() == false)
         {
-            local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+            local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+                
             local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
             if(retcode == XRC_FILE_NOT_FOUND || retcode == RESOURCE_NOT_FOUND_IN_LOADED_RESOURCES)
             {
@@ -103,6 +177,13 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             dialog.RegisterEventHandler(wxEVT_BUTTON,XRCID("clickme_btn"),this,"OnClick");
             dialog.RegisterEventHandler(wxEVT_LEFT_DOWN,XRCID("test_dialog"),this,"OnMouseClick");
             dialog.RegisterEventHandler(wxEVT_COMMAND_CHECKBOX_CLICKED,XRCID("controls_unchecked_checkbox"),this,"OnCheckbox");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_CHECKBOX_CLICKED,XRCID("controls_unchecked_checkbox"),this,"OnCheckbox");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_COMBOBOX_SELECTED,XRCID("controls_combobox"),this,"OnComboBox");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_TEXT_UPDATED,XRCID("controls_combobox"),this,"OnComboBoxText");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_RADIOBOX_SELECTED,XRCID("controls_radiobox"),this,"OnRadioBox");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_HYPERLINK,XRCID("controls_hyperlink"),this,"OnURLClick");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_CHOICE_SELECTED,XRCID("controls_choice"),this,"OnChoice");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_LISTBOX_SELECTED,XRCID("m_listBox1"),this,"OnListBox");
         }
         
         local retcode = dialog.ShowModal();

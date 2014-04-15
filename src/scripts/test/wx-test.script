@@ -97,6 +97,16 @@ class wxTest extends script_test_base
         test_string("insert",string.insert(4,"_new"),"long_new_string_to_test_replace" );
         test_string("replace(start, len,string)",string.replace(5,3,"old"),"long_old_string_to_test_replace");
         test_string("replace(start, len,string,start2,len2)",string.replace(5,3,"old_new_string",4,3),"long_new_string_to_test_replace");
+        string = wxString("42");
+        local ret_val = string.ToInt(10);
+        if(!ret_val.success)
+            made_failed("ToInt","it was no success");
+        test_equal("ToInt",ret_val.value,42);
+        string = wxString("42.42");
+        ret_val = string.ToDouble();
+        if(!ret_val.success)
+            made_failed("ToDouble","it was no success");
+        test_equal("ToDouble",ret_val.value,42.42);
 
         print_test_result();
         ::print("======= Test wx String END ======= \n");
