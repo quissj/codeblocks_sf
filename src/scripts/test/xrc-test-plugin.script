@@ -60,6 +60,11 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
 
     }
+    
+    function line(str)
+    {
+        print(str + "\n");
+    }
 
     function OnClick(evt)
     {
@@ -140,6 +145,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         dialog.GetControl("controls_hyperlink").SetVisitedColour(wxColour(255,0,0));
         //dialog.GetControl("controls_hyperlink").SetVisited(true);
         dialog.GetControl("controls_hyperlink").SetHoverColour(wxColour(128,128,0));
+        dialog.GetControl("m_listBox1").Append("hallo");
     }
     
     function OnChoice(evt)
@@ -156,6 +162,74 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         foreach(val in sel)
             txt += val + " ";
         print(txt + "\n");
+    }
+    
+    function OnRadioButton(evt)
+    {
+        local is_sel = dialog.GetControl("m_radioBtn1").GetValue();
+        line("Radio button: " + is_sel);
+    }
+    
+    function OnCheckList(evt)
+    {
+        local checkboxlist = dialog.GetControl("m_checkList1");
+        local sel = checkboxlist.GetCheckedItems();
+        local txt = "check list selected: ";
+        foreach(val in sel)
+            txt += val + " ";
+        line(txt);
+        
+        txt = "Name of checked items: ";
+        
+        foreach(val in sel)
+            txt += checkboxlist.GetString(val) + " ";
+        line(txt);
+    }
+    
+    function OnSlider(evt)
+    {
+        local value = dialog.GetControl("m_slider1").GetValue();
+        local txt = "slider :" + value;
+        line(txt);
+        dialog.GetControl("m_staticText1").SetLabel(txt);
+    }
+    
+    function OnTogButton(evt)
+    {
+        local value = dialog.GetControl("m_toggleBtn1").GetValue();
+        line("Toggle button value: "+ value);
+    }
+    
+    function OnColour(evt)
+    {
+        local colour = dialog.GetControl("m_colourPicker1").GetColour()
+        line("colour picker selected: " + colour);
+    }
+    
+    function OnFilePicker(evt)
+    {
+        local file;
+        if(evt.GetId() == XRCID("m_filePicker1"))
+            file = dialog.GetControl("m_filePicker1").GetPath();
+        else
+            file = dialog.GetControl("m_dirPicker1").GetPath();
+            
+        line("file/dir picker: " + file);
+    }
+    
+    function OnTimer(evt)
+    {
+        line("timer evt");
+    }
+    
+    function OnSpinCtrl(evt)
+    {
+        local value = dialog.GetControl("m_spinCtrl1").GetValue();
+        line("Spin Ctrl value: "+ value);
+        if(value == 10)
+            dialog.GetControl("m_spinCtrl1").SetValue("Hello");
+        else if(value == 15)
+             dialog.GetControl("m_spinCtrl1").SetValue(19);
     }
 
     function StartTest()
@@ -184,6 +258,20 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             dialog.RegisterEventHandler(wxEVT_COMMAND_HYPERLINK,XRCID("controls_hyperlink"),this,"OnURLClick");
             dialog.RegisterEventHandler(wxEVT_COMMAND_CHOICE_SELECTED,XRCID("controls_choice"),this,"OnChoice");
             dialog.RegisterEventHandler(wxEVT_COMMAND_LISTBOX_SELECTED,XRCID("m_listBox1"),this,"OnListBox");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_RADIOBUTTON_SELECTED,XRCID("m_radioBtn1"),this,"OnRadioButton");
+            dialog.RegisterEventHandler(wxEVT_CHECKLISTBOX,XRCID("m_checkList1"),this,"OnCheckList");
+            dialog.RegisterEventHandler(wxEVT_SCROLL_CHANGED,XRCID("m_slider1"),this,"OnSlider");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,XRCID("m_toggleBtn1"),this,"OnTogButton");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_COLOURPICKER_CHANGED,XRCID("m_colourPicker1"),this,"OnColour");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_FILEPICKER_CHANGED,XRCID("m_filePicker1"),this,"OnFilePicker");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_DIRPICKER_CHANGED,XRCID("m_dirPicker1"),this,"OnFilePicker");
+            dialog.RegisterEventHandler(wxEVT_COMMAND_SPINCTRL_UPDATED,XRCID("m_spinCtrl1"),this,"OnSpinCtrl");
+            
+            local timer = dialog.CreateTimer();
+                      
+            dialog.RegisterEventHandler(wxEVT_TIMER,timer.GetId(),this,"OnTimer");
+            
+            timer.Start(2000,false);
         }
         
         local retcode = dialog.ShowModal();

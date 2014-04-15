@@ -43,7 +43,7 @@ namespace SQ_WX_binding
  *  ### wxString Function bound to squirrel
  *   | Name            | parameter                     | description               | info       |
  *   | :-------------- | :---------------------------  | :------------------------ | :--------- |
- *   | wxString()      | wxString, SQchar,int,float    |  create a wxString object |        x   |
+ *   | wxString()      | string; wxString; SQchar; int; float |  create a wxString object |        x   |
  *   | Append          |                          x    |                        x  |        x   |
  *   | IsEmpty         |                          x    |                        x  |        x   |
  *   | Length          |                          x    |                        x  |        x   |

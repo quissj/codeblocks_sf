@@ -1,5 +1,6 @@
 
 #include <sq_wx/sq_wxBaseControls.h>
+#include <sq_wx/sq_wx_type_handler.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/animate.h>
@@ -36,8 +37,8 @@ namespace ScriptBindings
 *  ## Global resource-handling functions bound to squirrel
 *
 *  This functions base all on the wxWidgets equivalents so please read the wxWidgets XRC Manual for more information
-*   | Name                 | Parameter                     | Description                               | Info        |
-*   | :------------------- | :---------------------------  | :---------------------------------------- | :---------- |
+*   | Name                 | Parameter                     | Description                               | Info                        |
+*   | :------------------- | :---------------------------  | :---------------------------------------- | :-------------------------- |
 *   | XRCID                | string                        |  Get the ID of a xrc resource file object |                             |
 *   | XRCNAME              | string                        |  Get the name of a xrc object from the ID |                             |
 *   | LoadXMLResourceFile  | string                        |  Load a xrc file/files using a path mask  |  see: wxXmlResource::Load   |
@@ -272,6 +273,140 @@ namespace ScriptBindings
 *   print(txt + "\n");
 *  ~~~~~~~~~
 *
+*  ## wxCheckListBox class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxCheckListBox manual for more information.
+*  This control is derived from wxListBox.
+*   | Name                 | Parameter                     | Description                                      | Info           |
+*   | :------------------- | :---------------------------  | :----------------------------------------------- | :------------- |
+*   | Check                | int, bool                     |  check a item                                    |                |
+*   | IsChecked            |                               |  return true if the item is checked              |                |
+*   | GetCheckedItems      |                               |  return a squirrel array with the checked items  |                |
+*
+*  ## wxStaticText class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxStaticText manual for more information.
+*   | Name                 | Parameter                     | Description                                      | Info           |
+*   | :------------------- | :---------------------------  | :----------------------------------------------- | :------------- |
+*   | GetLabel             |                               |  return the text of the static text elem         |                |
+*   | SetLabel             | string                        |  set the text of the static text elem            |                |
+*
+*
+*
+*  ## wxSlider class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxSlider manual for more information.
+*   | Name                 | Parameter                     | Description                                      | Info           |
+*   | :------------------- | :---------------------------  | :----------------------------------------------- | :------------- |
+*   | ClearSel             |                               |                                                  |                |
+*   | ClearTicks           |                               |                                                  |                |
+*   | GetMax               |                               |                                                  |                |
+*   | GetMin               |                               |                                                  |                |
+*   | GetSelEnd            |                               |                                                  |                |
+*   | GetSelStart          |                               |                                                  |                |
+*   | GetThumbLength       |                               |                                                  |                |
+*   | GetTickFreq          |                               |                                                  |                |
+*   | GetValue             |                               |                                                  |                |
+*   | SetMin               | int                           |                                                  |                |
+*   | SetMax               | int                           |                                                  |                |
+*   | SetRange             | int                           |                                                  |                |
+*   | SetSelection         | int, int                      |                                                  |                |
+*   | SetTick              | int                           |                                                  |                |
+*   | SetTickFreq          | int                           |                                                  |                |
+*   | SetValue             | int                           |                                                  |                |
+*
+*
+*  ## wxToggleButton class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxToggleButton manual for more information.
+*   | Name                 | Parameter                     | Description                                      | Info           |
+*   | :------------------- | :---------------------------  | :----------------------------------------------- | :------------- |
+*   | GetValue             |                               |  return true if the button is clicked            |                |
+*   | SetValue             | bool                          |  set the state of the button (clicked or not)    |                |
+*
+*
+*
+*  ## wxSearchCtrl class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxSearchCtrl manual for more information.
+*   | Name                  | Parameter                     | Description                                            | Info           |
+*   | :-------------------- | :---------------------------  | :----------------------------------------------------- | :------------- |
+*   | ShowCancelButton      | bool                          |  show or hide the the cancel button                    |                |
+*   | SetDescriptiveText    | string                        |  set the text what is shown before the user enters text| wx >2.9        |
+*   | GetDescriptiveText    |                               |  get the text what is shown before the user enters text| wx >2.9        |
+*   | IsSearchButtonVisible |                               |  true if the search button is visible                  |                |
+*   | IsCancelButtonVisible |                               |  true if the cancel button is visible                  |                |
+*   | ShowSearchButton      |                               |  show or hide the search button                        |                |
+*
+*
+*  ## wxColourPickerCtrl class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxColourPickerCtrl manual for more information.
+*   | Name                  | Parameter                     | Description                                       | Info           |
+*   | :-------------------- | :---------------------------  | :------------------------------------------------ | :------------- |
+*   | GetColour             |                               |  get the selected color                           |                |
+*   | SetColour             | wxColour                      |  set the color                                    |                |
+*
+*
+*  ## wxDirPickerCtrl class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxDirPickerCtrl manual for more information.
+*   | Name                  | Parameter                     | Description                                       | Info           |
+*   | :-------------------- | :---------------------------  | :------------------------------------------------ | :------------- |
+*   | SetPath               |  string                       |  set the predefined path                          |                |
+*   | GetPath               |                               |  get the selected path                            |                |
+*
+*
+*  ## wxFilePickerCtrl class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxFilePickerCtrl manual for more information.
+*   | Name                  | Parameter                     | Description                                       | Info           |
+*   | :-------------------- | :---------------------------  | :------------------------------------------------ | :------------- |
+*   | SetPath               |  string                       |  set the predefined path                          |                |
+*   | GetPath               |                               |  get the selected path                            |                |
+*
+*
+*  ## wxTimer class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxTimer manual for more information.
+*   | Name              | Parameter                     | Description                                       | Info           |
+*   | :-----------------| :---------------------------  | :------------------------------------------------ | :------------- |
+*   | GetId             |                               |  return the id of the timer                       |                |
+*   | IsOneShot         |                               |  return true if it is only one shot               |                |
+*   | IsRunning         |                               |  return true if is running                        |                |
+*   | Start             |  int millisec, bool oneshot   |  start the timer with the given interval          |                |
+*   | Stop              |                               |  stop the timer                                   |                |
+*   | GetInterval       |                               |  get the selected path                            |                |
+*
+*
+*  ## wxSpinButton class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxSpinButton manual for more information.
+*   | Name              | Parameter                     | Description                                       | Info           |
+*   | :-----------------| :---------------------------  | :------------------------------------------------ | :------------- |
+*   | GetMax            |                               |  return the max value                             |                |
+*   | GetMin            |                               |  return the min value                             |                |
+*   | GetValue          |                               |  return the actual value                          |                |
+*   | SetRange          |  int min, int max             |  set min and max with one function                |                |
+*   | SetValue          |  int                          |  set the value                                    |                |
+*
+*
+*  ## wxSpinCtrl class squirrel binding
+*
+*  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxSpinCtrl manual for more information.
+*   | Name              | Parameter                     | Description                                       | Info           |
+*   | :-----------------| :---------------------------  | :------------------------------------------------ | :------------- |
+*   | GetMax            |                               |  return the max value                             |                |
+*   | GetMin            |                               |  return the min value                             |                |
+*   | GetValue          |                               |  return the actual value                          |                |
+*   | SetRange          |  int min, int max             |  set min and max with one function                |                |
+*   | SetValue          |  [int,string]                 |  set the value (integer or string)                |                |
+*   | GetBase           |                               |  get the base                                     | wx > 2.9       |
+*   | SetBase           |  int                          |  set the base                                     | wx > 2.9       |
+*   | SetSelection      |  int from, int to             |  set the value                                    |                |
+*
+*
+*
 **/
 
 
@@ -419,6 +554,67 @@ SQInteger wxListBox_GetSelections(HSQUIRRELVM vm)
         sa.PushValue(ret_val);
         return SC_RETURN_VALUE;
 
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
+}
+
+SQInteger wxCheckListBox_GetCheckedItems(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    try
+    {
+        wxCheckListBox* inst = sa.GetInstance<wxCheckListBox>(1);
+        wxArrayInt arr;
+#if wxCHECK_VERSION(2, 9, 0)
+        inst->GetCheckedItems(arr);
+#else
+        for(size_t i = 0;i < inst->GetCount(); i++)
+        {
+            if(inst->IsChecked(i))
+                arr.Add(i);
+        }
+#endif
+
+        Sqrat::Array ret_val(vm);
+
+        for(size_t i = 0; i < arr.GetCount();i++)
+            ret_val.Append((int) arr[i]);
+
+        sa.PushValue(ret_val);
+        return SC_RETURN_VALUE;
+
+    }
+    catch(CBScriptException &e)
+    {
+        return sa.ThrowError(e.Message());
+    }
+}
+
+SQInteger wxSpinCtrl_SetValue(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    try
+    {
+        wxSpinCtrl* inst = sa.GetInstance<wxSpinCtrl>(1);
+
+        Sqrat::Var<SQInteger> int_val(vm, 2);
+        if (!Sqrat::Error::Instance().Occurred(vm))
+        {
+            inst->SetValue(int_val.value);
+            return SC_RETURN_OK;
+        }
+        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Var<wxString> str_val(vm, 2);
+        if (!Sqrat::Error::Instance().Occurred(vm))
+        {
+            inst->SetValue(str_val.value);
+            return SC_RETURN_OK;
+        }
+
+        sa.ThrowError(_("wxSpinCtrl::SetValue could not get type of param"));
     }
     catch(CBScriptException &e)
     {
@@ -681,15 +877,6 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxListBox
     /***************************************************************************************************************/
-    /*Sqrat::DerivedClass<wxItemContainerImmutable,wxControl, Sqrat::NoConstructor<wxItemContainerImmutable> > bwxItemContainerImmutable(vm,"wxItemContainerImmutable");
-    bwxItemContainerImmutable.Func("SetSelection",&wxItemContainerImmutable::SetSelection);
-    Sqrat::RootTable(vm).Bind(_SC("wxItemContainerImmutable"),bwxItemContainerImmutable);
-
-    Sqrat::DerivedClass<wxItemContainer,wxItemContainerImmutable, Sqrat::NoConstructor<wxItemContainer> > bwxItemContainer(vm,"wxItemContainer");
-    bwxItemContainer.Func("SetSelection",&wxItemContainer::SetSelection);
-    Sqrat::RootTable(vm).Bind(_SC("wxItemContainer"),bwxItemContainer);*/
-
-
     Sqrat::DerivedClass<wxListBoxBase,wxControl, Sqrat::NoConstructor<wxListBoxBase> > bwxListBoxBase(vm,"wxListBoxBase");
     bwxListBoxBase.Func<void (wxListBoxBase::*) (int,bool)>("SetSelection",&wxListBoxBase::SetSelection);
     Sqrat::RootTable(vm).Bind(_SC("wxListBoxBase"),bwxListBoxBase);
@@ -697,7 +884,6 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::DerivedClass<wxListBox,wxListBoxBase, Sqrat::NoConstructor<wxListBox> > bwxListBox(vm,"wxListBox");
     bwxListBox.SquirrelFunc("GetSelections",&wxListBox_GetSelections)
     .Func("GetSelection",&wxListBox::GetSelection)
-    //bwxListBox.Func<int (wxListBox::*) (wxArrayInt&)>("GetSelections",&wxListBox::GetSelections)
     .Func<void (wxListBoxBase::*) (int,bool)>("SetSelection",&wxListBox::SetSelection)
     .Func("IsSelected",&wxListBox::IsSelected)
     .Func("EnsureVisible",&wxListBox::EnsureVisible)
@@ -712,6 +898,207 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     //.Func<void (wxListBox::*)(const wxString&,unsigned int)>("Set",&wxListBox::Set);
 
     Sqrat::RootTable(vm).Bind(_SC("wxListBox"),bwxListBox);
+
+    /***************************************************************************************************************/
+    // wxCheckListBox
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxCheckListBox,wxListBox, Sqrat::NoConstructor<wxCheckListBox> > bwxCheckListBox(vm,"wxCheckListBox");
+    bwxCheckListBox.Func("Check",&wxCheckListBox::Check)
+    .Func("IsChecked",&wxCheckListBox::IsChecked)
+    .SquirrelFunc("GetCheckedItems",&wxCheckListBox_GetCheckedItems);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxCheckListBox"),bwxCheckListBox);
+
+    /***************************************************************************************************************/
+    // wxStaticText
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxStaticText,wxControl, Sqrat::NoConstructor<wxStaticText> > bwxStaticText(vm,"wxStaticText");
+    bwxStaticText.Func("GetLabel",&wxStaticText::GetLabel)
+    .Func("SetLabel",&wxStaticText::SetLabel);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxStaticText"),bwxStaticText);
+
+    /***************************************************************************************************************/
+    // wxSlider
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxSliderBase,wxControl, Sqrat::NoConstructor<wxSliderBase> > bwxSliderBase(vm,"wxSliderBase");
+    //bwxSliderBase.Func<void (wxListBoxBase::*) (int,bool)>("SetSelection",&wxListBoxBase::SetSelection);
+    Sqrat::RootTable(vm).Bind(_SC("wxSliderBase"),bwxSliderBase);
+
+
+    Sqrat::DerivedClass<wxSlider,wxSliderBase, Sqrat::NoConstructor<wxSlider> > bwxSlider(vm,"wxSlider");
+    bwxSlider.Func("ClearSel",&wxSlider::ClearSel)
+    .Func("ClearTicks",&wxSlider::ClearTicks)
+    .Func("GetMax",&wxSlider::GetMax)
+    .Func("GetMin",&wxSlider::GetMin)
+    .Func("GetSelEnd",&wxSlider::GetSelEnd)
+    .Func("GetSelStart",&wxSlider::GetSelStart)
+    .Func("GetThumbLength",&wxSlider::GetThumbLength)
+    .Func("GetTickFreq",&wxSlider::GetTickFreq)
+    .Func("GetValue",&wxSlider::GetValue)
+    .Func("SetMin",&wxSlider::SetMin)
+    .Func("SetMax",&wxSlider::SetMax)
+    .Func("SetRange",&wxSlider::SetRange)
+    .Func("SetSelection",&wxSlider::SetSelection)
+    .Func("SetTick",&wxSlider::SetTick)
+    .Func("SetTickFreq",&wxSlider::SetTickFreq)
+    .Func("SetValue",&wxSlider::SetValue);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxSlider"),bwxSlider);
+
+
+    /***************************************************************************************************************/
+    // wxToggleButton
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxToggleButton,wxControl, Sqrat::NoConstructor<wxToggleButton> > bwxToggleButton(vm,"wxToggleButton");
+    bwxToggleButton.Func("GetValue",&wxToggleButton::GetValue)
+    .Func("SetValue",&wxToggleButton::SetValue);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxToggleButton"),bwxToggleButton);
+
+
+    /***************************************************************************************************************/
+    // wxTextCtrlBase
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxTextCtrlBase,wxControl, Sqrat::NoConstructor<wxTextCtrlBase> > bwxTextCtrlBase(vm,"wxTextCtrlBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxTextCtrlBase"),bwxTextCtrlBase);
+
+    /***************************************************************************************************************/
+    // wxSearchCtrl
+    /***************************************************************************************************************/
+#if (wxUSE_NATIVE_SEARCH_CONTROL == 1)
+    Sqrat::DerivedClass<wxSearchCtrl,wxTextCtrl, Sqrat::NoConstructor<wxSearchCtrl> > bwxSearchCtrl(vm,"wxSearchCtrl");
+#else
+    Sqrat::DerivedClass<wxSearchCtrl,wxTextCtrlBase, Sqrat::NoConstructor<wxSearchCtrl> > bwxSearchCtrl(vm,"wxSearchCtrl");
+#endif
+    bwxSearchCtrl.Func("ShowCancelButton",&wxSearchCtrl::ShowCancelButton)
+#if wxCHECK_VERSION(2, 9, 0)
+    .Func("SetDescriptiveText",&wxSearchCtrl::SetDescriptiveText)
+    .Func("GetDescriptiveText",&wxSearchCtrl::GetDescriptiveText)
+#endif // wxCHECK_VERSION
+    .Func("IsSearchButtonVisible",&wxSearchCtrl::IsSearchButtonVisible)
+    .Func("IsCancelButtonVisible",&wxSearchCtrl::IsSearchButtonVisible)
+    .Func("ShowSearchButton",&wxSearchCtrl::ShowSearchButton);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxSearchCtrl"),bwxSearchCtrl);
+
+
+
+    /***************************************************************************************************************/
+    // wxPickerBase
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxPickerBase,wxControl, Sqrat::NoConstructor<wxPickerBase> > bwxPickerBase(vm,"wxPickerBase");
+    bwxPickerBase.Func("HasTextCtrl",&wxPickerBase::HasTextCtrl)
+    .Func("GetTextCtrl",&wxPickerBase::GetTextCtrl);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxPickerBase"),bwxPickerBase);
+
+    /***************************************************************************************************************/
+    // wxColourPickerCtrl
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxColourPickerCtrl,wxPickerBase, Sqrat::NoConstructor<wxColourPickerCtrl> > bwxColourPickerCtrl(vm,"wxColourPickerCtrl");
+    bwxColourPickerCtrl.Func("GetColour",&wxColourPickerCtrl::GetColour)
+    .Func<void (wxColourPickerCtrl::*) (const wxColour&)>("SetColour",&wxColourPickerCtrl::SetColour);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxColourPickerCtrl"),bwxColourPickerCtrl);
+
+
+    /***************************************************************************************************************/
+    // wxFontPickerCtrl
+    /***************************************************************************************************************/
+    /*Sqrat::DerivedClass<wxFontPickerCtrl,wxPickerBase, Sqrat::NoConstructor<wxFontPickerCtrl> > bwxFontPickerCtrl(vm,"wxFontPickerCtrl");
+    bwxFontPickerCtrl.Func("GetMaxPointSize",&wxFontPickerCtrl::GetMaxPointSize)
+    .Func("GetSelectedColour",&wxFontPickerCtrl::GetSelectedColour)
+    .Func("GetSelectedFont",&wxFontPickerCtrl::GetSelectedFont)
+    .Func("SetMaxPointSize ",&wxFontPickerCtrl::SetMaxPointSize )
+    .Func("SetSelectedColour ",&wxFontPickerCtrl::SetSelectedColour )
+    .Func("SetSelectedFont",&wxFontPickerCtrl::SetSelectedFont);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxFontPickerCtrl"),bwxFontPickerCtrl);*/
+
+
+    /***************************************************************************************************************/
+    // wxFileDirPickerCtrlBase
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxFileDirPickerCtrlBase ,wxPickerBase, Sqrat::NoConstructor<wxFileDirPickerCtrlBase> > bwxFileDirPickerCtrlBase(vm,"wxFileDirPickerCtrlBase");
+    bwxFileDirPickerCtrlBase.Func("GetPath",&wxFileDirPickerCtrlBase::GetPath)
+    .Func("SetPath",&wxFileDirPickerCtrlBase::SetPath );
+
+    Sqrat::RootTable(vm).Bind(_SC("wxFileDirPickerCtrlBase"),bwxFileDirPickerCtrlBase);
+
+    /***************************************************************************************************************/
+    // wxDirPickerCtrl
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxDirPickerCtrl ,wxFileDirPickerCtrlBase, Sqrat::NoConstructor<wxDirPickerCtrl> > bwxDirPickerCtrl(vm,"wxDirPickerCtrl");
+    bwxDirPickerCtrl.Func("SetPath",&wxDirPickerCtrl::SetPath)
+    .Func("GetPath",&wxDirPickerCtrl::GetPath);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxDirPickerCtrl"),bwxDirPickerCtrl);
+
+    /***************************************************************************************************************/
+    // wxFilePickerCtrl
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxFilePickerCtrl ,wxFileDirPickerCtrlBase, Sqrat::NoConstructor<wxFilePickerCtrl> > bwxFilePickerCtrl(vm,"wxFilePickerCtrl");
+    bwxFilePickerCtrl.Func("SetPath",&wxFilePickerCtrl::SetPath )
+    .Func("GetPath",&wxFilePickerCtrl::GetPath);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxFilePickerCtrl"),bwxFilePickerCtrl);
+
+
+
+    /***************************************************************************************************************/
+    // wxSpinButton
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxSpinButtonBase ,wxControl, Sqrat::NoConstructor<wxSpinButtonBase> > bwxSpinButtonBase(vm,"wxSpinButtonBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxSpinButtonBase"),bwxSpinButtonBase);
+
+    Sqrat::DerivedClass<wxSpinButton,wxSpinButtonBase,Sqrat::NoConstructor<wxSpinButton> > bwxSpinButton(vm,"wxSpinButton");
+    bwxSpinButton.Func("GetMax",&wxSpinButton::GetMax)
+    .Func("GetMin",&wxSpinButton::GetMin)
+    .Func("GetValue",&wxSpinButton::GetValue)
+    .Func("SetRange",&wxSpinButton::SetRange)
+    .Func("SetValue",&wxSpinButton::SetValue);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxSpinCtrl"),bwxSpinButton);
+
+    /***************************************************************************************************************/
+    // wxSpinCtrl
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxSpinCtrl,wxSpinButton,Sqrat::NoConstructor<wxSpinCtrl> > bwxSpinCtrl(vm,"wxSpinCtrl");
+    bwxSpinCtrl.Func("GetMax",&wxSpinCtrl::GetMax)
+    .Func("GetMin",&wxSpinCtrl::GetMin)
+    .Func("GetValue",&wxSpinCtrl::GetValue)
+    .Func("SetRange",&wxSpinCtrl::SetRange)
+#if wxCHECK_VERSION(2, 9, 0)
+    .Func("GetBase",&wxSpinCtrl::GetBase)
+    .Func("SetBase",&wxSpinCtrl::SetBase)
+#endif // wxCHECK_VERSION
+    .Func("SetSelection",&wxSpinCtrl::SetSelection)
+    .SquirrelFunc("SetValue",&wxSpinCtrl_SetValue);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxSpinCtrl"),bwxSpinCtrl);
+
+
+    /***************************************************************************************************************/
+    // wxTimerBase
+    /***************************************************************************************************************/
+    Sqrat::Class<wxTimerBase ,Sqrat::NoConstructor<wxTimerBase> > bwxTimerBase(vm,"wxTimerBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxTimerBase"),bwxTimerBase);
+
+    /***************************************************************************************************************/
+    // wxTimer
+    /***************************************************************************************************************/
+    Sqrat::DerivedClass<wxTimer,wxTimerBase,Sqrat::NoConstructor<wxTimer> > bwxTimer(vm,"wxTimer");
+    bwxTimer.Func("GetId",&wxTimer::GetId)
+    .Func("IsOneShot",&wxTimer::IsOneShot)
+    .Func("IsRunning",&wxTimer::IsRunning)
+    .Func("Start",&wxTimer::Start)
+    //.Func("StartOnce",&wxTimer::StartOnce)
+    .Func("Stop",&wxTimer::Stop)
+    .Func("GetInterval",&wxTimer::GetInterval);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxTimer"),bwxTimer);
+
 
 }
 }

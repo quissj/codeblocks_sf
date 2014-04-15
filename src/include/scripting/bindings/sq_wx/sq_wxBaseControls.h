@@ -19,6 +19,16 @@
 #include <wx/hyperlink.h>
 #include <wx/radiobut.h>
 #include <wx/listbox.h>
+#include <wx/checklst.h>
+#include <wx/slider.h>
+#include <wx/stattext.h>
+#include <wx/tglbtn.h>
+#include <wx/srchctrl.h>
+#include <wx/pickerbase.h>
+#include <wx/clrpicker.h>
+#include <wx/filepicker.h>
+#include <wx/spinbutt.h>
+#include <wx/spinctrl.h>
 #include <map>
 
 namespace ScriptBindings
@@ -140,8 +150,32 @@ public:
      */
     void DeConnectEvtHandler()
     {
-        GetManagedWindow()->SetNextHandler(nullptr);
-        SetPreviousHandler(nullptr);
+        id_timer_map::iterator itr = m_timer_map.begin();
+        for(;itr != m_timer_map.end();++itr)
+        {
+            if(itr->second != nullptr)
+                delete itr->second;
+        }
+        m_timer_map.clear();
+
+        //GetManagedWindow()->SetNextHandler(nullptr);
+        //SetPreviousHandler(nullptr);
+    }
+
+    wxTimer* CreateTimer()
+    {
+        wxTimer* timer = new wxTimer(m_managed_obj);
+        m_timer_map.insert(std::make_pair(timer->GetId(),timer));
+        return timer;
+    }
+
+    wxTimer* GetTimer(int id)
+    {
+        id_timer_map::iterator itr = m_timer_map.find(id);
+        if(itr == m_timer_map.end())
+            return nullptr;
+
+        return itr->second;
     }
 
     /** \brief Helper function to register a squirrel function as event handler for a wxWidgets event
@@ -228,6 +262,9 @@ protected:
     typedef std::map<wxEventType,evt_id_func_map>   evt_type_id_map;
     evt_type_id_map m_evt_map;
 
+    typedef std::map<int,wxTimer*>      id_timer_map;
+    id_timer_map  m_timer_map;
+
 
     HSQUIRRELVM m_vm;
     Sqrat::Object m_object;
@@ -277,6 +314,18 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
     CHECK_CONTROL(wxHyperlinkCtrl,c_name,wind)
     CHECK_CONTROL(wxRadioButton,c_name,wind)
     CHECK_CONTROL(wxListBox,c_name,wind)
+    CHECK_CONTROL(wxCheckListBox,c_name,wind)
+    CHECK_CONTROL(wxStaticText,c_name,wind)
+    CHECK_CONTROL(wxSlider,c_name,wind)
+    CHECK_CONTROL(wxToggleButton,c_name,wind)
+    CHECK_CONTROL(wxSearchCtrl,c_name,wind)
+    CHECK_CONTROL(wxPickerBase,c_name,wind)
+    CHECK_CONTROL(wxColourPickerCtrl,c_name,wind)
+    CHECK_CONTROL(wxDirPickerCtrl,c_name,wind)
+    CHECK_CONTROL(wxFilePickerCtrl,c_name,wind)
+    CHECK_CONTROL(wxTimer,c_name,wind)
+    CHECK_CONTROL(wxSpinCtrl,c_name,wind)
+    CHECK_CONTROL(wxSpinButton,c_name,wind)
 
     CHECK_CONTROL_END(c_name)
 

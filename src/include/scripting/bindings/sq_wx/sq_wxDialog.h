@@ -52,7 +52,7 @@ namespace ScriptBindings
 
         bool IsLoaded()     {return (GetManagedWindow() != nullptr); };
 
-        void Centre();
+        void Center();
 
         friend SQInteger sq_wxDialog_constructor(HSQUIRRELVM vm);
 
