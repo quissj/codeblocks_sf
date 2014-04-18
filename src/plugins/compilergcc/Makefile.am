@@ -3,8 +3,6 @@ SUBDIRS = depslib resources
 AM_CPPFLAGS = $(WX_CXXFLAGS) \
 		-I$(top_srcdir)/src/include \
 		-I$(top_srcdir)/src/sdk/wxscintilla/include \
-		-I$(top_srcdir)/src/include/scripting/include \
-		-I$(top_srcdir)/src/include/scripting/sqplus \
 		-I$(top_srcdir)/src/plugins/compilergcc/depslib/src
 
 AM_CXXFLAGS = -DDEPSLIB_UNIX

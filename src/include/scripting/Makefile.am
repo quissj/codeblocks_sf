@@ -1,1 +1,57 @@
-SUBDIRS = squirrel sqstdlib sqplus bindings include
+#SUBDIRS = squirrel sqstdlib sqrat bindings
+
+noinst_HEADERS = sqrat/sqratConst.h \
+				sqrat/sqratUtil.h \
+				sqrat/sqratVM.h \
+				sqrat/sqratOverloadMethods.h \
+				sqrat/sqratAllocator.h \
+				sqrat/sqratTypes.h \
+				sqrat/sqratMemberMethods.h \
+				sqrat/sqratGlobalMethods.h \
+				sqrat/sqratFunction.h \
+				sqrat/sqratClassType.h \
+				sqrat/sqratObject.h \
+				sqrat/sqratArray.h \
+				sqrat/sqratTable.h \
+				sqrat/sqratScript.h \
+				sqrat/sqratClass.h \
+				sqrat/sqratext_Ref.h \
+				sqrat.h \
+				bindings/sq_wx/sq_wx_base_controls.h \
+				bindings/sq_wx/sq_wx_type_handler.h \
+				bindings/sq_wx/sq_wx.h \
+				bindings/sq_wx/sq_wx_dialog.h \
+				bindings/scriptbindings.h \
+				bindings/sc_binding_util.h \
+				bindings/sc_cb_vm.h \
+				bindings/sc_base_types.h \
+				bindings/sc_plugin.h \
+				squirrel/sqclass.h \
+				squirrel/squserdata.h \
+				squirrel/sqmem.h \
+				squirrel/sqlexer.h \
+				squirrel/squirrel.h \
+				squirrel/sqopcodes.h \
+				squirrel/sqstdstring.h \
+				squirrel/sqstring.h \
+				squirrel/sqstdaux.h \
+				squirrel/sqarray.h \
+				squirrel/sqfuncstate.h \
+				squirrel/sqstdio.h \
+				squirrel/sqstdsystem.h \
+				squirrel/sqpcheader.h \
+				squirrel/squtils.h \
+				squirrel/sqtable.h \
+				squirrel/sqstdmath.h \
+				squirrel/sqcompiler.h \
+				squirrel/sqstdblob.h \
+				squirrel/sqrdbg.h \
+				squirrel/sqobject.h \
+				squirrel/sqvm.h \
+				squirrel/sqstate.h \
+				squirrel/sqfuncproto.h \
+				squirrel/sqdbgserver.h \
+				squirrel/sqclosure.h \
+				Makefile.am \
+				sqstdlib/sqstdstream.h \
+				sqstdlib/sqstdblobimpl.h
