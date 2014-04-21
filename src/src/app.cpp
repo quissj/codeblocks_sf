@@ -43,7 +43,7 @@
 
 #include "projectmanagerui.h"
 
-#include <sqrat.h>
+#include <scripting/sqrat.h>
 
 #ifndef __WXMSW__
     #include "prefix.h" // binreloc

@@ -2,7 +2,7 @@
 #define SQ_WX_TYPE_HANDLER_H_INCLUDED
 
 #include <wx/string.h>
-#include <scripting/sqrat/sqrat.h>
+#include <scripting/sqrat.h>
 
 namespace Sqrat
 {

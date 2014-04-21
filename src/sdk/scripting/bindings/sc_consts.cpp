@@ -21,7 +21,7 @@
 #endif
 
 #include <filefilters.h>
-#include <sqrat.h>
+#include <scripting/sqrat.h>
 #include "sc_binding_util.h"
 
 

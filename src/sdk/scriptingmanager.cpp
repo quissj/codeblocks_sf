@@ -29,11 +29,9 @@
 #include "crc32.h"
 #include "menuitemsmanager.h"
 #include "genericmultilinenotesdlg.h"
-// FIXME (bluehazzard#1#): remove if not needed
-//#include "sqplus.h"
-#include "sqrat.h"
-#include "scriptbindings.h"
-#include "sc_plugin.h"
+#include <scripting/sqrat.h>
+#include <scripting/bindings/scriptbindings.h>
+#include <scripting/bindings/sc_plugin.h>
 #include "sqstdstring.h"
 //#include <sc_cb_vm.h>
 

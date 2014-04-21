@@ -7,10 +7,10 @@
 #define SQ_WX_H
 
 #include <scripting/squirrel/squirrel.h>
-#include <sqrat.h>
+#include <scripting/sqrat.h>
 #include <sq_wx/sq_wx_type_handler.h>
-#include <sq_wx/sq_wxDialog.h>
-#include <sq_wx/sq_wxBaseControls.h>
+#include <sq_wx/sq_wx_dialog.h>
+#include <sq_wx/sq_wx_base_controls.h>
 
 namespace ScriptBindings
 {

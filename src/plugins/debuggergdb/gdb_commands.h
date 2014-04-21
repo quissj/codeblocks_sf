@@ -28,8 +28,9 @@
 #include <logmanager.h>
 #include <macrosmanager.h>
 #include <scriptingmanager.h>
-#include <scripting/sqrat/sqrat.h>
+#include <scripting/sqrat.h>
 #include <scripting/bindings/sc_base_types.h>
+#include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
 
 #include "debugger_defs.h"
 #include "debuggergdb.h"
@@ -851,7 +852,6 @@ class GdbCmd_Watch : public DebuggerCmd
                     // A error occured
 
                 } else {
-                    // TODO (bluehazzard#1#): Use reference if sqrat supports it...
                     w << func.Evaluate<wxString>(output, m_watch->GetArrayStart());
                 }
                 wxString error = Manager::Get()->GetScriptingManager()->GetErrorString();

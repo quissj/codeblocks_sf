@@ -19,7 +19,7 @@
 #include "menuitemsmanager.h"
 #include <wx/intl.h>
 #include <scripting/bindings/sc_cb_vm.h>
-#include <scripting/sqrat/sqrat/sqratUtil.h>
+#include <scripting/sqrat/sqratUtil.h>
 #include <scripting/bindings/sc_plugin.h>
 
 

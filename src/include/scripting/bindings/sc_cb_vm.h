@@ -3,7 +3,7 @@
 #define SC_CB_VM_H
 
 #include <scripting/squirrel/squirrel.h>
-#include <scripting/sqrat/sqrat.h>
+#include <scripting/sqrat.h>
 #include "manager.h"
 #include <wx/hashmap.h>
 #include <wx/string.h>

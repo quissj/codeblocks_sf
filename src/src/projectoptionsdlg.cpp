@@ -39,8 +39,8 @@
 
 #include <wx/radiobox.h>
 
-// FIXME (bluehazzard#1#): sqrat
-#include <sqrat.h>
+
+#include <scripting/sqrat.h>
 
 #include "annoyingdialog.h"
 #include "configurationpanel.h"

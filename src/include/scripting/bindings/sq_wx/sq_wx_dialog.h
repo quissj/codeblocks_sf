@@ -1,7 +1,7 @@
 #ifndef SQ_WXDIALOG
 #define SQ_WXDIALOG
 
-#include <sq_wx/sq_wxBaseControls.h>
+#include <sq_wx/sq_wx_base_controls.h>
 #include <sc_binding_util.h>
 #include <sc_cb_vm.h>
 #include <sc_base_types.h>

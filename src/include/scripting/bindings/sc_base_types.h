@@ -26,7 +26,7 @@
 #include <compiletargetbase.h>
 #include <cbproject.h>
 #include <cbeditor.h>
-#include <scripting/sqrat/sqrat.h>
+#include <scripting/sqrat.h>
 #include <scripting/bindings/sc_cb_vm.h>
 #include <scripting/bindings/sc_binding_util.h>
 #include <scripting/bindings/sq_wx/sq_wx_type_handler.h>

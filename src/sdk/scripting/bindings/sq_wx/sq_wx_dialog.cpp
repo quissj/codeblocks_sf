@@ -1,5 +1,5 @@
 
-#include <sq_wx/sq_wxDialog.h>
+#include <sq_wx/sq_wx_dialog.h>
 #include <wx/button.h>
 
 

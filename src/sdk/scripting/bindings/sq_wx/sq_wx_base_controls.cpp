@@ -1,5 +1,5 @@
 
-#include <sq_wx/sq_wxBaseControls.h>
+#include <sq_wx/sq_wx_base_controls.h>
 #include <sq_wx/sq_wx_type_handler.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
@@ -702,7 +702,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::DerivedClass<wxAnimationCtrl,wxControl, Sqrat::NoConstructor<wxAnimationCtrl> >  bwxAnimationCtrl(vm,"wxAnimationCtrl");
     bwxAnimationCtrl.Func("IsPlaying",&wxAnimationCtrl::IsPlaying)
     .Func("LoadFile",&wxAnimationCtrl::LoadFile)
-    .Overload<bool (wxAnimationCtrl::*)(bool)>("Play",&wxAnimationCtrl::Play)
+    .Overload<bool (wxAnimationCtrl::*)()>("Play",&wxAnimationCtrl::Play)
     .Func("Stop",&wxAnimationCtrl::Stop)
     .Func("GetAnimation",&wxAnimationCtrl::GetAnimation);
     Sqrat::RootTable(vm).Bind(_SC("wxAnimationCtrl"),bwxAnimationCtrl);
@@ -789,7 +789,12 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxComboBox
     /***************************************************************************************************************/
+#if defined(__WXGTK__)
+    Sqrat::DerivedClass<wxComboBox,wxControl, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
+#else
     Sqrat::DerivedClass<wxComboBox,wxChoice, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
+#endif
+
     bwxComboBox
     //.Func("IsListEmpty",&wxComboBox::IsListEmpty)
     //.Func("IsTextEmpty",&wxComboBox::IsTextEmpty)
@@ -798,8 +803,6 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func("Dismiss",&wxComboBox::Dismiss)
     .Func("Popup",&wxComboBox::Popup)
 #endif // wxCHECK_VERSION
-    //.Overload<int (wxComboBox::*)() const>("GetSelection",&wxComboBox::GetSelection)
-    //.Overload<void (wxComboBox::*)(long*,long*) const>("GetSelection",&wxComboBox::GetSelection)
     .SquirrelFunc("GetSelection",&wxComboBox_GetSelection)
     .Func("GetValue",&wxComboBox::GetValue)
     .Func("FindString",&wxComboBox::FindString)
@@ -833,8 +836,11 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     bwxGaugeBase.Func("SetValue",&wxGauge::SetValue);
     Sqrat::RootTable(vm).Bind(_SC("wxGaugeBase"),bwxGaugeBase);
 
-
+#if defined(__WXGTK__)
+    Sqrat::DerivedClass<wxGauge,wxControl, Sqrat::NoConstructor<wxGauge> > bwxGauge(vm,"wxGauge");
+#else
     Sqrat::DerivedClass<wxGauge,wxGaugeBase, Sqrat::NoConstructor<wxGauge> > bwxGauge(vm,"wxGauge");
+#endif
     bwxGauge.Func("GetRange",&wxGauge::GetRange)
     .Func("GetValue",&wxGauge::GetValue)
     .Func("IsVertical",&wxGauge::IsVertical)
@@ -922,7 +928,6 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     // wxSlider
     /***************************************************************************************************************/
     Sqrat::DerivedClass<wxSliderBase,wxControl, Sqrat::NoConstructor<wxSliderBase> > bwxSliderBase(vm,"wxSliderBase");
-    //bwxSliderBase.Func<void (wxListBoxBase::*) (int,bool)>("SetSelection",&wxListBoxBase::SetSelection);
     Sqrat::RootTable(vm).Bind(_SC("wxSliderBase"),bwxSliderBase);
 
 
@@ -1064,7 +1069,11 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxSpinCtrl
     /***************************************************************************************************************/
+ #if defined(__WXMSW__) || (__WXMAC__)
     Sqrat::DerivedClass<wxSpinCtrl,wxSpinButton,Sqrat::NoConstructor<wxSpinCtrl> > bwxSpinCtrl(vm,"wxSpinCtrl");
+#else
+    Sqrat::DerivedClass<wxSpinCtrl,wxControl,Sqrat::NoConstructor<wxSpinCtrl> > bwxSpinCtrl(vm,"wxSpinCtrl");
+#endif
     bwxSpinCtrl.Func("GetMax",&wxSpinCtrl::GetMax)
     .Func("GetMin",&wxSpinCtrl::GetMin)
     .Func("GetValue",&wxSpinCtrl::GetValue)

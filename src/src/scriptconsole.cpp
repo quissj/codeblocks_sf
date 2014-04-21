@@ -8,7 +8,7 @@
  */
 
 #include <sdk.h>
-#include <sqrat.h>
+#include <scripting/sqrat.h>
 
 #include "scriptconsole.h"
 

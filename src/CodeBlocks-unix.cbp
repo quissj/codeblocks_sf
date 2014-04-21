@@ -919,64 +919,64 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wxBaseControls.h">
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_base_controls.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wxDialog.h">
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_dialog.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat.h">
+		<Unit filename="include/scripting/sqrat.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratAllocator.h">
+		<Unit filename="include/scripting/sqrat/sqratAllocator.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratArray.h">
+		<Unit filename="include/scripting/sqrat/sqratArray.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratClass.h">
+		<Unit filename="include/scripting/sqrat/sqratClass.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratClassType.h">
+		<Unit filename="include/scripting/sqrat/sqratClassType.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratConst.h">
+		<Unit filename="include/scripting/sqrat/sqratConst.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratFunction.h">
+		<Unit filename="include/scripting/sqrat/sqratFunction.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratGlobalMethods.h">
+		<Unit filename="include/scripting/sqrat/sqratGlobalMethods.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratMemberMethods.h">
+		<Unit filename="include/scripting/sqrat/sqratMemberMethods.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratObject.h">
+		<Unit filename="include/scripting/sqrat/sqratObject.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratOverloadMethods.h">
+		<Unit filename="include/scripting/sqrat/sqratOverloadMethods.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratScript.h">
+		<Unit filename="include/scripting/sqrat/sqratScript.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratTable.h">
+		<Unit filename="include/scripting/sqrat/sqratTable.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratTypes.h">
+		<Unit filename="include/scripting/sqrat/sqratTypes.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratUtil.h">
+		<Unit filename="include/scripting/sqrat/sqratUtil.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratVM.h">
+		<Unit filename="include/scripting/sqrat/sqratVM.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/sqrat/sqrat/sqratext_Ref.h">
+		<Unit filename="include/scripting/sqrat/sqratext_Ref.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/sqstdlib/sqstdblobimpl.h">
@@ -2928,16 +2928,16 @@
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxBaseControls.cpp">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxDialog.cpp">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wxString.cpp">
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_base_controls.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_constants.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_dialog.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_string.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/sqstdlib/sqstdaux.cpp">
