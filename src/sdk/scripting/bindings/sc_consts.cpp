@@ -16,7 +16,10 @@
     #include <compileoptionsbase.h>
     #include <cbproject.h>
     #include <cbplugin.h>
+    #include <compileoptionsbase.h>
+    #include <configmanager.h>
     #include <globals.h>
+    #include <printing_types.h>
     #include <settings.h>
 #endif
 

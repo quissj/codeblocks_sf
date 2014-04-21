@@ -23,6 +23,7 @@
     #include "configmanager.h"
     #include "pluginmanager.h"
     #include "cbplugin.h" // IsAttached
+    #include "scriptingmanager.h"
 #endif
 
 #include "annoyingdialog.h"

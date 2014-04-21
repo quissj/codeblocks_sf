@@ -22,6 +22,11 @@
 #include <scripting/sqrat/sqratUtil.h>
 #include <scripting/bindings/sc_plugin.h>
 
+namespace ScriptBindings
+{
+    class cbScriptPlugin;
+}
+
 
 void PrintSquirrelToWxString(wxString &msg,const SQChar *s, va_list& vl);
 

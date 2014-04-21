@@ -9,6 +9,7 @@
 
 #ifndef CB_PRECOMP
     #include <wx/frame.h> // GetMenuBar
+    #include <globals.h>
 #endif
 
 #include "sdk_precomp.h"
