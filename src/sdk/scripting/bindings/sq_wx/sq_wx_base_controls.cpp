@@ -622,6 +622,16 @@ SQInteger wxSpinCtrl_SetValue(HSQUIRRELVM vm)
     }
 }
 
+SQInteger wxAnimationCtrl_Play(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    wxAnimationCtrl*  inst = sa.GetInstance<wxAnimationCtrl>(1);
+    if(inst == nullptr)
+        return sa.ThrowError(_("wxAnimationCtrl: inst == nullptr"));
+    sa.PushValue<bool>(inst->Play());
+    return SC_RETURN_VALUE;
+}
+
 void bind_wxBaseControls(HSQUIRRELVM vm)
 {
     //**************************************************************************************************************/
@@ -702,7 +712,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::DerivedClass<wxAnimationCtrl,wxControl, Sqrat::NoConstructor<wxAnimationCtrl> >  bwxAnimationCtrl(vm,"wxAnimationCtrl");
     bwxAnimationCtrl.Func("IsPlaying",&wxAnimationCtrl::IsPlaying)
     .Func("LoadFile",&wxAnimationCtrl::LoadFile)
-    .Overload<bool (wxAnimationCtrl::*)()>("Play",&wxAnimationCtrl::Play)
+    .SquirrelFunc("Play",&wxAnimationCtrl_Play)
     .Func("Stop",&wxAnimationCtrl::Stop)
     .Func("GetAnimation",&wxAnimationCtrl::GetAnimation);
     Sqrat::RootTable(vm).Bind(_SC("wxAnimationCtrl"),bwxAnimationCtrl);
