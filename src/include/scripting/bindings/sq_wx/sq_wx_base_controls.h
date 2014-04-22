@@ -29,7 +29,13 @@
 #include <wx/filepicker.h>
 #include <wx/spinbutt.h>
 #include <wx/spinctrl.h>
+#include <wx/timer.h>
 #include <map>
+
+#if wxCHECK_VERSION(2, 9, 0)
+#include <wx/commandlinkbutton.h>
+#include <wx/anybutton.h>
+#endif // wxCHECK_VERSION
 
 namespace ScriptBindings
 {
@@ -318,7 +324,7 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
     CHECK_CONTROL(wxStaticText,c_name,wind)
     CHECK_CONTROL(wxSlider,c_name,wind)
     CHECK_CONTROL(wxToggleButton,c_name,wind)
-    CHECK_CONTROL(wxSearchCtrl,c_name,wind)
+    //CHECK_CONTROL(wxSearchCtrl,c_name,wind)
     CHECK_CONTROL(wxPickerBase,c_name,wind)
     CHECK_CONTROL(wxColourPickerCtrl,c_name,wind)
     CHECK_CONTROL(wxDirPickerCtrl,c_name,wind)

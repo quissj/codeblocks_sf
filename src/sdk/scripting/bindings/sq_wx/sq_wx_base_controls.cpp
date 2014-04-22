@@ -327,7 +327,7 @@ namespace ScriptBindings
 *
 *
 *  ## wxSearchCtrl class squirrel binding
-*
+*  !!! not implemented because of the difficulties on different platforms and wx Versions...
 *  This functions base all on the wxWidgets equivalents so please read the wxWidgets wxSearchCtrl manual for more information.
 *   | Name                  | Parameter                     | Description                                            | Info           |
 *   | :-------------------- | :---------------------------  | :----------------------------------------------------- | :------------- |
@@ -614,7 +614,7 @@ SQInteger wxSpinCtrl_SetValue(HSQUIRRELVM vm)
             return SC_RETURN_OK;
         }
 
-        sa.ThrowError(_("wxSpinCtrl::SetValue could not get type of param"));
+       return sa.ThrowError(_("wxSpinCtrl::SetValue could not get type of param"));
     }
     catch(CBScriptException &e)
     {
@@ -631,6 +631,20 @@ SQInteger wxAnimationCtrl_Play(HSQUIRRELVM vm)
     sa.PushValue<bool>(inst->Play());
     return SC_RETURN_VALUE;
 }
+
+SQInteger wxSlider_SetTickFreq(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    wxSlider* inst = sa.GetInstance<wxSlider>(1);
+    int freq = sa.GetValue<int>(2);
+#if defined(__WXMSW__)
+    inst->SetTickFreq(freq);
+#else
+    return sa.ThrowError(_("SetTickFreq not available on this platform"));
+#endif // defined
+    return SC_RETURN_OK;
+}
+
 
 void bind_wxBaseControls(HSQUIRRELVM vm)
 {
@@ -910,7 +924,12 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func("Delete",&wxListBox::Delete)
     .Func("Clear",&wxListBox::Clear)
     .Func<int (wxListBox::*)(const wxString&)>("Append",&wxListBox::Append)
+#if wxCHECK_VERSION(2, 9, 0)
+    .Func<int (wxListBox::*)(const wxString&, unsigned int)>("Insert",&wxListBox::Insert);
+#else
     .Func<void (wxListBox::*)(const wxString&, unsigned int)>("Insert",&wxListBox::Insert);
+#endif // wxCHECK_VERSION
+
     //.Func<void (wxListBox::*)(const wxString&,unsigned int)>("Set",&wxListBox::Set);
 
     Sqrat::RootTable(vm).Bind(_SC("wxListBox"),bwxListBox);
@@ -956,7 +975,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func("SetRange",&wxSlider::SetRange)
     .Func("SetSelection",&wxSlider::SetSelection)
     .Func("SetTick",&wxSlider::SetTick)
-    .Func("SetTickFreq",&wxSlider::SetTickFreq)
+    .SquirrelFunc("SetTickFreq",&wxSlider_SetTickFreq)
     .Func("SetValue",&wxSlider::SetValue);
 
     Sqrat::RootTable(vm).Bind(_SC("wxSlider"),bwxSlider);
@@ -981,7 +1000,8 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxSearchCtrl
     /***************************************************************************************************************/
-#if (wxUSE_NATIVE_SEARCH_CONTROL == 1)
+// TODO (bluehazzard#1#): Check the possibilities to implement this...
+/*#if (wxUSE_NATIVE_SEARCH_CONTROL == 1) || wxCHECK_VERSION(2, 9, 0)
     Sqrat::DerivedClass<wxSearchCtrl,wxTextCtrl, Sqrat::NoConstructor<wxSearchCtrl> > bwxSearchCtrl(vm,"wxSearchCtrl");
 #else
     Sqrat::DerivedClass<wxSearchCtrl,wxTextCtrlBase, Sqrat::NoConstructor<wxSearchCtrl> > bwxSearchCtrl(vm,"wxSearchCtrl");
@@ -995,7 +1015,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func("IsCancelButtonVisible",&wxSearchCtrl::IsSearchButtonVisible)
     .Func("ShowSearchButton",&wxSearchCtrl::ShowSearchButton);
 
-    Sqrat::RootTable(vm).Bind(_SC("wxSearchCtrl"),bwxSearchCtrl);
+    Sqrat::RootTable(vm).Bind(_SC("wxSearchCtrl"),bwxSearchCtrl);*/
 
 
 
@@ -1098,16 +1118,26 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::RootTable(vm).Bind(_SC("wxSpinCtrl"),bwxSpinCtrl);
 
 
+#if wxCHECK_VERSION(2, 9, 0)
+
+#else
     /***************************************************************************************************************/
     // wxTimerBase
     /***************************************************************************************************************/
     Sqrat::Class<wxTimerBase ,Sqrat::NoConstructor<wxTimerBase> > bwxTimerBase(vm,"wxTimerBase");
     Sqrat::RootTable(vm).Bind(_SC("wxTimerBase"),bwxTimerBase);
+#endif // wxCHECK_VERSION
+
 
     /***************************************************************************************************************/
     // wxTimer
     /***************************************************************************************************************/
+
+#if wxCHECK_VERSION(2, 9, 0)
+    Sqrat::Class<wxTimer,Sqrat::NoConstructor<wxTimer> > bwxTimer(vm,"wxTimer");
+#else
     Sqrat::DerivedClass<wxTimer,wxTimerBase,Sqrat::NoConstructor<wxTimer> > bwxTimer(vm,"wxTimer");
+#endif // wxCHECK_VERSION
     bwxTimer.Func("GetId",&wxTimer::GetId)
     .Func("IsOneShot",&wxTimer::IsOneShot)
     .Func("IsRunning",&wxTimer::IsRunning)
