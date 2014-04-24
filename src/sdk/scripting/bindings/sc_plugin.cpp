@@ -31,7 +31,7 @@ cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false
 cbScriptPlugin::~cbScriptPlugin()
 {
     Manager::Get()->RemoveAllEventSinksFor(this);
-    if(m_AttachedToMainWindow)
+    if(m_AttachedToMainWindow && this->GetPreviousHandler() != nullptr)
     {
         Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
         m_AttachedToMainWindow = false;

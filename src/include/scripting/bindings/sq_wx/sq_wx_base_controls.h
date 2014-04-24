@@ -119,7 +119,7 @@ public:
      */
     void OnClose(CodeBlocksEvent& event)
     {
-        DeConnectEvtHandler();
+        //DeConnectEvtHandler();
         Destroy();
     }
 
@@ -130,8 +130,13 @@ public:
      */
     void ConnectEvtHandler()
     {
+        #if wxCHECK_VERSION(2, 9, 0)
+        GetManagedWindow()->PushEventHandler(this);
+        #else
         GetManagedWindow()->SetNextHandler(this);
         SetPreviousHandler(GetManagedWindow());
+        #endif // wxCHECK_VERSION
+
     }
 
     /** \brief Destroy the managed window and set it to _nullptr_
@@ -143,6 +148,7 @@ public:
     {
         if(GetManagedWindow() != nullptr)
         {
+            DeConnectEvtHandler();
             GetManagedWindow()->Destroy();
             SetManagedWindow(nullptr);
         }
@@ -164,8 +170,14 @@ public:
         }
         m_timer_map.clear();
 
+        #if wxCHECK_VERSION(2, 9, 0)
+        GetManagedWindow()->PopEventHandler();
+        #else
         //GetManagedWindow()->SetNextHandler(nullptr);
         //SetPreviousHandler(nullptr);
+        #endif // wxCHECK_VERSION
+
+
     }
 
     wxTimer* CreateTimer()

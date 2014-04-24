@@ -638,7 +638,7 @@ SQInteger wxSlider_SetTickFreq(HSQUIRRELVM vm)
     wxSlider* inst = sa.GetInstance<wxSlider>(1);
     int freq = sa.GetValue<int>(2);
 #if defined(__WXMSW__)
-    inst->SetTickFreq(freq);
+    inst->SetTickFreq(freq,1);  //what is the second param???
 #else
     return sa.ThrowError(_("SetTickFreq not available on this platform"));
 #endif // defined
@@ -681,21 +681,24 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxControl
     /***************************************************************************************************************/
+#if wxCHECK_VERSION(2, 9, 0)
+    Sqrat::DerivedClass<wxControlBase,wxWindow,Sqrat::NoConstructor<wxControlBase> > bwxControlBase(vm,"wxControlBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxControlBase"),bwxControlBase);
+
+    Sqrat::DerivedClass<wxControl,wxControlBase,Sqrat::NoConstructor<wxControl> > bwxControl(vm,"wxControl");
+    bwxControl.Func("GetLabel",&wxControl::GetLabel)
+    .Func("SetLabelMarkup",&wxControl::SetLabelMarkup)
+    .Func("SetLabel",&wxControl::SetLabel);
+    Sqrat::RootTable(vm).Bind(_SC("wxControl"),bwxControl);
+#else
+
     Sqrat::DerivedClass<wxControl,wxWindow,Sqrat::NoConstructor<wxControl> > bwxControl(vm,"wxControl");
     bwxControl.Func("GetLabel",&wxControl::GetLabel)
-#if wxCHECK_VERSION(2, 9, 0)
-    .Func("SetLabelMarkup",&wxControl::SetLabelMarkup)
-#endif // wxCHECK_VERSION
     .Func("SetLabel",&wxControl::SetLabel);
     Sqrat::RootTable(vm).Bind(_SC("wxControl"),bwxControl);
 
-#if wxCHECK_VERSION(2, 9, 0)
-    /***************************************************************************************************************/
-    // wxAnyButton
-    /***************************************************************************************************************/
-    Sqrat::DerivedClass<wxAnyButton,wxControl,Sqrat::NoConstructor<wxControl> > bwxAnyButton(vm,"wxAnyButton");
-    Sqrat::RootTable(vm).Bind(_SC("wxAnyButton"),bwxAnyButton);
-#endif
+#endif // wxCHECK_VERSION
+
 
 
     /***************************************************************************************************************/
@@ -706,12 +709,27 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func("SetValue",&wxTextCtrl::SetValue);
     Sqrat::RootTable(vm).Bind(_SC("wxTextCtrl"),bwxTextCtrl);
 
+#if wxCHECK_VERSION(2, 9, 0)
+    /***************************************************************************************************************/
+    // wxAnyButton
+    /***************************************************************************************************************/
+
+    Sqrat::DerivedClass<wxAnyButtonBase,wxControl,Sqrat::NoConstructor<wxAnyButtonBase> > bwxAnyButtonBase(vm,"wxAnyButtonBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxAnyButtonBase"),bwxAnyButtonBase);
+
+    Sqrat::DerivedClass<wxAnyButton,wxAnyButtonBase,Sqrat::NoConstructor<wxAnyButton> > bwxAnyButton(vm,"wxAnyButton");
+    Sqrat::RootTable(vm).Bind(_SC("wxAnyButton"),bwxAnyButton);
+
+    Sqrat::DerivedClass<wxButtonBase,wxAnyButton,Sqrat::NoConstructor<wxButtonBase> > bwxButtonBase(vm,"wxButtonBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxButtonBase"),bwxButtonBase);
+#endif
 
     /***************************************************************************************************************/
     // wxButton
     /***************************************************************************************************************/
 #if wxCHECK_VERSION(2, 9, 0)
-    Sqrat::DerivedClass<wxButton,wxAnyButton, Sqrat::NoConstructor<wxButton> > bwxButton(vm,"wxButton");
+
+    Sqrat::DerivedClass<wxButton,wxButtonBase, Sqrat::NoConstructor<wxButton> > bwxButton(vm,"wxButton");
 #else
     Sqrat::DerivedClass<wxButton,wxControl, Sqrat::NoConstructor<wxButton> > bwxButton(vm,"wxButton");
 #endif
@@ -882,7 +900,18 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxHyperlinkCtrl
     /***************************************************************************************************************/
+#if wxCHECK_VERSION(2, 9, 0)
+
+    Sqrat::DerivedClass<wxHyperlinkCtrlBase,wxControl,Sqrat::NoConstructor<wxHyperlinkCtrlBase> > bwxHyperlinkCtrlBase(vm,"wxHyperlinkCtrlBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxHyperlinkCtrlBase"),bwxHyperlinkCtrlBase);
+
+    Sqrat::DerivedClass<wxGenericHyperlinkCtrl,wxHyperlinkCtrlBase,Sqrat::NoConstructor<wxGenericHyperlinkCtrl> > bwxGenericHyperlinkCtrl(vm,"wxGenericHyperlinkCtrl");
+    Sqrat::RootTable(vm).Bind(_SC("wxGenericHyperlinkCtrl"),bwxGenericHyperlinkCtrl);
+
+    Sqrat::DerivedClass<wxHyperlinkCtrl,wxGenericHyperlinkCtrl, Sqrat::NoConstructor<wxHyperlinkCtrl> > bwxHyperlinkCtrl(vm,"wxHyperlinkCtrl");
+#else
     Sqrat::DerivedClass<wxHyperlinkCtrl,wxControl, Sqrat::NoConstructor<wxHyperlinkCtrl> > bwxHyperlinkCtrl(vm,"wxHyperlinkCtrl");
+#endif // wxCHECK_VERSION
     bwxHyperlinkCtrl.Func("GetURL",&wxHyperlinkCtrl::GetURL)
     .Func("GetVisited",&wxHyperlinkCtrl::GetVisited)
     .Func("SetHoverColour",&wxHyperlinkCtrl::SetHoverColour)
