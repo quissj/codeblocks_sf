@@ -8,7 +8,7 @@
  */
 
 #include <sdk_precomp.h>
-#include "sc_plugin.h"
+#include "scripting/bindings/sc_plugin.h"
 #include <manager.h>
 #include <scriptingmanager.h>
 #include <wx/menu.h>

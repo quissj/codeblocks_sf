@@ -7,13 +7,12 @@
  * $HeadURL$
  */
 
-#include <sq_wx/sq_wx.h>
 #include <wx/wx.h>
 #include <wx/string.h>
-//#include <sqrat.h>
-#include "sc_binding_util.h"
-#include "sc_cb_vm.h"
-//#include <sq_wx/sq_wx_type_handler.h>
+
+#include "scripting/bindings/sq_wx/sq_wx.h"
+#include "scripting/bindings/sc_binding_util.h"
+#include "scripting/bindings/sc_cb_vm.h"
 
 // We need at least version 2.8.5
 #if !wxCHECK_VERSION(2, 8, 5)

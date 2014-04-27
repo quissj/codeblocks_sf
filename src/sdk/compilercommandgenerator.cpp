@@ -26,7 +26,7 @@
 
 // FIXME (bluehazzard#1#): sqrat
 #include "scripting/bindings/sc_base_types.h"
-#include "sc_cb_vm.h"
+#include "scripting/bindings/sc_cb_vm.h"
 
 // move this to globals if needed
 inline wxString UnquoteStringIfNeeded(const wxString& str)

@@ -122,10 +122,6 @@
 				<Compiler>
 					<Add directory="include" />
 					<Add directory="include/tinyxml" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/squirrel" />
-					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -159,9 +155,6 @@
 					<Add option="-DENABLE_BINRELOC" />
 					<Add option="-DUSE_GTK_NOTEBOOK" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -187,9 +180,6 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/sqrat" />
 				</Compiler>
 				<Linker>
 					<Add option="`$(WX_CONFIG) --libs`" />

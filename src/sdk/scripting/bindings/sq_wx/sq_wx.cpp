@@ -7,10 +7,8 @@
  * $HeadURL$
  */
 
- #include <sq_wx/sq_wx.h>
- //#include <scripting/squirrel/squirrel.h>
- #include <wx/stopwatch.h>
- //#include <sq_wx/sq_wx_type_handler.h>
+#include <wx/stopwatch.h>
+#include <scripting/bindings/sq_wx/sq_wx.h>
 
 namespace ScriptBindings
 {

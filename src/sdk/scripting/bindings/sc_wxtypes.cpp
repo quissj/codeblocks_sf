@@ -15,9 +15,9 @@
 #include <wx/filename.h>
 #include <wx/colour.h>
 
-#include "sc_binding_util.h"
-#include "sc_base_types.h"
-#include "sc_cb_vm.h"
+#include "scripting/bindings/sc_binding_util.h"
+#include "scripting/bindings/sc_base_types.h"
+#include "scripting/bindings/sc_cb_vm.h"
 
 // FIXME (bluehazzard#1#): Error Handling has to be improved...
 

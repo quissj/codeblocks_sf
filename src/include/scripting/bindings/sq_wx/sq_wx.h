@@ -8,9 +8,9 @@
 
 #include <scripting/squirrel/squirrel.h>
 #include <scripting/sqrat.h>
-#include <sq_wx/sq_wx_type_handler.h>
-#include <sq_wx/sq_wx_dialog.h>
-#include <sq_wx/sq_wx_base_controls.h>
+#include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
+#include <scripting/bindings/sq_wx/sq_wx_dialog.h>
+#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
 namespace ScriptBindings
 {

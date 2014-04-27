@@ -141,10 +141,6 @@
 					<Add option="-DWXMAKINGDLL_SCI" />
 					<Add directory="include" />
 					<Add directory="include/tinyxml" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/squirrel" />
-					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -188,9 +184,6 @@
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/sqrat" />
 					<Add directory="include/mozilla_chardet" />
 					<Add directory="include/mozilla_chardet/mfbt" />
 					<Add directory="include/mozilla_chardet/nsprpub/pr/include" />
@@ -241,9 +234,6 @@
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
 					<Add directory="include" />
-					<Add directory="include/scripting/include" />
-					<Add directory="include/scripting/bindings" />
-					<Add directory="include/scripting/sqrat" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />

@@ -15,7 +15,7 @@
     #include <wx/string.h>
 #endif
 
-#include "sc_base_types.h"
+#include "scripting/bindings/sc_base_types.h"
 
 #include <editarrayfiledlg.h>
 #include <editarrayorderdlg.h>

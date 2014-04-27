@@ -1,6 +1,6 @@
 
-#include <sq_wx/sq_wx.h>
-#include <sc_binding_util.h>
+#include <scripting/bindings/sq_wx/sq_wx.h>
+#include <scripting/bindings/sc_binding_util.h>
 #include <wx/choice.h>
 #include <wx/hyperlink.h>
 

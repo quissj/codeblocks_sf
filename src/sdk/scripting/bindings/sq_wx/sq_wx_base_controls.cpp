@@ -1,6 +1,5 @@
+#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
-#include <sq_wx/sq_wx_base_controls.h>
-#include <sq_wx/sq_wx_type_handler.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/animate.h>
@@ -15,6 +14,7 @@
 #include <wx/commandlinkbutton.h>
 #endif
 
+#include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
 
 namespace ScriptBindings
 {

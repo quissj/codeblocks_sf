@@ -42,8 +42,8 @@
 #endif
 
 #include <cbstyledtextctrl.h>
-#include <sc_base_types.h>
-#include <scripting/sqrat/sqrat.h>
+#include <scripting/bindings/sc_base_types.h>
+#include <scripting/sqrat.h>
 
 
 #include "help_plugin.h"

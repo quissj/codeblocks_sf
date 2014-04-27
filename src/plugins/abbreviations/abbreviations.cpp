@@ -19,7 +19,7 @@
 #include "abbreviationsconfigpanel.h"
 
 #include <scripting/sqrat.h>
-#include <sc_base_types.h>
+#include <scripting/bindings/sc_base_types.h>
 #include <editor_hooks.h>
 
 

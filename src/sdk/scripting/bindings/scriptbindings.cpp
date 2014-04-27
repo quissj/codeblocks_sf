@@ -23,11 +23,11 @@
 #endif
 #include "cbstyledtextctrl.h"
 
-#include "scriptbindings.h"
+#include "scripting/bindings/scriptbindings.h"
 #include <cbexception.h>
-#include "sc_base_types.h"
-#include "sc_cb_vm.h"
-#include "sq_wx/sq_wx.h"
+#include "scripting/bindings/sc_base_types.h"
+#include "scripting/bindings/sc_cb_vm.h"
+#include "scripting/bindings/sq_wx/sq_wx.h"
 
 /** \defgroup Squirrel Squirrel Binding
  *  \brief The Squirrel scripting Module of Code Blocks

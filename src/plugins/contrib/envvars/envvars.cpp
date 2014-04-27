@@ -25,8 +25,8 @@
 #endif
 
 #include "projectloader_hooks.h"
-#include <scripting/sqrat/sqrat.h>
-#include <sc_base_types.h>
+#include <scripting/sqrat.h>
+#include <scripting/bindings/sc_base_types.h>
 
 #include "envvars_common.h"
 #include "envvars_cfgdlg.h"

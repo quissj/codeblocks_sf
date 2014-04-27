@@ -1,10 +1,10 @@
 #ifndef SQ_WXDIALOG
 #define SQ_WXDIALOG
 
-#include <sq_wx/sq_wx_base_controls.h>
-#include <sc_binding_util.h>
-#include <sc_cb_vm.h>
-#include <sc_base_types.h>
+#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
+#include <scripting/bindings/sc_binding_util.h>
+#include <scripting/bindings/sc_cb_vm.h>
+#include <scripting/bindings/sc_base_types.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <wx/xrc/xmlres.h>

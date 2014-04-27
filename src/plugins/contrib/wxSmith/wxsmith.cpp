@@ -35,8 +35,8 @@
 #include <configmanager.h>
 #include <projectmanager.h>
 #include <logmanager.h>
-#include <scripting/sqrat/sqrat.h>
-#include <sc_base_types.h>
+#include <scripting/sqrat.h>
+#include <scripting/bindings/sc_base_types.h>
 
 namespace
 {

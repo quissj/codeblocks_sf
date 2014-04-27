@@ -29,11 +29,10 @@
 #include "crc32.h"
 #include "menuitemsmanager.h"
 #include "genericmultilinenotesdlg.h"
-#include <scripting/sqrat.h>
-#include <scripting/bindings/scriptbindings.h>
-#include <scripting/bindings/sc_plugin.h>
-#include "sqstdstring.h"
-//#include <sc_cb_vm.h>
+#include "scripting/sqrat.h"
+#include "scripting/bindings/scriptbindings.h"
+#include "scripting/bindings/sc_plugin.h"
+#include "scripting/squirrel/sqstdstring.h"
 
 template<> ScriptingManager* Mgr<ScriptingManager>::instance = nullptr;
 template<> bool  Mgr<ScriptingManager>::isShutdown = false;

@@ -20,7 +20,7 @@
     #include <pluginmanager.h>
 #endif
 
-#include "sc_base_types.h"
+#include "scripting/bindings/sc_base_types.h"
 
 #include <wx/colordlg.h>
 #include <wx/numdlg.h>

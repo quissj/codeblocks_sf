@@ -21,8 +21,8 @@
 
 #include <wx/xrc/xmlres.h>
 
-#include "sq_wx/sq_wx.h"
-#include "sc_base_types.h"
+#include "scripting/bindings/sq_wx/sq_wx.h"
+#include "scripting/bindings/sc_base_types.h"
 
 namespace ScriptBindings
 {

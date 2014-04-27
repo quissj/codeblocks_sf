@@ -25,7 +25,7 @@
 
 #include <filefilters.h>
 #include <scripting/sqrat.h>
-#include "sc_binding_util.h"
+#include "scripting/bindings/sc_binding_util.h"
 
 
 namespace ScriptBindings

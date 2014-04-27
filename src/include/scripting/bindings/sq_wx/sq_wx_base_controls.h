@@ -1,9 +1,9 @@
 #ifndef SQ_WXBASECONTROLS
 #define SQ_WXBASECONTROLS
 
-#include <sq_wx/sq_wx_type_handler.h>
-#include <sc_cb_vm.h>
-#include <sc_base_types.h>
+#include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
+#include <scripting/bindings/sc_cb_vm.h>
+#include <scripting/bindings/sc_base_types.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <wx/xrc/xmlres.h>

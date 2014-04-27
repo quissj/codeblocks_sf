@@ -38,8 +38,8 @@
 #include <projectloader_hooks.h>
 #include <compiler.h>
 #include <compilerfactory.h>
-#include <scripting/sqrat/sqrat.h>
-#include <sc_base_types.h>
+#include <scripting/sqrat.h>
+#include <scripting/bindings/sc_base_types.h>
 #include <logmanager.h>
 
 #include "resultmap.h"
