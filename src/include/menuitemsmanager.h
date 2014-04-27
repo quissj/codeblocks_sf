@@ -17,7 +17,7 @@ class Menu_point_base
 {
     public:
         Menu_point_base() : m_deleted(false)   {};
-        ~Menu_point_base()  {};
+        virtual ~Menu_point_base()  {};
 
         /** \brief Delete the managed menu item from the menus
          *
@@ -40,7 +40,7 @@ class Menu_point_sub_menu : public Menu_point_base
     {
     };
 
-    ~Menu_point_sub_menu()
+    virtual ~Menu_point_sub_menu()
     {
     };
 
@@ -67,7 +67,7 @@ class Menu_point_item : public Menu_point_base
     public:
     Menu_point_item(wxMenuItem *item, wxMenu *parent) : m_item(item), m_parent(parent) {};
 
-    ~Menu_point_item()  {};
+    virtual ~Menu_point_item()  {};
 
     void Delete()
     {
@@ -91,7 +91,7 @@ class Menu_point_menubar : public Menu_point_base
 {
     public:
     Menu_point_menubar(wxMenuBar* bar,int pos) : m_bar(bar) , m_pos(pos) {};
-    ~Menu_point_menubar()    {};
+    virtual ~Menu_point_menubar()    {};
 
     void Delete()
     {

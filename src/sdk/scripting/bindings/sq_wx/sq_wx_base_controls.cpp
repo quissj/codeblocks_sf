@@ -635,9 +635,9 @@ SQInteger wxAnimationCtrl_Play(HSQUIRRELVM vm)
 SQInteger wxSlider_SetTickFreq(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
+#if defined(__WXMSW__)
     wxSlider* inst = sa.GetInstance<wxSlider>(1);
     int freq = sa.GetValue<int>(2);
-#if defined(__WXMSW__)
     inst->SetTickFreq(freq,1);  //what is the second param???
 #else
     return sa.ThrowError(_("SetTickFreq not available on this platform"));

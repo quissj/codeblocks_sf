@@ -198,7 +198,6 @@ int MenuItemsManager::CreateFromString(const wxString& menuPath, int id)
                 else
                 {
                     // We need a new sub menu
-                    wxMenu* sub_menu = new wxMenu();
                     wxMenuItem* sub_menu_item = InsertSubmenu(menu,wxNewId(),insert ? insertIndex : menu->GetMenuItemCount(),current,wxEmptyString);
                     menu = sub_menu_item->GetSubMenu();
                 }

@@ -152,7 +152,7 @@ namespace ScriptBindings
         wxArrayString* inst = sa.GetInstance<wxArrayString>(1);
         int pos = sa.GetValue<int>(2);
 
-        if(inst->GetCount() == 0 || inst->GetCount() < pos)
+        if(inst->GetCount() == 0 || inst->GetCount() < (size_t) pos)
             return sa.ThrowError("wxArrayString: GetCount < pos");
 
         sa.PushValue<wxString>(inst->Item(pos));
