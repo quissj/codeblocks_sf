@@ -26,9 +26,20 @@
 #include "wx/propgrid/propgrid.h"
 #include "wx/propgrid/manager.h"
 
+#include <wx/propgrid/propgrid.h>
+
+
 #if wxUSE_XRC && wxCHECK_VERSION(2,8,0)
 
+#if wxCHECK_VERSION(2,9,0)
+
+// Does this can make problems?
+#define wxPropertyGridState wxPropertyGridPageState
+
 class wxPropertyGridXmlHandler : public wxXmlResourceHandler
+#else
+class WXDLLIMPEXP_PG wxPropertyGridXmlHandler : public wxXmlResourceHandler
+#endif // wxCHECK_VERSION
 {
     friend class wxPropertyGridXrcPopulator;
     DECLARE_DYNAMIC_CLASS(wxPropertyGridXmlHandler)

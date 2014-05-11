@@ -31,8 +31,8 @@
 #if wxUSE_XRC && wxCHECK_VERSION(2,8,0)
 
 #include <wx/propgrid/propgrid.h>
-
 #include <wx/propgrid/xh_propgrid.h>
+#include <wx/xml/xml.h>
 
 #ifndef WX_PRECOMP
     #include "wx/intl.h"
@@ -43,6 +43,7 @@
 #else
     #define wxXML_GetAttribute(A,B,C)   (A->GetPropVal(B,C))
 #endif
+
 
 IMPLEMENT_DYNAMIC_CLASS(wxPropertyGridXmlHandler, wxXmlResourceHandler)
 

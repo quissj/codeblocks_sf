@@ -133,6 +133,7 @@
 					<Add directory="include/mozilla_chardet/xpcom" />
 					<Add directory="include/mozilla_chardet/xpcom/base" />
 					<Add directory="include/mozilla_chardet/xpcom/glue" />
+					<Add directory="sdk/wxpropgrid/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />
@@ -150,7 +151,6 @@
 					<Add directory="sdk/scripting/lib" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="build_tools/autorevision/autorevision30 +wx +int +t . include/autorevision.h" />
 					<Add after="cmd /c if not exist devel30\share\CodeBlocks mkdir devel30\share\CodeBlocks" />
 					<Add after="zip -jq9 devel30\share\CodeBlocks\manager_resources.zip sdk\resources\*.xrc" />
 					<Add after='cmd /c &quot;cd sdk\resources &amp; zip -0 -q ..\..\devel30\share\CodeBlocks\manager_resources.zip images\*.png images\12x12\*.png images\16x16\*.png&quot;' />
@@ -3255,6 +3255,12 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/workspaceloader.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/xh_propgrid.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/src/xh_propgrid.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/include/wx/wxscintilla.h">

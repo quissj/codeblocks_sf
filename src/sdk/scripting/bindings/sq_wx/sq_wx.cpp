@@ -7,8 +7,10 @@
  * $HeadURL$
  */
 
+
 #include <wx/stopwatch.h>
 #include <scripting/bindings/sq_wx/sq_wx.h>
+#include <wx/propgrid/xh_propgrid.h>
 
 namespace ScriptBindings
 {
@@ -27,6 +29,9 @@ namespace ScriptBindings
      */
     void bind_wx_types(HSQUIRRELVM vm)
     {
+        wxPropertyGridXmlHandler* property_grid_handler = new wxPropertyGridXmlHandler();
+        wxXmlResource::Get()->AddHandler(property_grid_handler);
+
         SQ_WX_binding::bind_wxString(vm);
         bind_wx_util_dialogs(vm);
         bind_wxDialog(vm);

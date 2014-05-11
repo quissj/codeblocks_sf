@@ -1157,6 +1157,9 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_dialog.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_property_grid_xml_h.h#">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>

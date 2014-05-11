@@ -12,6 +12,7 @@
 #include <scripting/bindings/sq_wx/sq_wx_dialog.h>
 #include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
+
 namespace ScriptBindings
 {
     namespace SQ_WX_binding
