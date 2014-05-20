@@ -1,0 +1,184 @@
+
+/*
+ * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * $Revision$
+ * $Id$
+ * $HeadURL$
+ */
+
+// user-dialog-test
+// Script plugins must extend cbScriptPlugin
+
+class user_dialog_test_Plugin extends cbScriptPlugin
+{
+    // mandatory to setup the plugin's info
+    constructor()
+    {
+        info = PluginInfo();
+
+        info.name = _T("xrc_test");
+        info.title = _T("Test the xrc system");
+        info.version = _T("0.1a");
+        info.license = _T("GPL");
+    }
+
+    // optional to create menubar items
+    function GetMenu()
+    {
+        local entries = ::wxArrayString();
+        entries.Add(_T("Plugins/Test Scripting/Test XRC"), 1);
+        entries.Add(_T("Plugins/Test Scripting/Test Propgrid"), 1);
+        return entries;
+    }
+
+    // optional to create context menu entries
+    /*function GetModuleMenu(who, data)
+    {
+
+    }*/
+
+    // optional to support ExecutePlugin(pluginNameString)
+    function Execute()
+    {
+        StartTest();
+        return 0;
+    }
+
+    // optional calback for menubar items clicking
+    function OnMenuClicked(index)
+    {
+        if (index == 0)
+        {
+            StartTest();
+        } else if (index == 1)
+        {
+            StartPropgrid();
+        }
+
+    }
+
+    // optional calback for context menu items clicking
+    function OnModuleMenuClicked(index)
+    {
+
+    }
+    
+    function line(str)
+    {
+        print(str + "\n");
+    }
+
+
+    function StartPropgrid()
+    {
+        PropgridHandler = wxPropertyGridWrapper(dialog.GetControl("m_propertygrid"));
+        local table = 
+        {
+            hallo_1 = {
+                //Name = "hallo_1",
+                Label = "label",
+                Type = 2,
+                Style = 1,
+                Children = {
+                    children_hallo_1 = {
+                            //Name = "children_hallo_1",
+                            Label = "children_label",
+                            Type = 2
+                           },
+                    children_hallo_2 = {
+                            //Name = "children_hallo_2",
+                            Label = "children_label2",
+                            Type = 3
+                            Selection = ["value1","value2","value3"]
+                            Children = {
+                                noch_tiefer = {
+                                        Label = "tief_label2",
+                                        Type = 3
+                                        Selection = ["value1","value2","value3"]
+                                }
+                                    
+                                }
+                           }
+                }
+            },
+            hallo_2 = {
+                //Name = "hallo_2",
+                Label = "label_2",
+                Type = 2
+            }
+        }
+        
+        PropgridHandler.Populate(table);
+        
+    };
+    
+    function PrintTable(tab,tiefe)
+    {
+        local leeeeeer = "";
+        for(local i = 0; i < tiefe;i++)
+            leeeeeer += " ";
+
+        line(leeeeeer+"{");
+        foreach(i,val in tab)
+        {
+             line(leeeeeer+i + " = " + val );
+             if(typeof val == "table")
+                 PrintTable(val,tiefe+8);
+         }
+         line(leeeeeer+"}");
+    }
+    
+    function OnSelected(evt)
+    {
+        local prop = PropgridHandler.GetSelectedProperty();
+        PrintTable(prop,0);
+    }
+
+    function StartTest()
+    {
+        print("Start xrc test\n");
+        print("load memory xrc\n");
+        
+        if(dialog.IsLoaded() == false)
+        {
+          
+            //LoadXMLResourceFromString("xrc_string",xrc_string);
+            local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+            //local path_to_xrc  = "scripts/test/property_grid.xrc";
+            local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
+            if(retcode == XRC_FILE_NOT_FOUND || retcode == RESOURCE_NOT_FOUND_IN_LOADED_RESOURCES)
+            {
+                error("could not load the xrc file: " + path_to_xrc + " retcode: " + retcode);
+                return;
+            }
+            /*local retcode = dialog.LoadFromXRCPool("test_dialog")
+            if(retcode == XRC_FILE_NOT_FOUND || retcode == RESOURCE_NOT_FOUND_IN_LOADED_RESOURCES)
+            {
+                error("could not load the xrc file: retcode: " + retcode);
+                return;
+            }*/
+            
+            dialog.RegisterEventHandler(wxEVT_PG_SELECTED,XRCID("m_propertygrid"),this,"OnSelected");
+            
+            StartPropgrid();
+            
+        }
+        
+        local retcode = dialog.Show(true);
+        print("dialog exited with " + retcode);
+
+    };
+    
+    dialog = wxDialog();
+    PropgridHandler = {};
+}
+
+
+
+// this call actually registers the script plugin with Code::Blocks
+RegisterPlugin(user_dialog_test_Plugin());
+
+// if you want to call this plugin's Execute() function, use this in a script:
+// ExecutePlugin(_T("Scripting_TestPlugin"));

@@ -129,6 +129,19 @@ public:
         return 1;
     }
 
+    bool HasKey(const SQChar* name)
+    {
+        sq_pushobject(vm, obj);
+        sq_pushstring(vm, name, -1);
+        if (SQ_FAILED(sq_get(vm, -2)))
+        {
+             sq_pop(vm, 1);
+             return false;
+        }
+        sq_pop(vm, 2);
+        return true;
+    }
+
     template <typename T>
     SQInteger GetValue(int index, T& out_entry)
     {

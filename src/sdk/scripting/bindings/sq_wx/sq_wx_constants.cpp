@@ -3,6 +3,7 @@
 #include <scripting/bindings/sc_binding_util.h>
 #include <wx/choice.h>
 #include <wx/hyperlink.h>
+#include <wx/propgrid/propgrid.h>
 
 namespace ScriptBindings
 {
@@ -193,6 +194,21 @@ void bind_wxConstants(HSQUIRRELVM vm)
     BIND_INT_CONSTANT(wxEVT_HELP);
     BIND_INT_CONSTANT(wxEVT_DETAILED_HELP);
 
+
+    // Property Grid event
+    BIND_INT_CONSTANT(wxEVT_PG_SELECTED);
+    BIND_INT_CONSTANT(wxEVT_PG_CHANGED);
+    BIND_INT_CONSTANT(wxEVT_PG_CHANGING);
+    BIND_INT_CONSTANT(wxEVT_PG_HIGHLIGHTED);
+    BIND_INT_CONSTANT(wxEVT_PG_RIGHT_CLICK);
+    BIND_INT_CONSTANT(wxEVT_PG_DOUBLE_CLICK);
+    BIND_INT_CONSTANT(wxEVT_PG_ITEM_COLLAPSED);
+    BIND_INT_CONSTANT(wxEVT_PG_ITEM_EXPANDED);
+    BIND_INT_CONSTANT(wxEVT_PG_LABEL_EDIT_BEGIN);
+    BIND_INT_CONSTANT(wxEVT_PG_LABEL_EDIT_ENDING);
+    //BIND_INT_CONSTANT(wxEVT_PG_COL_BEGIN_DRAG);
+    //BIND_INT_CONSTANT(wxEVT_PG_COL_DRAGGING);
+    //BIND_INT_CONSTANT(wxEVT_PG_COL_END_DRAG);
 
     // path separator for filenames
     BIND_WXSTR_CONSTANT_NAMED(wxString(wxFILE_SEP_PATH), "wxFILE_SEP_PATH");

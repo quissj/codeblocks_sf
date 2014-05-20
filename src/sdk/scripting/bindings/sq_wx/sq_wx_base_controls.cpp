@@ -7,7 +7,8 @@
 #include <wx/choice.h>
 #include <wx/collpane.h>
 #include <wx/combobox.h>
-
+#include <wx/fs_mem.h>
+#include <scripting/bindings/sq_wx/sq_wx_propgrid.h>
 
 #if wxCHECK_VERSION(2, 9, 0)
 #include <wx/anybutton.h>
@@ -456,6 +457,12 @@ bool LoadXMLResourceFile(wxString mask)
     return wxXmlResource::Get()->Load(mask);
 }
 
+bool LoadXMLResourceFromString(wxString name,wxString resource)
+{
+    wxMemoryFSHandler::AddFile(name,resource);
+    return wxXmlResource::Get()->Load(wxT("memory:")+name);
+}
+
 SQInteger wxRadioBox_Show(HSQUIRRELVM vm)
 {
     StackHandler sa(vm);
@@ -654,6 +661,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::RootTable(vm).Func(_SC("XRCID"),&GetIDfromXRC);
     Sqrat::RootTable(vm).Func(_SC("XRCNAME"),&GetNameFromIDFromXRC);
     Sqrat::RootTable(vm).Func(_SC("LoadXMLResourceFile"),&LoadXMLResourceFile);
+    Sqrat::RootTable(vm).Func(_SC("LoadXMLResourceFromString"),&LoadXMLResourceFromString);
 
 
     //**************************************************************************************************************/
@@ -1146,6 +1154,53 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
 
     Sqrat::RootTable(vm).Bind(_SC("wxSpinCtrl"),bwxSpinCtrl);
 
+
+
+
+    /***************************************************************************************************************/
+    // wxPGPropArgCls
+    /***************************************************************************************************************/
+    /*Sqrat::Class<wxPGPropArgCls,Sqrat::NoConstructor<wxPGPropArgCls> > bwxPGPropArgCls(vm,"wxPGPropArgCls");
+    bwxPGPropArg.Func("GetName",&wxPGPropArgCls::GetName)
+    Sqrat::RootTable(vm).Bind(_SC("wxPGPropArgCls"),bwxPGPropArgCls);*/
+
+    /***************************************************************************************************************/
+    // wxPropertyGrid
+    /***************************************************************************************************************/
+
+    /*Sqrat::DerivedClass<wxPropertyGrid,wxControl,Sqrat::NoConstructor<wxPropertyGrid> > bwxPropGrid(vm,"wxPropertyGrid");
+    bwxPropGrid.Func("Clear",&wxPropertyGrid::Clear)
+    .Func("FitColumns",&wxPropertyGrid::FitColumns)
+    .Func("GetLabelEditor",&wxPropertyGrid::GetLabelEditor)
+    .Func("GetColumnCount",&wxPropertyGrid::GetColumnCount)
+    .Func("GetRoot",&wxPropertyGrid::GetRoot)
+    .Func("GetSelectedProperty",&wxPropertyGrid::GetSelectedProperty)
+    .Func("GetSelection",&wxPropertyGrid::GetSelection)
+    .Func("SelectProperty",&wxPropertyGrid::SelectProperty)
+    .Func("SetColumnCount",&wxPropertyGrid::SetColumnCount)
+    .Func("SetCellTextColour",&wxPropertyGrid::SetCellTextColour)
+    .Func("SetCaptionTextColour",&wxPropertyGrid::SetCaptionTextColour)
+    .Func("SetCaptionBackgroundColour",&wxPropertyGrid::SetCaptionBackgroundColour)
+    .Func("SetSelectionBackgroundColour",&wxPropertyGrid::SetSelectionBackgroundColour)
+    .Func("SetSelectionTextColour",&wxPropertyGrid::SetSelectionTextColour);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxPropertyGrid"),bwxPropGrid);*/
+
+
+
+    Sqrat::Class<wxPropertyGridInterface,Sqrat::NoConstructor<wxPropertyGridInterface> > bwxPropertyGridInterface(vm,"wxPropertyGridInterface");
+    Sqrat::RootTable(vm).Bind(_SC("wxPropertyGridInterface"),bwxPropertyGridInterface);
+
+    Sqrat::DerivedClass<wxPropertyGrid,wxPropertyGridInterface,Sqrat::NoConstructor<wxPropertyGrid> > bwxPropGrid(vm,"wxPropertyGrid");
+    Sqrat::RootTable(vm).Bind(_SC("wxPropertyGrid"),bwxPropGrid);
+
+    Sqrat::Class<sq_wx_propgrid_wrapper> bwxPropertyGridWrapper(vm,"wxPropertyGridWrapper");
+    bwxPropertyGridWrapper.SquirrelFunc(_SC("constructor"),sq_wx_propgrid_wrapper_constructor)
+    .Func(_SC("Populate"),&sq_wx_propgrid_wrapper::Populate)
+    .Func(_SC("GetSelectedProperty"),&sq_wx_propgrid_wrapper::GetSelectedProperty)
+    .Func(_SC("GetRoot"),&sq_wx_propgrid_wrapper::GetRoot);
+
+    Sqrat::RootTable(vm).Bind(_SC("wxPropertyGridWrapper"),bwxPropertyGridWrapper);
 
 #if wxCHECK_VERSION(2, 9, 0)
 

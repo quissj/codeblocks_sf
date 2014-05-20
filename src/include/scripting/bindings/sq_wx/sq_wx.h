@@ -10,6 +10,7 @@
 #include <scripting/sqrat.h>
 #include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
 #include <scripting/bindings/sq_wx/sq_wx_dialog.h>
+#include <scripting/bindings/sq_wx/sq_wx_propgrid.h>
 #include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
 

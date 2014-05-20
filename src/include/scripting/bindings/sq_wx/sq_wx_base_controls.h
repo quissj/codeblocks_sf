@@ -30,6 +30,7 @@
 #include <wx/spinbutt.h>
 #include <wx/spinctrl.h>
 #include <wx/timer.h>
+#include <wx/propgrid/propgrid.h>
 #include <map>
 
 #if wxCHECK_VERSION(2, 9, 0)
@@ -344,6 +345,7 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
     CHECK_CONTROL(wxTimer,c_name,wind)
     CHECK_CONTROL(wxSpinCtrl,c_name,wind)
     CHECK_CONTROL(wxSpinButton,c_name,wind)
+    CHECK_CONTROL(wxPropertyGrid,c_name,wind)
 
     CHECK_CONTROL_END(c_name)
 

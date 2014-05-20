@@ -28,6 +28,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         local entries = ::wxArrayString();
         entries.Add(_T("Plugins/Test Scripting/Test XRC"), 1);
+        entries.Add(_T("Plugins/Test Scripting/Test Propgrid"), 1);
         return entries;
     }
 
@@ -50,7 +51,9 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         if (index == 0)
         {
             StartTest();
-
+        } else if (index == 1)
+        {
+            StartPropgrid();
         }
 
     }
@@ -231,6 +234,35 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         else if(value == 15)
              dialog.GetControl("m_spinCtrl1").SetValue(19);
     }
+    
+    function StartPropgrid()
+    {
+        local PropgridHandler = wxPropertyGridWrapper(dialog.GetControl("m_propertygrid"));
+        local table = 
+        {
+            [0] = {
+                Name = "hallo_1",
+                Label = "label",
+                Type = 2,
+                Style = 1,
+                Children = {
+                    [0] = {
+                            Name = "children_hallo_1",
+                            Label = "children_label",
+                            Type = 2
+                           }
+                }
+            },
+            [1] = {
+                Name = "hallo_2",
+                Label = "label_2",
+                Type = 2
+            }
+        }
+        
+        PropgridHandler.Populate(table);
+        
+    };
 
     function StartTest()
     {
@@ -267,6 +299,8 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             dialog.RegisterEventHandler(wxEVT_COMMAND_DIRPICKER_CHANGED,XRCID("m_dirPicker1"),this,"OnFilePicker");
             dialog.RegisterEventHandler(wxEVT_COMMAND_SPINCTRL_UPDATED,XRCID("m_spinCtrl1"),this,"OnSpinCtrl");
             
+            StartPropgrid();
+            
             local timer = dialog.CreateTimer();
                       
             dialog.RegisterEventHandler(wxEVT_TIMER,timer.GetId(),this,"OnTimer");
@@ -274,7 +308,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             timer.Start(2000,false);
         }
         
-        local retcode = dialog.ShowModal();
+        local retcode = dialog.Show(true);
         print("dialog exited with " + retcode);
 
     };

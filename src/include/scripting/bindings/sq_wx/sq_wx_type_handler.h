@@ -115,6 +115,7 @@ struct Var<wxString*> {
     }
 };
 
+
 /*
 template<class T>
 struct Var<T* const> {
