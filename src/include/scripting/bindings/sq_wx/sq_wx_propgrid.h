@@ -20,6 +20,8 @@ namespace ScriptBindings
         P_TYPE_LABEL
     };
 
+    #define CHECK_NULL(n)    if(n==NULL)return
+
     class sq_wx_propgrid_wrapper
     {
         friend SQInteger sq_wx_propgrid_wrapper_constructor(HSQUIRRELVM vm);
@@ -42,6 +44,14 @@ namespace ScriptBindings
         wxTextCtrl* GetLabelEditor();
         Sqrat::Table GetEntry(wxString name);
         Sqrat::Table GetSelectedProperty();
+        bool    IsAnyModified()                                 {if(!m_grid) return false; return m_grid->IsAnyModified();};
+        void 	SetCellTextColour (const wxColour &col)         {CHECK_NULL(m_grid); m_grid->SetCellTextColour(col);};
+        void 	SetColumnCount (int colCount)                   {CHECK_NULL(m_grid); m_grid->SetColumnCount(colCount);};
+        void 	SetLineColour (const wxColour &col)             {CHECK_NULL(m_grid); m_grid->SetLineColour(col);};
+        void 	SetMarginColour (const wxColour &col)           {CHECK_NULL(m_grid); m_grid->SetMarginColour(col);};
+        //void 	SetSelectionBackgroundColour (const wxColour &col){CHECK_NULL(m_grid); m_grid->SetSelectionBackgroundColour(col);};
+        //void    SetSelectionTextColour (const wxColour &col)    {CHECK_NULL(m_grid); m_grid->SetSelectionTextColour(col);};
+
 
         private:
             int PropertyToSqratTabel(wxPGProperty* prop,Sqrat::Table& table);

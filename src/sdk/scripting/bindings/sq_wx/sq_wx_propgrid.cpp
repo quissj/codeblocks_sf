@@ -193,7 +193,6 @@ namespace ScriptBindings
             tmp_child.GetValue("Name",name);
             table.SetValue(name,tmp_child);
         }
-
     }
 
     SQInteger sq_wx_propgrid_wrapper_constructor(HSQUIRRELVM vm)

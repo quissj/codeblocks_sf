@@ -74,6 +74,43 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     function StartPropgrid()
     {
         PropgridHandler = wxPropertyGridWrapper(dialog.GetControl("m_propertygrid"));
+        
+        
+        local project_count = GetProjectManager().GetProjectCount();
+        //local project_tree = {};
+        line("count: " + project_count);
+        for( local i = 0; i < project_count;i++)
+        {
+            local project = GetProjectManager().GetProject(i);
+            project_tree[project.GetTitle()] <- project;
+        }
+        
+        local proptree = {};
+        foreach(i,pro in project_tree)
+        {
+            local prop_project = {};
+            prop_project.Label <- pro.GetTitle();
+            prop_project.Type <- 2;
+            prop_project.Style <- 1;
+            local target_count = pro.GetBuildTargetsCount();
+            local target_array = array(target_count);
+            line("target count: " + target_count);
+            for(local a = 0; a < target_count; a++)
+            {
+                target_array[a] = pro.GetBuildTarget(a).GetTitle();
+            }
+            local prop_target = {};
+            prop_target.Label <- "Target";
+            prop_target.Type <- 3;
+            prop_target.Selection <- target_array;
+            prop_project.Children <- {};
+            prop_project.Children.Target <- prop_target;
+            
+            proptree[pro.GetTitle()] <- prop_project;
+        }
+        
+        
+        
         local table = 
         {
             hallo_1 = {
@@ -110,8 +147,12 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             }
         }
         
-        PropgridHandler.Populate(table);
+        PropgridHandler.Populate(proptree);
         
+        
+        //PrintTable(PropgridHandler.GetRoot(),0);
+        PrintTable(PropgridHandler.GetEntry("hallo_1.children_hallo_1"),0);
+        PropgridHandler.SetLineColour(wxColour(255,0,0));
     };
     
     function PrintTable(tab,tiefe)
@@ -134,6 +175,32 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         local prop = PropgridHandler.GetSelectedProperty();
         PrintTable(prop,0);
+        OnClick({});
+    }
+    
+    function FindProjectByName(name)
+    {
+        foreach(project in project_tree)
+        {
+            if(project.GetTitle() == name)
+                return project;
+        }
+        return {};
+    }
+    
+    function OnClick(evt)
+    {
+        local prop_tree = PropgridHandler.GetRoot();
+        foreach(i,project in prop_tree)
+        {
+            local pro = FindProjectByName(project.Label);
+            if(project.Value == "True")
+            {
+                pro.SetActiveBuildTarget(project.Children.Target.Value);
+                
+            }
+            
+        }
     }
 
     function StartTest()
@@ -160,7 +227,9 @@ class user_dialog_test_Plugin extends cbScriptPlugin
                 return;
             }*/
             
+            
             dialog.RegisterEventHandler(wxEVT_PG_SELECTED,XRCID("m_propertygrid"),this,"OnSelected");
+            dialog.RegisterEventHandler(wxEVT_BUTTON,XRCID("clickme_btn"),this,"OnClick");
             
             StartPropgrid();
             
@@ -173,6 +242,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     
     dialog = wxDialog();
     PropgridHandler = {};
+    project_tree = {};
 }
 
 

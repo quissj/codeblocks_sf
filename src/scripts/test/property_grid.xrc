@@ -13,5 +13,9 @@
                 <value>true</value>
             </property>
         </object>
+        <object class="wxButton" name="clickme_btn">
+            <label>Build</label>
+            <default>0</default>
+		</object>
     </object>
 </resource>

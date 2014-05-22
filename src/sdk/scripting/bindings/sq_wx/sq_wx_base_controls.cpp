@@ -1198,7 +1198,15 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     bwxPropertyGridWrapper.SquirrelFunc(_SC("constructor"),sq_wx_propgrid_wrapper_constructor)
     .Func(_SC("Populate"),&sq_wx_propgrid_wrapper::Populate)
     .Func(_SC("GetSelectedProperty"),&sq_wx_propgrid_wrapper::GetSelectedProperty)
-    .Func(_SC("GetRoot"),&sq_wx_propgrid_wrapper::GetRoot);
+    .Func(_SC("GetRoot"),&sq_wx_propgrid_wrapper::GetRoot)
+    .Func(_SC("GetEntry"),&sq_wx_propgrid_wrapper::GetEntry)
+    .Func(_SC("GetLabelEditor"),&sq_wx_propgrid_wrapper::GetLabelEditor)
+    .Func(_SC("IsAnyModified"),&sq_wx_propgrid_wrapper::IsAnyModified)
+    .Func(_SC("SetColumnCount"),&sq_wx_propgrid_wrapper::SetColumnCount)
+    .Func(_SC("SetLineColour"),&sq_wx_propgrid_wrapper::SetLineColour)
+    .Func(_SC("SetMarginColour"),&sq_wx_propgrid_wrapper::SetMarginColour);
+    //.Func(_SC("SetSelectionBackgroundColour"),&sq_wx_propgrid_wrapper::SetSelectionBackgroundColour)
+    //.Func(_SC("SetSelectionTextColour"),&sq_wx_propgrid_wrapper::SetSelectionTextColour);
 
     Sqrat::RootTable(vm).Bind(_SC("wxPropertyGridWrapper"),bwxPropertyGridWrapper);
 
