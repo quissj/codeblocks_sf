@@ -7,15 +7,21 @@
 #define SC_PLUGIN_H
 
 #include "sc_base_types.h"
+//#include
 #include <wx/dynarray.h>
 #include <wx/event.h>
+#include <deque>
 #include <scripting/squirrel/squirrel.h>
+//#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
 class FileTreeData;
 class wxMenu;
+class sq_wxDialog;
 
 namespace ScriptBindings
 {
+
+class cb_wxBaseManagedWindowInterface;
 
 namespace ScriptPluginWrapper
 {
@@ -34,7 +40,7 @@ class cbScriptPlugin : public wxEvtHandler
 public:
 
     cbScriptPlugin(Sqrat::Object obj);
-    ~cbScriptPlugin();
+    virtual ~cbScriptPlugin();
 
 
     /** \brief Event function called on a click in a menu
@@ -123,11 +129,16 @@ public:
 
     friend SQInteger ScriptPluginWrapper::RegisterPlugin(HSQUIRRELVM vm);
 
+    friend SQInteger CreateWxDialog(HSQUIRRELVM vm);
+    friend SQInteger CreateWxFrame(HSQUIRRELVM vm);
+
 protected:
     void SetInfo(PluginInfo info)
     {
         m_info = info;
     };
+
+    void RegisterWxWindow(ScriptBindings::cb_wxBaseManagedWindowInterface* window);
 
 private:
 
@@ -139,6 +150,10 @@ private:
     typedef std::map<int,int>   cb_menu_id_to_idx;  // [id] -> idx
     cb_menu_id_to_idx m_menu_to_idx_map;
     cb_menu_id_to_idx m_modul_menu_to_idx_map;
+
+    typedef std::deque<cb_wxBaseManagedWindowInterface*> cb_man_window_list;
+
+    cb_man_window_list m_window_list;
 
     bool m_AttachedToMainWindow;
     MenuItemsManager m_menu_manager;

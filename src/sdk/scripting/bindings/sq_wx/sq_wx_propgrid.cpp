@@ -2,6 +2,14 @@
 #include <scripting/bindings/sq_wx/sq_wx_propgrid.h>
 #include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
 
+#define PROPGRID_LABEL_NAME     "name"
+#define PROPGRID_LABEL_LABEL    "label"
+#define PROPGRID_LABEL_VALUE    "value"
+#define PROPGRID_LABEL_TYPE     "type"
+#define PROPGRID_LABEL_CHILDREN     "children"
+#define PROPGRID_LABEL_STYLE        "style"
+#define PROPGRID_LABEL_SELECTION    "selection"
+
 namespace ScriptBindings
 {
     void sq_wx_propgrid_wrapper::Populate(Sqrat::Table table)
@@ -15,13 +23,13 @@ namespace ScriptBindings
             Sqrat::Table entry(itr.getValue(),table.GetVM());
             int ret = 0;
             wxString  name = key_name;
-            if(entry.HasKey("Name"))
-                ret = entry.GetValue<wxString>("Name",name);
+            if(entry.HasKey(PROPGRID_LABEL_NAME))
+                ret = entry.GetValue<wxString>(PROPGRID_LABEL_NAME,name);
 
             wxString label;
-            ret = entry.GetValue<wxString>("Label",label);
+            ret = entry.GetValue<wxString>(PROPGRID_LABEL_LABEL,label);
             int type;
-            ret = entry.GetValue<int>("Type",type);
+            ret = entry.GetValue<int>(PROPGRID_LABEL_TYPE,type);
 
             wxPGProperty* parent = NULL;
             parent = CreateEntry(entry,name,label,type);
@@ -34,7 +42,7 @@ namespace ScriptBindings
             parent = m_grid->Append(parent);
 
             Sqrat::Table children;
-            ret = entry.GetValue<Sqrat::Table>("Children",children);
+            ret = entry.GetValue<Sqrat::Table>(PROPGRID_LABEL_CHILDREN,children);
             if(ret != -1)
                 AddChildren(children,parent);
         }
@@ -44,14 +52,14 @@ namespace ScriptBindings
     {
         int style = 0;
         int ret = 0;
-        ret = entry.GetValue<int>("Style",style);
+        ret = entry.GetValue<int>(PROPGRID_LABEL_STYLE,style);
         wxPGProperty* prop = NULL;
         switch(type)
         {
             case P_TYPE_BOOL:
                 {
                     bool value = false;
-                    ret = entry.GetValue<bool>("Value",value);
+                    ret = entry.GetValue<bool>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxBoolProperty(label,name,value);
                     if(style & 0x01)
                        prop->SetAttribute(wxPG_BOOL_USE_CHECKBOX,true);
@@ -61,7 +69,7 @@ namespace ScriptBindings
             case P_TYPE_STRING:
                 {
                     wxString value;
-                    ret = entry.GetValue<wxString>("Value",value);
+                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxStringProperty(label,name,value);
                     //if(style & 0x01)
                         //prop->SetAttribute(wxTE_PASSWORD,true);
@@ -71,7 +79,7 @@ namespace ScriptBindings
             case P_TYPE_INT:
                 {
                     int value;
-                    ret = entry.GetValue<int>("Value",value);
+                    ret = entry.GetValue<int>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxIntProperty(label,name,value);
 
                 }
@@ -80,8 +88,8 @@ namespace ScriptBindings
                 {
                     wxString value;
                     Sqrat::Array selection(entry.GetVM());
-                    ret = entry.GetValue<wxString>("Value",value);
-                    ret = entry.GetValue<Sqrat::Array>("Selection",selection);
+                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
+                    ret = entry.GetValue<Sqrat::Array>(PROPGRID_LABEL_SELECTION,selection);
                     size_t size = selection.GetSize();
                     wxArrayString arr;
                     for(size_t i = 0; i < size;i++)
@@ -96,7 +104,7 @@ namespace ScriptBindings
             case P_TYPE_LABEL:
                 {
                     wxString value;
-                    ret = entry.GetValue<wxString>("Value",value);
+                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxPropertyCategory(label,name);
 
                 }
@@ -124,13 +132,13 @@ namespace ScriptBindings
             Sqrat::Table entry(itr.getValue(),table.GetVM());
             int ret = 0;
             wxString  name = key_name;
-            if(entry.HasKey("Name"))
-                ret = entry.GetValue<wxString>("Name",name);
+            if(entry.HasKey(PROPGRID_LABEL_NAME))
+                ret = entry.GetValue<wxString>(PROPGRID_LABEL_NAME,name);
 
             wxString label;
-            ret = entry.GetValue<wxString>("Label",label);
+            ret = entry.GetValue<wxString>(PROPGRID_LABEL_LABEL,label);
             int type;
-            ret = entry.GetValue<int>("Type",type);
+            ret = entry.GetValue<int>(PROPGRID_LABEL_TYPE,type);
 
             wxPGProperty* prop = NULL;
             wxPGProperty* parent_parent = NULL;
@@ -143,7 +151,7 @@ namespace ScriptBindings
             }
             parent_parent = m_grid->AppendIn(parent,prop);
             Sqrat::Table children;
-            ret = entry.GetValue<Sqrat::Table>("Children",children);
+            ret = entry.GetValue<Sqrat::Table>(PROPGRID_LABEL_CHILDREN,children);
             if(ret != -1)
                 AddChildren(children,parent_parent);
         }
@@ -181,16 +189,16 @@ namespace ScriptBindings
         if(prop == NULL)
             return -1;
 
-        table.SetValue("Name",Sqrat::string(prop->GetBaseName().ToUTF8()));
-        table.SetValue("Label",Sqrat::string(prop->GetLabel().ToUTF8()));
-        table.SetValue("Value",Sqrat::string(prop->GetValueString().ToUTF8()));
+        table.SetValue("name",Sqrat::string(prop->GetBaseName().ToUTF8()));
+        table.SetValue("label",Sqrat::string(prop->GetLabel().ToUTF8()));
+        table.SetValue("value",Sqrat::string(prop->GetValueString().ToUTF8()));
         for(size_t i = 0; i < prop->GetChildCount(); i++)
         {
             Sqrat::Table tmp_child(m_vm);
             if(PropertyToSqratTabel(prop->Item(i),tmp_child) < 0)
                 return -2;
             SQChar *name = NULL;
-            tmp_child.GetValue("Name",name);
+            tmp_child.GetValue("name",name);
             table.SetValue(name,tmp_child);
         }
     }

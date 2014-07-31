@@ -411,6 +411,23 @@ namespace ScriptBindings
 **/
 
 
+
+cb_wxBaseManagedWindowInterface::cb_wxBaseManagedWindowInterface()
+{
+
+};
+
+cb_wxBaseManagedWindowInterface::~cb_wxBaseManagedWindowInterface()
+{
+
+}
+
+void cb_wxBaseManagedWindowInterface::Destroy()
+{
+
+};
+
+
 /** \defgroup sq_helper_functions Squirrel-binding helper functions
  *  \brief The helper functions for binding various C::B and wxWidgets functions to squirrel
  **/

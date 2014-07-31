@@ -29,7 +29,7 @@ namespace ScriptBindings
     public:
 
         sq_wxDialog(HSQUIRRELVM vm);
-        ~sq_wxDialog();
+        virtual ~sq_wxDialog();
 
         int LoadFromXRCFile(wxString file,wxString name);
         int LoadFromXRCPool(wxString name);

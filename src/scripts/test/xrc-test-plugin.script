@@ -21,6 +21,8 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         info.title = _T("Test the xrc system");
         info.version = _T("0.1a");
         info.license = _T("GPL");
+        
+        
     }
 
     // optional to create menubar items
@@ -269,6 +271,8 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         print("Start xrc test\n");
         print("load dialog.xrc\n");
         
+        dialog = CreateWxDialog(this);
+        
         if(dialog.IsLoaded() == false)
         {
             local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
@@ -313,7 +317,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
 
     };
     
-    dialog = wxDialog();
+    dialog = 0;
 }
 
 // this call actually registers the script plugin with Code::Blocks

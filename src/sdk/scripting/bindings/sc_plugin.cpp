@@ -12,11 +12,36 @@
 #include <manager.h>
 #include <scriptingmanager.h>
 #include <wx/menu.h>
+#include <scripting/bindings/sq_wx/sq_wx_dialog.h>
 
 #include <map>
 
 namespace ScriptBindings
 {
+
+SQInteger CreateWxDialog(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    HSQOBJECT obj;
+    sq_getstackobj(vm,2,&obj);
+    Sqrat::Object o(obj,vm);
+    cbScriptPlugin* cb_plugin = GetPluginFromObject(sa,obj);
+
+    if(cb_plugin == nullptr)
+        return SC_RETURN_FAILED;
+
+    sq_wxDialog* diag = new sq_wxDialog(vm);
+
+    cb_plugin->RegisterWxWindow(diag);
+    sa.PushInstance(diag);
+    return SC_RETURN_VALUE;
+}
+
+SQInteger CreateWxFrame(HSQUIRRELVM vm)
+{
+    StackHandler sa(vm);
+    return sa.ThrowError(_("CreateWxFrame: Not implemented"));
+}
 
 cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false),
     m_menu_manager(true),             // Destroy the menu if this plugin is removed...
@@ -30,14 +55,35 @@ cbScriptPlugin::cbScriptPlugin(Sqrat::Object obj) : m_AttachedToMainWindow(false
 
 cbScriptPlugin::~cbScriptPlugin()
 {
-    Manager::Get()->RemoveAllEventSinksFor(this);
-    if(m_AttachedToMainWindow && this->GetPreviousHandler() != nullptr)
+    cb_man_window_list::iterator itr;
+
+    for(itr = m_window_list.begin(); itr != m_window_list.end();++itr)
     {
-        Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
-        m_AttachedToMainWindow = false;
+        (*itr)->Destroy();
+    }
+    m_window_list.clear();
+
+    Manager::Get()->RemoveAllEventSinksFor(this);
+    if(m_AttachedToMainWindow )
+    {
+        if(this->GetPreviousHandler() != nullptr || this->GetNextHandler() != nullptr)
+        {
+            Manager::Get()->GetAppWindow()->RemoveEventHandler(this);
+            m_AttachedToMainWindow = false;
+        }
+        else
+        {
+            // so this is strange.. we have a m_AttachedToMainWindow==true, but no registered event handler...
+            Manager::Get()->GetLogManager()->LogWarning(_("Scripting error: Could not find any EventHandler to remove from the plugin \"") + GetName+ _("\". Please report this to the developer") );
+        }
     }
 
     m_menu_manager.Clear();
+}
+
+void cbScriptPlugin::RegisterWxWindow(cb_wxBaseManagedWindowInterface* window)
+{
+    m_window_list.push_front(window);
 }
 
 void cbScriptPlugin::OnMenu(wxMenuEvent &evt)
@@ -366,6 +412,7 @@ SQInteger RegisterCBEvent(HSQUIRRELVM vm)
     return SC_RETURN_OK;
 }
 
+
 }; // namespace ScriptPluginWrapper
 
 // base script plugin class
@@ -418,6 +465,7 @@ const char* s_cbScriptPlugin =
  *   | GetPlugin       | wxString name  |  return the squirrel class of the plugin _name_  |   x   |
  *   | RegisterPlugin  | cbScriptPlugin plugin  |   A instance of the script plugin to be registered  |   x   |
  *   | RegisterCBEvent | cbScriptPlugin plugin, wxEventType type, wxString function | Register a function with the name _function_ for the _type_ event for the _plugin_ (for ex _this_) |   x   |
+ *   | CreateWxDialog  | cbScriptPlugin plugin  | Create a wxDialog |   x   |
  *
  */
 
@@ -431,11 +479,13 @@ void Register_ScriptPlugin(HSQUIRRELVM vm)
     Sqrat::RootTable(vm).SquirrelFunc("GetPlugin",&ScriptPluginWrapper::GetPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("RegisterPlugin",&ScriptPluginWrapper::RegisterPlugin);
     Sqrat::RootTable(vm).SquirrelFunc("RegisterCBEvent",&ScriptPluginWrapper::RegisterCBEvent);
+    Sqrat::RootTable(vm).SquirrelFunc("CreateWxDialog",&CreateWxDialog);
+    //Sqrat::RootTable(vm).SquirrelFunc("CreateWxDialog",&ScriptPluginWrapper::CreateWxDialog);
 
     // load base script plugin
 
     // WARNING: we CANNOT use ScriptingManager::LoadBuffer() because we have reached here
-    // by a call from inside ScriptingManager's constructor. This would cause an infinite
+    // by a call from inside ScriptingManager's constructor. This would cause an infiniteCreateWxDialog
     // loop and the app would die with a stack overflow. We got to load the script manually...
     // we also have to disable the printfunc for a while
 

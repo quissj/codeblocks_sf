@@ -171,9 +171,8 @@ void bind_wxDialog(HSQUIRRELVM vm)
     bBasewxDialog.Func("GetTimer", &cb_wxBaseManagedWindow<wxDialog>::GetTimer);
     //.Func("RegisterEventHandler", &cb_wxBaseManagedWindow<wxDialog>::RegisterEventHandler);
 
-    Sqrat::DerivedClass<sq_wxDialog,cb_wxBaseManagedWindow<wxDialog> ,Sqrat::NoCopy<sq_wxDialog> > bwxDialog(vm,"wxDialog");
-    bwxDialog.SquirrelFunc("constructor",&sq_wxDialog_constructor)                  // One parameter to get the function context in which the callbacks are searched
-    .Func("LoadFromXRCFile", &sq_wxDialog::LoadFromXRCFile)
+    Sqrat::DerivedClass<sq_wxDialog,cb_wxBaseManagedWindow<wxDialog> ,Sqrat::NoConstructor<sq_wxDialog> > bwxDialog(vm,"wxDialog"); // One parameter to get the function context in which the callbacks are searched
+    bwxDialog.Func("LoadFromXRCFile", &sq_wxDialog::LoadFromXRCFile)
     .Func("LoadFromXRCPool", &sq_wxDialog::LoadFromXRCPool)
     .Func("IsModal", &sq_wxDialog::IsModal)
     .Func("Center", &sq_wxDialog::Center)

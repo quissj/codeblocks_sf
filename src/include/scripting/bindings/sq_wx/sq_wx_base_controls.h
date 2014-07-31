@@ -40,6 +40,8 @@
 
 namespace ScriptBindings
 {
+
+
 #define CHECK_CONTROL_BEGIN(ctrl,name,ptr)   if(name == CLASSINFO(ctrl)->GetClassName() ) \
     {                                                               \
         ctrl* ctr = dynamic_cast<ctrl*>(ptr);                       \
@@ -60,10 +62,20 @@ namespace ScriptBindings
     }
 
 
+class cb_wxBaseManagedWindowInterface : public wxEvtHandler
+{
+public:
+    cb_wxBaseManagedWindowInterface();
+    virtual ~cb_wxBaseManagedWindowInterface();
+
+    virtual void Destroy();
+};
+
+
 /** \brief Base class to bind wxWidgets windows like dialogs and frames to squirrel
  */
 
-template<class B> class cb_wxBaseManagedWindow : public wxEvtHandler
+template<class B> class cb_wxBaseManagedWindow :  public cb_wxBaseManagedWindowInterface
 {
 public:
 
@@ -78,10 +90,10 @@ public:
         Manager::Get()->RegisterEventSink(cbEVT_APP_START_SHUTDOWN, new cbEventFunctor<cb_wxBaseManagedWindow, CodeBlocksEvent>(this, &cb_wxBaseManagedWindow::OnClose));
     };
 
-    /** \brief Base destructor for all managed wxWidgets windows
+    /** \brief Base destructor for all manage   d wxWidgets windows
      *
      */
-    ~cb_wxBaseManagedWindow()
+    virtual ~cb_wxBaseManagedWindow()
     {
         Destroy();
     };
@@ -174,8 +186,8 @@ public:
         #if wxCHECK_VERSION(2, 9, 0)
         GetManagedWindow()->PopEventHandler();
         #else
-        //GetManagedWindow()->SetNextHandler(nullptr);
-        //SetPreviousHandler(nullptr);
+        GetManagedWindow()->SetNextHandler(nullptr);
+        SetPreviousHandler(nullptr);
         #endif // wxCHECK_VERSION
 
 
@@ -353,6 +365,8 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
 }
 
 void bind_wxBaseControls(HSQUIRRELVM vm);
+
+
 }
 
 
