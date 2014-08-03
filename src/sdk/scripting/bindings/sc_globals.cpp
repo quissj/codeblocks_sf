@@ -164,7 +164,8 @@ namespace ScriptBindings
                         #if wxCHECK_VERSION(2, 9, 0)
                         mbar->GetEventHandler()->ProcessEvent(evt);
                         #else
-                        if ( !mbar->ProcessEvent(evt) )
+                        if(!Manager::Get()->GetAppWindow()->ProcessEvent(evt))
+                        //if ( !mbar->ProcessEvent(evt) )
                         {
                             // TODO (bluehazzard#1#): Report the error to squirrel
                             wxString msg;
