@@ -138,6 +138,7 @@
 					<Add library="wxscintilla_cb" />
 					<Add library="sqstdlib" />
 					<Add library="squirrel" />
+					<Add library="wxpropgrid" />
 					<Add directory="devel" />
 					<Add directory="sdk/scripting/lib" />
 					<Add directory="sdk/propgrid" />
@@ -913,6 +914,12 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_dialog.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_property_grid_xml_h.h">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_propgrid.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
@@ -2925,6 +2932,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_dialog.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_propgrid.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_string.cpp">
