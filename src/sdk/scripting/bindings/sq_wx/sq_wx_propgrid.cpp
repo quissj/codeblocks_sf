@@ -12,54 +12,70 @@
 
 namespace ScriptBindings
 {
-    void sq_wx_propgrid_wrapper::Populate(Sqrat::Table table)
+    int sq_wx_propgrid_wrapper::Populate(Sqrat::Table table)
     {
         Sqrat::Table::iterator itr;
+        StackHandler sa(table.GetVM());
         while(table.Next(itr))
         {
             HSQOBJECT key = itr.getKey();
+
+
             const SQChar *tmp_key_name = sq_objtostring(&key);
-            wxString key_name = wxString::FromUTF8(tmp_key_name);
+            wxString  name = wxString::FromUTF8(tmp_key_name);
+
             Sqrat::Table entry(itr.getValue(),table.GetVM());
+
             int ret = 0;
-            wxString  name = key_name;
             if(entry.HasKey(PROPGRID_LABEL_NAME))
                 ret = entry.GetValue<wxString>(PROPGRID_LABEL_NAME,name);
 
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_NAME));;
+
+
             wxString label;
             ret = entry.GetValue<wxString>(PROPGRID_LABEL_LABEL,label);
-            int type;
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_LABEL));
+
+            int type = 0;
             ret = entry.GetValue<int>(PROPGRID_LABEL_TYPE,type);
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_TYPE));
+
 
             wxPGProperty* parent = NULL;
             parent = CreateEntry(entry,name,label,type);
             if(parent == NULL)
-            {
-                StackHandler sa(table.GetVM());
-                sa.ThrowError(wxString::Format(_("Could not create property with Type: %d"),type));
-                return;
-            }
+                return sa.ThrowError(wxString::Format(_("Could not create property with Type: %d"),type));
+
             parent = m_grid->Append(parent);
 
             Sqrat::Table children;
             ret = entry.GetValue<Sqrat::Table>(PROPGRID_LABEL_CHILDREN,children);
             if(ret != -1)
-                AddChildren(children,parent);
+            {
+                ret = AddChildren(children,parent);
+                if (ret < 0)
+                    return ret;
+            }
         }
+
+        return 0;
     }
 
     wxPGProperty* sq_wx_propgrid_wrapper::CreateEntry(Sqrat::Table entry,wxString name, wxString label, int type)
     {
         int style = 0;
-        int ret = 0;
-        ret = entry.GetValue<int>(PROPGRID_LABEL_STYLE,style);
+        entry.GetValue<int>(PROPGRID_LABEL_STYLE,style);
         wxPGProperty* prop = NULL;
         switch(type)
         {
             case P_TYPE_BOOL:
                 {
                     bool value = false;
-                    ret = entry.GetValue<bool>(PROPGRID_LABEL_VALUE,value);
+                    entry.GetValue<bool>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxBoolProperty(label,name,value);
                     if(style & 0x01)
                        prop->SetAttribute(wxPG_BOOL_USE_CHECKBOX,true);
@@ -69,7 +85,7 @@ namespace ScriptBindings
             case P_TYPE_STRING:
                 {
                     wxString value;
-                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
+                    entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxStringProperty(label,name,value);
                     //if(style & 0x01)
                         //prop->SetAttribute(wxTE_PASSWORD,true);
@@ -79,7 +95,7 @@ namespace ScriptBindings
             case P_TYPE_INT:
                 {
                     int value;
-                    ret = entry.GetValue<int>(PROPGRID_LABEL_VALUE,value);
+                    entry.GetValue<int>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxIntProperty(label,name,value);
 
                 }
@@ -88,8 +104,8 @@ namespace ScriptBindings
                 {
                     wxString value;
                     Sqrat::Array selection(entry.GetVM());
-                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
-                    ret = entry.GetValue<Sqrat::Array>(PROPGRID_LABEL_SELECTION,selection);
+                    entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
+                    entry.GetValue<Sqrat::Array>(PROPGRID_LABEL_SELECTION,selection);
                     size_t size = selection.GetSize();
                     wxArrayString arr;
                     for(size_t i = 0; i < size;i++)
@@ -104,7 +120,7 @@ namespace ScriptBindings
             case P_TYPE_LABEL:
                 {
                     wxString value;
-                    ret = entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
+                    entry.GetValue<wxString>(PROPGRID_LABEL_VALUE,value);
                     prop = new wxPropertyCategory(label,name);
 
                 }
@@ -118,27 +134,37 @@ namespace ScriptBindings
         return prop;
     }
 
-    void sq_wx_propgrid_wrapper::AddChildren(Sqrat::Table table,wxPGProperty* parent)
+    int sq_wx_propgrid_wrapper::AddChildren(Sqrat::Table table,wxPGProperty* parent)
     {
         if(parent == NULL)
-            return;
+            return -1;
+
+        StackHandler sa(table.GetVM());
 
         Sqrat::Table::iterator itr;
         while(table.Next(itr))
         {
             HSQOBJECT key = itr.getKey();
             const SQChar *tmp_key_name = sq_objtostring(&key);
-            wxString key_name = wxString::FromUTF8(tmp_key_name);
+            wxString name = wxString::FromUTF8(tmp_key_name);
+
             Sqrat::Table entry(itr.getValue(),table.GetVM());
+
             int ret = 0;
-            wxString  name = key_name;
             if(entry.HasKey(PROPGRID_LABEL_NAME))
                 ret = entry.GetValue<wxString>(PROPGRID_LABEL_NAME,name);
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_NAME));
 
             wxString label;
             ret = entry.GetValue<wxString>(PROPGRID_LABEL_LABEL,label);
-            int type;
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_LABEL));
+
+            int type = 0;
             ret = entry.GetValue<int>(PROPGRID_LABEL_TYPE,type);
+            if(ret < 0)
+                return sa.ThrowError(wxString::Format(_("Could not find attribute \"%s\" to populate the property grid"),PROPGRID_LABEL_TYPE));
 
             wxPGProperty* prop = NULL;
             wxPGProperty* parent_parent = NULL;
@@ -146,15 +172,20 @@ namespace ScriptBindings
             if(prop == NULL)
             {
                 StackHandler sa(table.GetVM());
-                sa.ThrowError(wxString::Format(_("Could not create property with Type: %d"),type));
-                return;
+                return sa.ThrowError(wxString::Format(_("Could not create property with Type: %d"),type));
+
             }
             parent_parent = m_grid->AppendIn(parent,prop);
             Sqrat::Table children;
             ret = entry.GetValue<Sqrat::Table>(PROPGRID_LABEL_CHILDREN,children);
             if(ret != -1)
-                AddChildren(children,parent_parent);
+            {
+                ret = AddChildren(children,parent_parent);
+                if(ret < 0)
+                    return ret;
+            }
         }
+        return 0;
     }
 
     Sqrat::Table sq_wx_propgrid_wrapper::GetEntry(wxString name)

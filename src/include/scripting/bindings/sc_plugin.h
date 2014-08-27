@@ -14,6 +14,10 @@
 #include <scripting/squirrel/squirrel.h>
 //#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
 
+#define SCRIPT_BINDING_VERSION_MAJOR 2
+#define SCRIPT_BINDING_VERSION_MINOR 0
+#define SCRIPT_BINDING_VERSION_RELEASE 0
+
 class FileTreeData;
 class wxMenu;
 class sq_wxDialog;

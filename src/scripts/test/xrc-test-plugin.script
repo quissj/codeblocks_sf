@@ -21,8 +21,8 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         info.title = _T("Test the xrc system");
         info.version = _T("0.1a");
         info.license = _T("GPL");
-        
-        
+
+
     }
 
     // optional to create menubar items
@@ -55,7 +55,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             StartTest();
         } else if (index == 1)
         {
-            StartPropgrid();
+            StartPropgrid(true);
         }
 
     }
@@ -65,7 +65,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
 
     }
-    
+
     function line(str)
     {
         print(str + "\n");
@@ -78,39 +78,39 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         print("Content of text control: " + value + "\n");
         local button = dialog.GetControl("clickme_btn").GetLabel();
         print("Content of button control: " + button + "\n");
-        
+
         local gauge_val = value.ToInt(10);
-        
+
         if(gauge_val.success)
             dialog.GetControl("controls_horizontal_gauge").SetValue(gauge_val.value);
-    
+
         print("gauge range: " + dialog.GetControl("controls_horizontal_gauge").GetRange() + "\n");
 
-        
+
     }
-    
+
     function OnCheckbox(evt)
     {
         local state = dialog.GetControl("controls_unchecked_checkbox").Get3StateValue();
         print("checkbox clicked: state:" +state +"\n");
-    }    
-    
+    }
+
     function OnChoiceBox(evt)
     {
         local sel = dialog.GetControl("controls_choice").GetCurrentSelection();
         local txt = dialog.GetControl("controls_choice").GetString(sel);
         print("checkbox clicked: state:" + sel +" in text: "+ txt +"\n");
     }
-    
-    
-    
+
+
+
     function OnComboBox(evt)
     {
         local sel = dialog.GetControl("controls_combobox").GetSelection();
         local txt = dialog.GetControl("controls_combobox").GetString(sel);
         print("ComboBox clicked: state:" + sel +" in text: "+ txt +"\n");
     }
-    
+
     function OnComboBoxText(evt)
     {
         local txt = "hallo";
@@ -127,7 +127,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         print("mouse moved\n")
     }
-    
+
     function OnRadioBox(evt)
     {
         local sel = dialog.GetControl("controls_radiobox").GetSelection();
@@ -142,7 +142,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         else
             dialog.GetControl("controls_radiobox").Enable(3,true);
     }
-    
+
     function OnURLClick(evt)
     {
         local url = dialog.GetControl("controls_hyperlink").GetURL();
@@ -151,15 +151,16 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         //dialog.GetControl("controls_hyperlink").SetVisited(true);
         dialog.GetControl("controls_hyperlink").SetHoverColour(wxColour(128,128,0));
         dialog.GetControl("m_listBox1").Append("hallo");
+        dialog.Maximize(true);
     }
-    
+
     function OnChoice(evt)
     {
         local sel = dialog.GetControl("controls_choice").GetCurrentSelection();
         local text = dialog.GetControl("controls_choice").GetString(sel);
         print("choice: " + text + "\n");
     }
-    
+
     function OnListBox(evt)
     {
         local sel = dialog.GetControl("m_listBox1").GetSelections();
@@ -168,13 +169,13 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             txt += val + " ";
         print(txt + "\n");
     }
-    
+
     function OnRadioButton(evt)
     {
         local is_sel = dialog.GetControl("m_radioBtn1").GetValue();
         line("Radio button: " + is_sel);
     }
-    
+
     function OnCheckList(evt)
     {
         local checkboxlist = dialog.GetControl("m_checkList1");
@@ -183,14 +184,14 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         foreach(val in sel)
             txt += val + " ";
         line(txt);
-        
+
         txt = "Name of checked items: ";
-        
+
         foreach(val in sel)
             txt += checkboxlist.GetString(val) + " ";
         line(txt);
     }
-    
+
     function OnSlider(evt)
     {
         local value = dialog.GetControl("m_slider1").GetValue();
@@ -198,19 +199,19 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         line(txt);
         dialog.GetControl("m_staticText1").SetLabel(txt);
     }
-    
+
     function OnTogButton(evt)
     {
         local value = dialog.GetControl("m_toggleBtn1").GetValue();
         line("Toggle button value: "+ value);
     }
-    
+
     function OnColour(evt)
     {
         local colour = dialog.GetControl("m_colourPicker1").GetColour()
         line("colour picker selected: " + colour);
     }
-    
+
     function OnFilePicker(evt)
     {
         local file;
@@ -218,15 +219,15 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             file = dialog.GetControl("m_filePicker1").GetPath();
         else
             file = dialog.GetControl("m_dirPicker1").GetPath();
-            
+
         line("file/dir picker: " + file);
     }
-    
+
     function OnTimer(evt)
     {
         line("timer evt");
     }
-    
+
     function OnSpinCtrl(evt)
     {
         local value = dialog.GetControl("m_spinCtrl1").GetValue();
@@ -236,54 +237,74 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         else if(value == 15)
              dialog.GetControl("m_spinCtrl1").SetValue(19);
     }
-    
-    function StartPropgrid()
-    {
-        local PropgridHandler = wxPropertyGridWrapper(dialog.GetControl("m_propertygrid"));
-        local table = 
-        {
-            [0] = {
-                Name = "hallo_1",
-                Label = "label",
-                Type = 2,
-                Style = 1,
-                Children = {
-                    [0] = {
-                            Name = "children_hallo_1",
-                            Label = "children_label",
-                            Type = 2
-                           }
-                }
-            },
-            [1] = {
-                Name = "hallo_2",
-                Label = "label_2",
-                Type = 2
-            }
-        }
-        
-        PropgridHandler.Populate(table);
-        
-    };
 
-    function StartTest()
+    function StartPropgrid(load_file)
     {
-        print("Start xrc test\n");
-        print("load dialog.xrc\n");
-        
-        dialog = CreateWxDialog(this);
-        
-        if(dialog.IsLoaded() == false)
+        if(load_file)
         {
             local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
-                
+
+            dialog = CreateWxDialog(this);
             local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
             if(retcode == XRC_FILE_NOT_FOUND || retcode == RESOURCE_NOT_FOUND_IN_LOADED_RESOURCES)
             {
                 error("could not load the xrc file: " + path_to_xrc + " retcode: " + retcode);
                 return;
             }
-            
+        }
+
+        local PropgridHandler = wxPropertyGridWrapper(dialog.GetControl("m_propertygrid"));
+        local table =
+        {
+            [0] = {
+                name = "hallo_1",
+                label = "label",
+                type = 2,
+                style = 1,
+                children = {
+                    [0] = {
+                            name = "children_hallo_1",
+                            label = "children_label",
+                            type = 2
+                           }
+                }
+            },
+            [1] = {
+                name = "hallo_2",
+                label = "label_2",
+                type = 2
+            }
+        }
+
+        if(PropgridHandler.Populate(table) < 0)
+	{
+	    print("Could not populate the property grid\nTry to throw an error...\n");
+	    throw "error";
+ 	}
+
+        if(load_file)
+            dialog.Show(true);
+
+    };
+
+    function StartTest()
+    {
+        print("Start xrc test\n");
+        print("load dialog.xrc\n");
+
+        dialog = CreateWxDialog(this);
+
+        if(dialog.IsLoaded() == false)
+        {
+            local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+
+            local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
+            if(retcode == XRC_FILE_NOT_FOUND || retcode == RESOURCE_NOT_FOUND_IN_LOADED_RESOURCES)
+            {
+                error("could not load the xrc file: " + path_to_xrc + " retcode: " + retcode);
+                return;
+            }
+
             dialog.RegisterEventHandler(wxEVT_BUTTON,XRCID("clickme_btn"),this,"OnClick");
             dialog.RegisterEventHandler(wxEVT_LEFT_DOWN,XRCID("test_dialog"),this,"OnMouseClick");
             dialog.RegisterEventHandler(wxEVT_COMMAND_CHECKBOX_CLICKED,XRCID("controls_unchecked_checkbox"),this,"OnCheckbox");
@@ -302,21 +323,22 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             dialog.RegisterEventHandler(wxEVT_COMMAND_FILEPICKER_CHANGED,XRCID("m_filePicker1"),this,"OnFilePicker");
             dialog.RegisterEventHandler(wxEVT_COMMAND_DIRPICKER_CHANGED,XRCID("m_dirPicker1"),this,"OnFilePicker");
             dialog.RegisterEventHandler(wxEVT_COMMAND_SPINCTRL_UPDATED,XRCID("m_spinCtrl1"),this,"OnSpinCtrl");
-            
-            StartPropgrid();
-            
+
+            StartPropgrid(false);
+
             local timer = dialog.CreateTimer();
-                      
+
             dialog.RegisterEventHandler(wxEVT_TIMER,timer.GetId(),this,"OnTimer");
-            
+
             timer.Start(2000,false);
         }
-        
+
         local retcode = dialog.Show(true);
+	dialog.Maximize(true);
         print("dialog exited with " + retcode);
 
     };
-    
+
     dialog = 0;
 }
 

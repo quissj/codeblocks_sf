@@ -317,6 +317,11 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
     StackHandler sa(vm);
 
     A* base = sa.GetInstance<A>(1);
+    if(base == nullptr)
+    {
+        // We have no base pointer...
+        return sa.ThrowError(_("Base pointer of GetControl is nullptr"));
+    }
 
     wxString name = sa.GetValue<wxString>(2);
     int id = wxXmlResource::Get()->GetXRCID(name);

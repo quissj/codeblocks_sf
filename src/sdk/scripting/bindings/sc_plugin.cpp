@@ -74,7 +74,7 @@ cbScriptPlugin::~cbScriptPlugin()
         else
         {
             // so this is strange.. we have a m_AttachedToMainWindow==true, but no registered event handler...
-            Manager::Get()->GetLogManager()->LogWarning(_("Scripting error: Could not find any EventHandler to remove from the plugin \"") + GetName+ _("\". Please report this to the developer") );
+            //Manager::Get()->GetLogManager()->LogWarning(_("Scripting error: Could not find any EventHandler to remove from the plugin \"") + GetName() + _("\". Please report this to the developer") );
         }
     }
 

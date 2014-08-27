@@ -39,7 +39,7 @@ namespace ScriptBindings
         };
         virtual ~sq_wx_propgrid_wrapper()   {};
 
-        void Populate(Sqrat::Table table);
+        int Populate(Sqrat::Table table);
         Sqrat::Table GetRoot();
         wxTextCtrl* GetLabelEditor();
         Sqrat::Table GetEntry(wxString name);
@@ -57,7 +57,7 @@ namespace ScriptBindings
             int PropertyToSqratTabel(wxPGProperty* prop,Sqrat::Table& table);
 
             wxPGProperty* CreateEntry(Sqrat::Table entry,wxString name, wxString label, int type);
-            void AddChildren(Sqrat::Table table,wxPGProperty* parent);
+            int AddChildren(Sqrat::Table table,wxPGProperty* parent);
             wxPropertyGrid* m_grid;
             HSQUIRRELVM m_vm;
 
