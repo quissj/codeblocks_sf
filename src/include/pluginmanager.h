@@ -57,6 +57,34 @@ struct PluginElement
     cbPlugin* plugin; // the plugin itself
 };
 
+struct InstallInfo
+{
+    InstallInfo(InstallInfo* info)
+    {
+        copy(info);
+
+    void copy(InstallInfo* info)
+    {
+        if(info == nullptr)
+            return;
+
+        name = info->name;
+        version_major = info->version_major;
+        version_minor = info->version_minor;
+        type = info->type;
+        preInstallScript = info->preInstallScript;
+        postInstallScript = info->postInstallScript;
+    }
+
+    wxString name;
+    int version_major;
+    int version_minor;
+    wxString type;
+    wxString preInstallScript;
+    wxString postInstallScript;
+};
+
+
 WX_DEFINE_ARRAY(PluginElement*, PluginElementsArray);
 WX_DEFINE_ARRAY(cbPlugin*, PluginsArray);
 WX_DEFINE_ARRAY(cbConfigurationPanel*, ConfigurationPanelsArray);
@@ -96,6 +124,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool DetachPlugin(cbPlugin* plugin);
 
         bool InstallPlugin(const wxString& pluginName, bool forAllUsers = true, bool askForConfirmation = true);
+        bool InstallScriptPlugin(const wxString& pluginName,InstallInfo* info = nullptr, bool forAllUsers = true, bool askForConfirmation = true);
         bool UninstallPlugin(cbPlugin* plugin, bool removeFiles = true);
         bool ExportPlugin(cbPlugin* plugin, const wxString& filename);
 
@@ -127,6 +156,8 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
 
         static void SetSafeMode(bool on){ s_SafeMode = on; }
         static bool GetSafeMode(){ return s_SafeMode; }
+
+
     private:
         PluginManager();
         ~PluginManager();
@@ -135,6 +166,22 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool ReadManifestFile(const wxString& pluginFilename,
                                 const wxString& pluginName = wxEmptyString,
                                 PluginInfo* infoOut = nullptr);
+
+
+        /** \brief Read the install.xml file from a .cbplugin
+         *
+         * \param
+         * \param
+         * \return  0 if all is ok
+         *         -1 if infoOut is invalid
+         *         -2 file has no install.xml
+         *         -3 if the file has an error
+         *
+         */
+        int ReadInstallInfo(const wxString& pluginFilename,
+                            InstallInfo* infoOut);
+
+
         void ReadExtraFilesFromManifestFile(const wxString& pluginFilename,
                                             wxArrayString& extraFiles);
         bool ExtractFile(const wxString& bundlename,

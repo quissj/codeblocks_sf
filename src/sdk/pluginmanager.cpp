@@ -208,6 +208,239 @@ bool PluginManager::DetachPlugin(cbPlugin* plugin)
     return true;
 }
 
+bool PluginManager::InstallScriptPlugin(const wxString& pluginName,InstallInfo* info, bool forAllUsers, bool askForConfirmation)
+{
+    wxString actualName = pluginName;
+    Manager::Get()->GetMacrosManager()->ReplaceMacros(actualName);
+
+    InstallInfo install_info;
+
+    if(info == nullptr) // if the plugin info was not read from the file
+    {
+        int ret = ReadInstallInfo(pluginName,&install_info);
+        if(ret != 0)    // A error occoured during ReadInstallInfo
+            return false;
+    }
+    else
+    {
+        // this is inefficient
+        install_info.copy(info);
+    }
+    if(install_info.type != wxT("SCRIPT"))
+        return false;   // This is not a script plugin
+
+    // Now we can start to install the plugin
+     Manager::Get()->GetLogManager()->DebugLog(F(_T("Install Plugin: %s"),install_info.name ));
+
+    // if plugin with the same name exists, ask to uninstall first
+    if(Manager::Get()->GetScriptingManager()->GetPlugin(install_info.name) != nullptr)
+    {
+        if (askForConfirmation)
+        {
+            wxString msg = _("A plugin with the same name is already registered.\n");
+
+            if (cbMessageBox(msg + _T('\n') +
+                            _("If you want to proceed, the installed plugin will be "
+                            "uninstalled first.\n"
+                            "Do you want to proceed?"),
+                            _("Confirmation"), wxICON_QUESTION | wxYES_NO) == wxID_NO)
+            {
+                return false;
+            }
+        }
+        if (!UninstallScriptPlugin(install_info.name))
+            return false;
+    }
+
+    wxString pluginDir;
+    wxString resourceDir;
+    if (forAllUsers)
+    {
+        pluginDir = ConfigManager::GetFolder(sdPluginsGlobal);
+        resourceDir = ConfigManager::GetFolder(sdDataGlobal);
+    }
+    else
+    {
+        pluginDir = ConfigManager::GetFolder(sdPluginsUser);
+        resourceDir = ConfigManager::GetFolder(sdDataUser);
+    }
+
+    wxProgressDialog pd(_("Installing: ") + basename, _T("A description wide enough for the dialog ;)"), 5);
+
+    wxString resourceName = basename + _T(".zip");
+    wxString settingsOnName = basename + _T(".png");
+    wxString settingsOffName = basename + _T("-off.png");
+
+    wxString pluginFilename = UnixFilename(pluginDir + _T('/') + localName);
+
+    pd.Update(1, _("Extracting plugin"));
+
+    // extract plugin from bundle
+    if (!ExtractFile(actualName,
+                    localName,
+                    pluginFilename))
+        return false;
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Extracted plugin")));
+
+    pd.Update(2, _("Extracting plugin resources"));
+
+    // extract resources from bundle
+    if (!ExtractFile(actualName,
+                    resourceName,
+                    resourceDir + _T('/') + resourceName))
+        return false;
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Extracted resources")));
+
+    pd.Update(3, _("Extracting plugin icons for \"Settings\" dialog"));
+
+    // extract resources from bundle
+    ExtractFile(actualName,
+                settingsOnName,
+                resourceDir + _T("/images/settings/") + settingsOnName,
+                false);
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Extracted resources")));
+
+    // extract resources from bundle
+    ExtractFile(actualName,
+                settingsOffName,
+                resourceDir + _T("/images/settings/") + settingsOffName,
+                false);
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Extracted resources")));
+
+    // extract extra files
+    wxArrayString extraFiles;
+    ReadExtraFilesFromManifestFile(localName, extraFiles);
+    for (size_t i = 0; i < extraFiles.GetCount(); ++i)
+    {
+        ExtractFile(actualName,
+                    extraFiles[i],
+                    resourceDir + _T("/") + extraFiles[i],
+                    false);
+    }
+
+    pd.Update(4, _("Loading plugin"));
+
+    // bundle extracted; now load the plugin on-the-fly
+    //    Manager::Get()->GetLogManager()->DebugLog(F(_T("Loading plugin...")));
+    ScanForPlugins(pluginDir);
+
+    LoadAllPlugins();
+
+    ScriptBindings::cbScriptPlugin* plugin = Manager::Get()->GetScriptingManager()->GetPlugin(pluginName);
+    if(plugin != nullptr)
+    {
+        // plugin not found
+        Manager::Get()->GetLogManager()->DebugLog(_T("Failed to install script Plugin"));
+        return false;
+    }
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Succeeded")));
+
+    // inform app to update menus and toolbars
+    /*pd.Update(5, _("Updating menus and toolbars"));
+    CodeBlocksEvent evt(cbEVT_PLUGIN_INSTALLED);
+    evt.SetPlugin(plugin);
+    Manager::Get()->ProcessEvent(evt);*/
+//    Manager::Get()->GetLogManager()->DebugLog(F(_T("Menus updated")));
+
+    return true;
+
+}
+
+bool PluginManager::UninstallScriptPlugin(const wxString& pluginName, bool removeFiles)
+{
+    ScriptBindings::cbScriptPlugin* plugin = Manager::Get()->GetScriptingManager()->GetPlugin(pluginName);
+    if(plugin != nullptr)
+    {
+        // plugin not found
+        return false;
+    }
+
+    wxFileName fname(pluginFilename);
+    resourceFilename = fname.GetName() + _T(".zip");
+    settingsOnFilename = fname.GetName() + _T(".png");
+    settingsOffFilename = fname.GetName() + _T("-off.png");
+    resourceFilename = ConfigManager::LocateDataFile(resourceFilename, sdDataGlobal | sdDataUser);
+    settingsOnFilename = ConfigManager::LocateDataFile(_T("images/settings/") + settingsOnFilename, sdDataGlobal | sdDataUser);
+    settingsOffFilename = ConfigManager::LocateDataFile(_T("images/settings/") + settingsOffFilename, sdDataGlobal | sdDataUser);
+
+    wxArrayString ExtraFiles;
+    ReadExtraFilesFromManifestFile(pluginName,&ExtraFiles);
+    for (size_t n = 0; n < extrafiles.GetCount(); ++n)
+    {
+        extrafiles[n] = ConfigManager::LocateDataFile(extrafiles[n], sdDataGlobal | sdDataUser);
+    }
+    // Check the rights
+    if (wxFileExists(pluginFilename) && !wxFile::Access(pluginFilename, wxFile::write))
+    {
+        // no write-access; abort
+        cbMessageBox(_("You don't have the needed privileges to uninstall this plugin.\n"
+                        "Ask your administrator to uninstall this plugin for you..."),
+                        _("Warning"), wxICON_WARNING);
+        return false;
+    }
+
+    wxProgressDialog pd(wxString::Format(_("Uninstalling %s"), title.c_str()),
+                        _T("A description wide enough for the dialog ;)"), 3);
+
+    Manager::Get()->GetScriptingManager()->UnRegisterScriptPlugin(pluginName);
+
+    if (!removeFiles)
+        return true;
+
+
+    if (!pluginFilename.IsEmpty())
+    {
+        if (wxRemoveFile(pluginFilename))
+        {
+//            Manager::Get()->GetLogManager()->DebugLog(F(_T("Plugin file removed")));
+            if (!resourceFilename.IsEmpty())
+            {
+                if (!wxRemoveFile(resourceFilename))
+                    Manager::Get()->GetLogManager()->LogWarning(_T("Failed to remove plugin resources: ") + resourceFilename);
+            }
+            if (!settingsOnFilename.IsEmpty() && wxFileExists(settingsOnFilename))
+            {
+                if (!wxRemoveFile(settingsOnFilename))
+                    Manager::Get()->GetLogManager()->LogWarning(_T("Failed to remove icon for \"Settings\" dialog: ") + settingsOnFilename);
+            }
+            if (!settingsOffFilename.IsEmpty() && wxFileExists(settingsOffFilename))
+            {
+                if (!wxRemoveFile(settingsOffFilename))
+                    Manager::Get()->GetLogManager()->LogWarning(_T("Failed to remove icon for \"Settings\" dialog: ") + settingsOffFilename);
+            }
+            for (size_t i = 0; i < extrafiles.GetCount(); ++i)
+            {
+                if (!extrafiles[i].IsEmpty() && wxFileExists(extrafiles[i]))
+                {
+                    if (!wxRemoveFile(extrafiles[i]))
+                        Manager::Get()->GetLogManager()->LogWarning(_T("Failed to remove extra file: ") + extrafiles[i]);
+                }
+            }
+            return true;
+        }
+        else
+        {
+            Manager::Get()->GetLogManager()->LogWarning(_T("Failed to remove plugin file: ") + pluginFilename);
+            cbMessageBox(_("Plugin could not be completely uninstalled because its files could not be removed.\n\n"
+                            "This can happen if the plugin's file is in-use like, for "
+                            "example, when the same plugin file provides more than one "
+                            "plugin.\n"
+                            "In this case either uninstall all other plugins "
+                            "which are provided by the same file, or remove it yourself "
+                            "(manually) when you shut down Code::Blocks.\n"
+                            "The files that could not be deleted are:\n\n") +
+                            pluginFilename + _T('\n') +
+                            resourceFilename + _T('\n') +
+                            settingsOnFilename + _T('\n') +
+                            settingsOffFilename,
+                            _("Warning"), wxICON_WARNING);
+            return false;
+        }
+    }
+    return false;
+
+}
+
 bool PluginManager::InstallPlugin(const wxString& pluginName, bool forAllUsers, bool askForConfirmation)
 {
     if (pluginName.IsEmpty())
@@ -215,6 +448,16 @@ bool PluginManager::InstallPlugin(const wxString& pluginName, bool forAllUsers, 
 
     wxString actualName = pluginName;
     Manager::Get()->GetMacrosManager()->ReplaceMacros(actualName);
+
+    InstallInfo install_info;
+    int ret = ReadInstallInfo(pluginName,&install_info);
+    if(ret == 0)
+    {
+        if(install_info.type == wxT("SCRIPT"))
+        {
+            return InstallScriptPlugin(pluginName,&install_info,forAllUsers,askForConfirmation);
+        }
+    }
 
     // base name
     wxString basename = wxFileName(actualName).GetName();
@@ -717,6 +960,133 @@ void PluginManager::RegisterPlugin(const wxString& name,
     m_RegisteredPlugins.push_back(pr);
 }
 
+int PluginManager::ReadInstallInfo(const wxString& pluginFilename,
+                                   InstallInfo* infoOut)
+{
+    if(infoOut == nullptr)
+        return -1;
+
+    // The pluginFilename parameter contains the path to the plugin...
+    wxString contents;
+    wxFileSystem* fs = new wxFileSystem;
+    wxFSFile* f = fs->OpenFile(pluginFilename + _T("#zip:manifest.xml"));
+    if (f)
+    {
+        wxInputStream* is = f->GetStream();
+        char tmp[1024] = {};
+        while (!is->Eof() && is->CanRead())
+        {
+            memset(tmp, 0, sizeof(tmp));
+            is->Read(tmp, sizeof(tmp) - 1);
+            contents << cbC2U((const char*)tmp);
+        }
+        delete f;
+    }
+    else
+    {
+        delete fs;
+        return -2;
+    }
+    delete fs;
+
+    // We have now loaded the content of the install.xml file in "contents"
+
+    /*
+    * The install.xml file structure:
+    *
+    *
+    *<?xml version="1.0" standalone=no>
+	*<CodeBlocks_plugin_install_file>
+	*	<Plugin type="SCRIPT" name="PluginName" version_major=1 version_minor=0>
+    *       <preinstall>
+    *           // Here you can Add a Squirrel script. It will get called before the installation process
+    *       </preinstall>
+    *
+    *       <postinstall>
+    *           // Here you can Add a Squirrel script. It will get called after the installation process
+    *       </postinstall>
+	*   </Plugin>
+	*</CodeBlocks_plugin_install_file>
+    *
+    *  The Attribute "type" can either be "SCRIPT" or "BINARY"
+    *
+    */
+
+    cb::shared_ptr<TiXmlDocument> xml_doc(new TiXmlDocument());
+
+    //TiXmlDocument xml_doc = new TiXmlDocument();
+
+    if(!xml_doc->Parse(cbU2C(contents)))
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install.xml could not be parsed: ") + pluginFilename);
+        return -2;
+    }
+
+    TiXmlElement* root = xml_doc->FirstChildElement("CodeBlocks_plugin_install_file");
+    if(!root)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no root element found) for: ") + pluginFilename);
+        return -3;
+    }
+
+    TiXmlElement* plugin = root->FirstChildElement("Plugin");
+    if(!plugin)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no \"Plugin\" element found) for: ") + pluginFilename);
+        return -3;
+    }
+
+    const char* type = plugin->Attribute("type");
+    if(!type)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no \"type\" attribute in \"Plugin\" element found) for: ") + pluginFilename);
+        return -3;
+    }
+    infoOut->type.FromUTF8(type);
+
+    const char* name = plugin->Attribute("name");
+    if(!type)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no \"name\" attribute in \"Plugin\" element found) for: ") + pluginFilename);
+        return -3;
+    }
+    infoOut->name.FromUTF8(name);
+
+    infoOut->version_major = 0;
+    if(plugin->QueryIntAttribute("version_major",&(infoOut->version_major)) != TIXML_SUCCESS)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no or wrong \"version_major\" attribute in \"Plugin\" element found) for: ") + pluginFilename);
+    }
+
+    infoOut->version_minor = 0;
+    if(plugin->QueryIntAttribute("version_minor",&(infoOut->version_minor)) != TIXML_SUCCESS)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T("Plugin install file not valid (no or wrong \"version_minor\" attribute in \"Plugin\" element found) for: ") + pluginFilename);
+    }
+
+
+    TiXmlElement* install_script = plugin->FirstChildElement("preinstall");
+    if(install_script)
+    {
+        const char* pre_install_script = install_script->GetText();
+        if(pre_install_script)
+            infoOut->preInstallScript.FromUTF8(pre_install_script);
+        else
+            infoOut->preInstallScript.Clear();
+    }
+    install_script = plugin->FirstChildElement("postinstall");
+    if(install_script)
+    {
+        const char* post_install_script = install_script->GetText();
+        if(post_install_script)
+            infoOut->postInstallScript.FromUTF8(type);
+        else
+            infoOut->postInstallScript.Clear();
+    }
+
+    return 0;
+}
+
 bool PluginManager::ReadManifestFile(const wxString& pluginFilename,
                                     const wxString& pluginName,
                                     PluginInfo* infoOut)
@@ -1032,8 +1402,8 @@ bool PluginManager::LoadPlugin(const wxString& pluginName)
     // by now, the library has loaded and its global variables are initialized.
     // this means it has already called RegisterPlugin()
     // now we can actually create the plugin(s) instance(s) :)
-
     // try to load the plugin(s)
+
     std::vector<PluginRegistration>::iterator it;
     for (it = m_RegisteredPlugins.begin(); it != m_RegisteredPlugins.end(); ++it)
     {
