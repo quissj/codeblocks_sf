@@ -59,9 +59,15 @@ struct PluginElement
 
 struct InstallInfo
 {
+    InstallInfo()
+    {
+
+    }
+
     InstallInfo(InstallInfo* info)
     {
         copy(info);
+    }
 
     void copy(InstallInfo* info)
     {
@@ -113,7 +119,9 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
                             FreePluginProc freeProc,
                             PluginSDKVersionProc versionProc);
 
+        int ScanForScriptPlugins(const wxString& path);
         int ScanForPlugins(const wxString& path);
+        bool LoadScriptPlugin(const wxString& pluginName);
         bool LoadPlugin(const wxString& pluginName);
         void LoadAllPlugins();
         void UnloadAllPlugins();
@@ -126,6 +134,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool InstallPlugin(const wxString& pluginName, bool forAllUsers = true, bool askForConfirmation = true);
         bool InstallScriptPlugin(const wxString& pluginName,InstallInfo* info = nullptr, bool forAllUsers = true, bool askForConfirmation = true);
         bool UninstallPlugin(cbPlugin* plugin, bool removeFiles = true);
+        bool UninstallScriptPlugin(const wxString& pluginName, bool removeFiles);
         bool ExportPlugin(cbPlugin* plugin, const wxString& filename);
 
         const PluginInfo* GetPluginInfo(const wxString& pluginName);

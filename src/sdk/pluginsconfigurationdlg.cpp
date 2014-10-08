@@ -328,12 +328,14 @@ void PluginsConfigurationDlg::OnUninstall(cb_unused wxCommandEvent& event)
             }
         } else if(type == wxT("script"))
         {
+
             unsigned int plugin_count = script_man->GetPluginCount();
             for(unsigned int i = 0; i < plugin_count;++i)
             {
                 if(script_man->GetPlugin(i)->GetInfo().title == GetText(list,sel,0))
                 {
-                    script_man->UnInstallScriptPlugin(script_man->GetPlugin(i)->GetInfo().name);
+                    //script_man->UnInstallScriptPlugin(script_man->GetPlugin(i)->GetInfo().name);
+                    Manager::Get()->GetPluginManager()->UninstallScriptPlugin(script_man->GetPlugin(i)->GetInfo().name,true);
                     break;
                 }
             }
