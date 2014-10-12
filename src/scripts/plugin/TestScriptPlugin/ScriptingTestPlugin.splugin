@@ -61,11 +61,35 @@ class ScriptingTestPlugin extends cbScriptPlugin
     {
 
     }
+	
+	function OnButton(evt)
+	{
+		::ShowMessage(_T("Hello World"));
+	}
 
     function StartTest()
     {
         ::ShowMessage(_T("Start the Test"));
+		dialog = CreateWxDialog(this);
+		if(LoadResource("ScriptingTestPlugin.zip") == false)
+		{
+			error("Could not load resource \"ScriptingTestPlugin.zip\" ");
+			return;
+		}
+		
+		local ret = dialog.LoadFromXRCPool("MainDialog");
+		if(ret != RESOURCE_LOADED_SUCCESFULLY)
+		{
+			error("Could not load \"MainDialog\" from Resource pool");
+			return;
+		}
+		dialog.RegisterEventHandler(wxEVT_BUTTON,XRCID("HelloWorld"),this,"OnButton");
+		
+		dialog.Show(true);
+		
     }
+	
+	dialog = 0;
 }
 
 // this call actually registers the script plugin with Code::Blocks

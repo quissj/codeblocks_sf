@@ -214,6 +214,11 @@ namespace ScriptBindings
         return value;
     }
 
+    bool LoadResource(wxString& res)
+    {
+        return Manager::LoadResource(res);
+    }
+
 
     void Register_Globals(HSQUIRRELVM vm)
     {
@@ -259,6 +264,9 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("InstallPlugin",      InstallPlugin);
 
         Sqrat::RootTable(vm).Func("CallMenu",   CallMenu);
+
+
+        Sqrat::RootTable(vm).Func("LoadResource",   LoadResource);
 
         Sqrat::RootTable(vm).Func("Include",        Include);
         Sqrat::RootTable(vm).SquirrelFunc("Require",Require);
