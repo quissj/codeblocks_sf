@@ -429,6 +429,9 @@ void CompilerGCC::OnAttach()
     Manager::Get()->RegisterEventSink(cbEVT_PROJECT_TARGETS_MODIFIED, new cbEventFunctor<CompilerGCC, CodeBlocksEvent>(this, &CompilerGCC::OnProjectActivated));
 
     Manager::Get()->RegisterEventSink(cbEVT_COMPILE_FILE_REQUEST,     new cbEventFunctor<CompilerGCC, CodeBlocksEvent>(this, &CompilerGCC::OnCompileFileRequest));
+
+    // Bind Scripting
+    ScriptBindings::CompilerGCC_BindScripting(vm->GetVM());
 }
 
 void CompilerGCC::OnRelease(bool appShutDown)
@@ -3860,4 +3863,89 @@ wxString CompilerGCC::GetMinSecStr()
 #else
     return wxString::Format(_("%d minute(s), %d second(s)"), mins, secs);
 #endif // NO_TRANSLATION
+}
+
+namespace ScriptBindings
+{
+
+
+    /** \defgroup sq_CompilerGCC The compiler plugin binding
+     *  \ingroup Squirrel
+     *  \brief The binding of the compiler plugin to squirrel
+     *
+     *  With this binding squirrel is able to control the compiler plugin, and start build processes on workspace, project or target base
+     */
+
+     /**
+     *  \ingroup sq_CompilerGCC
+     *  \brief Function bound to squirrel:
+     *
+     *  ### CompilerGCC functions bound to squirrel
+     *   | Name             | parameter                     | description               | info       |
+     *   | :--------------- | :---------------------------  | :------------------------ | :--------- |
+     *   | Run              | ProjectBuildTarget            |                        x  |        x   |
+     *   | Clean            | ProjectBuildTarget            |                        x  |        x   |
+     *   | DistClean        | ProjectBuildTarget            |                        x  |        x   |
+     *   | Build            | ProjectBuildTarget            |                        x  |        x   |
+     *   | Rebuild          | ProjectBuildTarget            |                        x  |        x   |
+     *   | CleanWorkspace   | wxString                      |                        x  |        x   |
+     *   | BuildWorkspace   | wxString                      |                        x  |        x   |
+     *   | RebuildWorkspace | wxString                      |                        x  |        x   |
+     *   | CompileFile      | wxString                      |                        x  |        x   |
+     *   | CompileFileWithoutProject | wxString             |                        x  |        x   |
+     *   | CompileFileDefault        | wxString             |                        x  |        x   |
+     *   | KillProcess      | x                             |                        x  |        x   |
+     *   | IsRunning        | x                             |                        x  |        x   |
+     *   | GetExitCode      | x                             |                        x  |        x   |
+     *   | IsValidTarget    | x                             |                        x  |        x   |
+     *   | SwitchCompiler   | x                             |                        x  |        x   |
+     *   | GetCurrentCompilerID      | x                    |                        x  |        x   |
+     *
+     * \note This class has no constructor. Please use GetCompilerPlugin() to get a instance.
+     *
+     * ### Global functions
+     *
+     *   | Name                   | parameter                     | description               | info       |
+     *   | :--------------------- | :---------------------------  | :------------------------ | :--------- |
+     *   | GetCompilerPlugin      |  x                            |  Get the compiler plugin  |        x   |
+     *
+     * ### Example
+     * \code
+     * GetCompilerPlugin().RebuildWorkspace("");       // Rebuild the whole workspace
+     *
+     * \endcode
+     **/
+
+    CompilerGCC* GetCompilerPlugin()
+    {
+        return dynamic_cast<CompilerGCC*>(Manager::Get()->GetPluginManager()->FindPluginByName(_("Compiler")));
+    }
+
+    void CompilerGCC_BindScripting(HSQUIRRELVM vm)
+    {
+        Sqrat::Class<CompilerGCC, Sqrat::NoConstructor<CompilerGCC> > compilergcc(vm,"CompilerGCC");
+        compilergcc.Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Run",&CompilerGCC::Run)
+                    .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Clean",&CompilerGCC::Clean)
+                    .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("DistClean",&CompilerGCC::DistClean)
+                    .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Build",&CompilerGCC::Build)
+                    .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Rebuild",&CompilerGCC::Rebuild)
+                    .Func("CleanWorkspace",&CompilerGCC::CleanWorkspace)
+                    .Func("BuildWorkspace",&CompilerGCC::BuildWorkspace)
+                    .Func("RebuildWorkspace",&CompilerGCC::RebuildWorkspace)
+                    .Func("CompileFile",&CompilerGCC::CompileFile)
+                    .Func("CompileFileWithoutProject",&CompilerGCC::CompileFileWithoutProject)
+                    .Func("CompileFileDefault",&CompilerGCC::CompileFileDefault)
+                    .Func("KillProcess",&CompilerGCC::KillProcess)
+                    .Func("IsRunning",&CompilerGCC::IsRunning)
+                    .Func("GetExitCode",&CompilerGCC::GetExitCode)
+                    .Func("IsValidTarget",&CompilerGCC::IsValidTarget)
+                    .Func("SwitchCompiler",&CompilerGCC::SwitchCompiler)
+                    .Func<const wxString& (CompilerGCC::*) ()>("GetCurrentCompilerID",&CompilerGCC::GetCurrentCompilerID);
+
+
+        Sqrat::RootTable(vm).Bind("CompilerGCC",compilergcc);
+
+        Sqrat::RootTable(vm).Func("GetCompilerPlugin",&GetCompilerPlugin);
+
+    }
 }
