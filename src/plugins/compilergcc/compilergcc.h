@@ -255,6 +255,7 @@ class CompilerGCC : public cbCompilerPlugin
         BuildJobTarget GetNextJob();
         const BuildJobTarget& PeekNextJob();
 
+
         struct CompilerProcess
         {
             PipedProcess* pProcess;
@@ -324,5 +325,17 @@ class CompilerGCC : public cbCompilerPlugin
 
         DECLARE_EVENT_TABLE()
 };
+
+namespace ScriptBindings
+{
+    /** \brief Bind CompilerGCC to the Squirrel vm
+     *
+     * \param vm HSQUIRRELVM vm to which CompilerGCC should be bound
+     * \return void
+     *
+     */
+    void CompilerGCC_BindScripting(HSQUIRRELVM vm);
+}
+
 
 #endif // COMPILERGCC_H
