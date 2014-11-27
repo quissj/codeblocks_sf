@@ -8,7 +8,9 @@
 #include <wx/collpane.h>
 #include <wx/combobox.h>
 #include <wx/fs_mem.h>
+
 #include <scripting/bindings/sq_wx/sq_wx_propgrid.h>
+
 
 #if wxCHECK_VERSION(2, 9, 0)
 #include <wx/anybutton.h>
@@ -679,6 +681,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     Sqrat::RootTable(vm).Func(_SC("XRCNAME"),&GetNameFromIDFromXRC);
     Sqrat::RootTable(vm).Func(_SC("LoadXMLResourceFile"),&LoadXMLResourceFile);
     Sqrat::RootTable(vm).Func(_SC("LoadXMLResourceFromString"),&LoadXMLResourceFromString);
+    Sqrat::RootTable(vm).Func(_SC("wxBell"),&wxBell);
 
 
     //**************************************************************************************************************/
@@ -699,8 +702,14 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     //**************************************************************************************************************/
     Sqrat::Class<wxWindow,Sqrat::NoConstructor<wxWindow> > bwxWindow(vm,"wxWindow");
     bwxWindow.Func("GetLabel",&wxWindow::GetLabel)
-    .Func("SetLabel",&wxWindow::SetLabel);
+    .Func("SetLabel",&wxWindow::SetLabel)
+    .Func("SetAutoLayout",&wxWindow::SetAutoLayout)
+    .Func("Fit",&wxWindow::Fit);
     Sqrat::RootTable(vm).Bind(_SC("wxWindow"),bwxWindow);
+
+     Sqrat::Class<wxSizer,Sqrat::NoConstructor<wxSizer> > bwxSizer(vm,"wxSizer");
+     bwxSizer.Func("Fit",&wxSizer::Fit);
+     Sqrat::RootTable(vm).Bind(_SC("wxSizer"),bwxSizer);
 
 
     /***************************************************************************************************************/
@@ -1221,6 +1230,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     .Func(_SC("IsAnyModified"),&sq_wx_propgrid_wrapper::IsAnyModified)
     .Func(_SC("SetColumnCount"),&sq_wx_propgrid_wrapper::SetColumnCount)
     .Func(_SC("SetLineColour"),&sq_wx_propgrid_wrapper::SetLineColour)
+    .Func(_SC("Clear"),&sq_wx_propgrid_wrapper::Clear)
     .Func(_SC("SetMarginColour"),&sq_wx_propgrid_wrapper::SetMarginColour);
     //.Func(_SC("SetSelectionBackgroundColour"),&sq_wx_propgrid_wrapper::SetSelectionBackgroundColour)
     //.Func(_SC("SetSelectionTextColour"),&sq_wx_propgrid_wrapper::SetSelectionTextColour);

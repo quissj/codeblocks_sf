@@ -45,6 +45,8 @@ namespace ScriptBindings
         int Show(bool show);
         void EndModal(int retcode);
 
+        wxWindow* GetWindow();
+
         void SetTitle(wxString& title);
         void Maximize(bool maximize);
 

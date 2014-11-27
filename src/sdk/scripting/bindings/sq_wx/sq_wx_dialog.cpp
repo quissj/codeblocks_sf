@@ -160,6 +160,10 @@ void sq_wxDialog::Maximize(bool maximize)
 }
 
 
+wxWindow* sq_wxDialog::GetWindow()
+{
+    return dynamic_cast<wxWindow*>(GetManagedWindow());
+}
 
 
 void bind_wxDialog(HSQUIRRELVM vm)
@@ -182,7 +186,9 @@ void bind_wxDialog(HSQUIRRELVM vm)
     .Func("SetTitle", &sq_wxDialog::SetTitle)
     .Func("Maximize", &sq_wxDialog::Maximize)
     .Func("IsLoaded", &sq_wxDialog::IsLoaded)
+    .Func("GetWindow", &sq_wxDialog::GetWindow)
     .SquirrelFunc("GetControl", &GetControlTemplate<sq_wxDialog>);
+
     Sqrat::RootTable(vm).Bind(_SC("wxDialog"),bwxDialog);
 
 

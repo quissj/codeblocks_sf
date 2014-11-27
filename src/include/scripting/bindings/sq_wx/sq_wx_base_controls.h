@@ -363,6 +363,7 @@ template <typename A> SQInteger GetControlTemplate(HSQUIRRELVM vm)
     CHECK_CONTROL(wxSpinCtrl,c_name,wind)
     CHECK_CONTROL(wxSpinButton,c_name,wind)
     CHECK_CONTROL(wxPropertyGrid,c_name,wind)
+    CHECK_CONTROL(wxSizer,c_name,wind)
 
     CHECK_CONTROL_END(c_name)
 

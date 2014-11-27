@@ -14,9 +14,11 @@ namespace ScriptBindings
 {
     int sq_wx_propgrid_wrapper::Populate(Sqrat::Table table)
     {
+        //m_grid->Clear();
         Sqrat::Table::iterator itr;
         StackHandler sa(table.GetVM());
-        while(table.Next(itr))
+        bool next = table.Next(itr);
+        while(next)
         {
             HSQOBJECT key = itr.getKey();
 
@@ -60,6 +62,7 @@ namespace ScriptBindings
                 if (ret < 0)
                     return ret;
             }
+            next = table.Next(itr);
         }
 
         return 0;
@@ -195,12 +198,19 @@ namespace ScriptBindings
         return entry;
     }
 
-    Sqrat::Table sq_wx_propgrid_wrapper::GetRoot()
+    Sqrat::Array sq_wx_propgrid_wrapper::GetRoot()
     {
-        Sqrat::Table root(m_vm);
-        PropertyToSqratTabel(m_grid->GetRoot(),root);
-        return root;
+        Sqrat::Array ret_arry(m_vm);
+        Sqrat::Table entry(m_vm);
 
+        wxPGProperty* prop = m_grid->GetRoot();
+        unsigned int count = prop->GetChildCount();
+        for(unsigned int i = 0; i < count; i++)
+        {
+            PropertyToSqratTabel(prop->Item(i),entry);
+            ret_arry.Append(entry);
+        }
+        return ret_arry;
     }
 
     wxTextCtrl* sq_wx_propgrid_wrapper::GetLabelEditor()
@@ -220,18 +230,23 @@ namespace ScriptBindings
         if(prop == NULL)
             return -1;
 
-        table.SetValue("name",Sqrat::string(prop->GetBaseName().ToUTF8()));
-        table.SetValue("label",Sqrat::string(prop->GetLabel().ToUTF8()));
-        table.SetValue("value",Sqrat::string(prop->GetValueString().ToUTF8()));
-        for(size_t i = 0; i < prop->GetChildCount(); i++)
+        table.SetValue("name",prop->GetName());
+        table.SetValue("label",prop->GetLabel());
+        table.SetValue("value",prop->GetValueAsString());
+
+        if(prop->GetChildCount() > 0)
         {
-            Sqrat::Table tmp_child(m_vm);
-            if(PropertyToSqratTabel(prop->Item(i),tmp_child) < 0)
-                return -2;
-            SQChar *name = NULL;
-            tmp_child.GetValue("name",name);
-            table.SetValue(name,tmp_child);
-        }
+            Sqrat::Array children(m_vm);
+            for(size_t i = 0; i < prop->GetChildCount(); i++)
+            {
+                Sqrat::Table tmp_child(m_vm);
+                if(PropertyToSqratTabel(prop->Item(i),tmp_child) < 0)
+                    return -2;
+                children.Append(tmp_child);
+            }
+            table.SetValue("children",children);
+            }
+        return 0;
     }
 
     SQInteger sq_wx_propgrid_wrapper_constructor(HSQUIRRELVM vm)
