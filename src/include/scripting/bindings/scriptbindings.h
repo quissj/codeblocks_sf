@@ -7,6 +7,20 @@
 #define SCRIPTBINDINGS_H
 
 #include <scripting/bindings/sc_cb_vm.h>
+#include <scripting/sqrat.h>
+
+
+SQRAT_DECLARE_CLASS(ProjectBuildTarget);
+/*namespace Sqrat
+{
+
+ template<> inline Sqrat::string Sqrat_get_class_name<ProjectBuildTarget>()
+{
+    return Sqrat::string("ProjectBuildTarget");
+}
+}*/
+//SQRAT_DECLARE_CLASS(cbProject);
+
 
 namespace ScriptBindings
 {

@@ -73,6 +73,7 @@
 #include "compilerXML.h"
 
 #include <scripting/bindings/sc_base_types.h>
+#include <scripting/bindings/scriptbindings.h>
 
 namespace ScriptBindings
 {
@@ -3921,13 +3922,42 @@ namespace ScriptBindings
         return dynamic_cast<CompilerGCC*>(Manager::Get()->GetPluginManager()->FindPluginByName(_("Compiler")));
     }
 
+    SQInteger CompilerGCC_BuildTarget(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        try
+        {
+
+        Sqrat::ClassType<ProjectBuildTarget>::hasClassData(v);
+        ProjectBuildTarget* target = sa.GetInstance<ProjectBuildTarget>(2);
+        int ret_value = dynamic_cast<CompilerGCC*>(Manager::Get()->GetPluginManager()->FindPluginByName(_("Compiler")))->Build(target);
+        sa.PushValue(ret_value);
+
+        return SC_RETURN_VALUE;
+        }
+        catch(CBScriptException &e)
+        {
+           // try
+           // {
+           //     ProjectBuildTarget target = sa.GetValue<ProjectBuildTarget>(1);
+           //     int ret_value = dynamic_cast<CompilerGCC*>(Manager::Get()->GetPluginManager()->FindPluginByName(_("Compiler")))->Build(&target);
+           //     sa.PushValue(ret_value);
+           // }
+           // catch(CBScriptException &e)
+           // {
+                return sa.ThrowError(e.Message());
+           // }
+        }
+    }
+
     void CompilerGCC_BindScripting(HSQUIRRELVM vm)
     {
         Sqrat::Class<CompilerGCC, Sqrat::NoConstructor<CompilerGCC> > compilergcc(vm,"CompilerGCC");
         compilergcc.Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Run",&CompilerGCC::Run)
                     .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Clean",&CompilerGCC::Clean)
                     .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("DistClean",&CompilerGCC::DistClean)
-                    .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Build",&CompilerGCC::Build)
+                    //.Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Build",&CompilerGCC::Build)
+                    .SquirrelFunc("Build",&CompilerGCC_BuildTarget)
                     .Func<int (CompilerGCC::*) (ProjectBuildTarget*)>("Rebuild",&CompilerGCC::Rebuild)
                     .Func("CleanWorkspace",&CompilerGCC::CleanWorkspace)
                     .Func("BuildWorkspace",&CompilerGCC::BuildWorkspace)
@@ -3942,8 +3972,8 @@ namespace ScriptBindings
                     .Func("SwitchCompiler",&CompilerGCC::SwitchCompiler)
                     .Func<const wxString& (CompilerGCC::*) ()>("GetCurrentCompilerID",&CompilerGCC::GetCurrentCompilerID);
 
-
         Sqrat::RootTable(vm).Bind("CompilerGCC",compilergcc);
+
 
         Sqrat::RootTable(vm).Func("GetCompilerPlugin",&GetCompilerPlugin);
 

@@ -20,6 +20,7 @@
 #include <logger.h>
 #include <sdk_events.h>
 #include <settings.h> // SDK
+#include <scripting/squirrel/squirrel.h>
 
 #include "compilermessages.h"
 #include "compilererrors.h"
