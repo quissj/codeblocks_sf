@@ -304,18 +304,18 @@ wxString CBsquirrelVM::getLastErrorMsg()
     ErrorMessage.Append(wxString(m_lastErrorMsg.c_str(),wxConvUTF8));
     m_lastErrorMsg.clear();
 
-    if(Sqrat::Error::Instance().Occurred(m_vm))
+    if(Sqrat::Error::Occurred(m_vm))
     {
         ErrorMessage.Append(_("\nSqrat Error:\n"));
-        ErrorMessage.Append(wxString::FromUTF8(Sqrat::Error::Instance().Message(m_vm).c_str()));
-        Sqrat::Error::Instance().Clear(m_vm);
+        ErrorMessage.Append(wxString::FromUTF8(Sqrat::Error::Message(m_vm).c_str()));
+        Sqrat::Error::Clear(m_vm);
     }
     return ErrorMessage;
 };
 
 bool CBsquirrelVM::HasError()
 {
-    if(!m_lastErrorMsg.empty() ||  Sqrat::Error::Instance().Occurred(m_vm))
+    if(!m_lastErrorMsg.empty() ||  Sqrat::Error::Occurred(m_vm))
         return true;
     else
         return false;
@@ -383,22 +383,22 @@ wxString StackHandler::CreateStackInfo()
 
 wxString StackHandler::GetError(bool del)
 {
-    if(!Sqrat::Error::Instance().Occurred(m_vm))
+    if(!Sqrat::Error::Occurred(m_vm))
         return wxEmptyString;
 
     wxString stack_string = CreateStackInfo();
     stack_string += _("\nSqrat Error\n");
-    stack_string += wxString::FromUTF8(Sqrat::Error::Instance().Message(m_vm).c_str());
+    stack_string += wxString::FromUTF8(Sqrat::Error::Message(m_vm).c_str());
 
     if(del)
-        Sqrat::Error::Instance().Clear(m_vm);
+        Sqrat::Error::Clear(m_vm);
 
     return stack_string;
 }
 
 bool StackHandler::HasError()
 {
-    return Sqrat::Error::Instance().Occurred(m_vm);
+    return Sqrat::Error::Occurred(m_vm);
 }
 
 } // namespace ScriptBindings

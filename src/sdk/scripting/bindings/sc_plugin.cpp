@@ -183,7 +183,7 @@ int cbScriptPlugin::CreateMenus()
         return 0;       // This plugin does not need menus
 
     wxArrayString menu_arr;
-    menu_arr = func.Evaluate<wxArrayString>();
+    menu_arr = *func.Evaluate<wxArrayString>().Get();
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
     {
         return 0;
@@ -248,7 +248,7 @@ void cbScriptPlugin::BuildModuleMenu(cb_optional const ModuleType type, cb_optio
         return;       // This plugin does not need menus
 
     wxArrayString menu_arr;
-    menu_arr = func.Evaluate<wxArrayString>(type,data);
+    menu_arr = *func.Evaluate<wxArrayString>(type,data).Get();
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
     {
         return;
@@ -297,7 +297,7 @@ cbScriptPlugin* GetPluginFromObject(StackHandler& sa,Sqrat::Object obj)
         return nullptr;
     }
 
-    PluginInfo info = func.Evaluate<PluginInfo>();
+    PluginInfo info = *func.Evaluate<PluginInfo>().Get();
     cbScriptPlugin *plugin = Manager::Get()->GetScriptingManager()->GetPlugin(info.name);
     if(plugin == nullptr)
     {
@@ -344,7 +344,7 @@ SQInteger RegisterPlugin(HSQUIRRELVM vm)
     plugin->SetScriptFile(wxString(si.source,wxConvUTF8));
 
     // ask for its registration name
-    PluginInfo info = func.Evaluate<PluginInfo>();
+    PluginInfo info = *func.Evaluate<PluginInfo>().Get();
 
     plugin->SetInfo(info);
     Manager::Get()->GetScriptingManager()->RegisterScriptPlugin(plugin->GetName(), plugin);

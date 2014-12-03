@@ -12,5 +12,27 @@
 #define SC_RETURN_OK        -0
 #define SC_RETURN_VALUE      1
 
+namespace ScriptBindings
+{
 
+
+template <typename U> int GetValueFromTable(Sqrat::Table table,const SQChar* name,U& output,bool exe = false)
+{
+    if(!table.HasKey(name))
+        return -1;
+
+    Sqrat::SharedPtr<U> ptr = table.GetValue<U>(name);
+    if(ptr == nullptr)
+    {
+        if(exe)
+            throw CBScriptException(wxString::Format(_("Could not Find Value with name: %s"),name) + wxString(_(" from table ")) + wxString::FromUTF8(table.getName()));
+        return -2;
+    }
+
+
+    output = *ptr.Get();
+    return 0;
+}
+
+}
 #endif // SC_BINDING_UTIL_H

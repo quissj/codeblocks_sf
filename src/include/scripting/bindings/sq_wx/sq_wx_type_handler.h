@@ -10,12 +10,12 @@ template<>
 struct Var<wxString> {
     wxString value;
     Var(HSQUIRRELVM v, SQInteger idx) {
-        if (!Sqrat::Error::Instance().Occurred(v)) {
+        if (!Sqrat::Error::Occurred(v)) {
             wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
             if (ptr != NULL) {
                 value = *ptr;
             } else {
-                Sqrat::Error::Instance().Clear(v);
+                Sqrat::Error::Clear(v);
                 switch(sq_gettype(v,idx))
                 {
                 case OT_INTEGER:    // It is a const char ''
@@ -50,12 +50,12 @@ struct Var<wxString&> {
     wxString value;
 
     Var(HSQUIRRELVM v, SQInteger idx) {
-        if (!Sqrat::Error::Instance().Occurred(v)) {
+        if (!Sqrat::Error::Occurred(v)) {
             wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
             if (ptr != NULL) {
                 value = *ptr;
             } else {
-                Sqrat::Error::Instance().Clear(v);
+                Sqrat::Error::Clear(v);
                 const SQChar* str;
                 sq_tostring(v, idx);
                 sq_getstring(v, -1, &str);
@@ -75,12 +75,12 @@ struct Var<const wxString&> {
     wxString value;
 
     Var(HSQUIRRELVM v, SQInteger idx) {
-        if (!Sqrat::Error::Instance().Occurred(v)) {
+        if (!Sqrat::Error::Occurred(v)) {
             wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
             if (ptr != NULL) {
                 value = *ptr;
             } else {
-                Sqrat::Error::Instance().Clear(v);
+                Sqrat::Error::Clear(v);
                 const SQChar* str;
                 sq_tostring(v, idx);
                 sq_getstring(v, -1, &str);
@@ -100,13 +100,13 @@ template<>
 struct Var<wxString*> {
     wxString* value;
     Var(HSQUIRRELVM v, SQInteger idx){
-        if (!Sqrat::Error::Instance().Occurred(v)) {
+        if (!Sqrat::Error::Occurred(v)) {
             value = ClassType<wxString>::GetInstance(v, idx);
             if (value != NULL) {
                 return;
             } else {
-                Sqrat::Error::Instance().Clear(v);
-                Sqrat::Error::Instance().Throw(v,"Tried to get an wxString* from a string");
+                Sqrat::Error::Clear(v);
+                Sqrat::Error::Throw(v,"Tried to get an wxString* from a string");
             }
         }
     }

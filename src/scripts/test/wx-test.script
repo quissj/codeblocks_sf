@@ -32,8 +32,8 @@ class wxTest extends script_test_base
         ::print("======= Test wx String BEGINN ======= \n");
         clear_test_result();
 
-        local string = wxString("Hallo");
-        if(test_string("tostring",string,"Hallo") == true)
+       local string = wxString("Hallo");
+       if(test_string("tostring",string,"Hallo") == true)
             made_passed("constructor(SQchar)");
         else
             made_failed("constructor(SQchar)","see previous result");

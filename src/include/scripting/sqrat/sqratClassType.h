@@ -1,4 +1,3 @@
-
 //
 // SqratClassType: Type Translators
 //
@@ -33,33 +32,46 @@
 #include <map>
 
 #include "sqratUtil.h"
+
+#define SQRAT_DECLARE_NAMED_CLASS(cla,name) \
+namespace Sqrat{\
+template<> inline Sqrat::string Sqrat_get_class_name<cla>() \
+{\
+    return Sqrat::string(name);\
+}\
+}
+
+#define SQRAT_DECLARE_CLASS(cla) SQRAT_DECLARE_NAMED_CLASS(cla,#cla)
+
+
 namespace Sqrat
 {
 
-//
-// ClassType
-//
+/// @cond DEV
 
-// Get the Copy Function for this Class
+
+template<class T> Sqrat::string Sqrat_get_class_name()
+{
+    return Sqrat::string("sqrat_no_name");
+}
+
+// The copy function for a class
 typedef SQInteger (*COPYFUNC)(HSQUIRRELVM, SQInteger, const void*);
 
-struct ClassTypeDataBase {
-    HSQOBJECT    classObj;
-    HSQOBJECT    getTable;
-    HSQOBJECT    setTable;
-    COPYFUNC    copyFunc;
-    string        className;
-    ClassTypeDataBase* baseClass;
-    bool        ctorCalled;
-    virtual ~ClassTypeDataBase() {}
+// Every Squirrel class instance made by Sqrat has its type tag set to a AbstractStaticClassData object that is unique per C++ class
+struct AbstractStaticClassData {
+    AbstractStaticClassData() {}
+    virtual ~AbstractStaticClassData() {}
     virtual SQUserPointer Cast(SQUserPointer ptr, SQUserPointer classType) = 0;
-    ClassTypeDataBase() : ctorCalled(false){}
+    AbstractStaticClassData* baseClass;
+    string                   className;
+    COPYFUNC                 copyFunc;
 };
 
+// StaticClassData keeps track of the nearest base class B and the class associated with itself C in order to cast C++ pointers to the right base class
 template<class C, class B>
-struct ClassTypeData : public ClassTypeDataBase {
+struct StaticClassData : public AbstractStaticClassData {
     virtual SQUserPointer Cast(SQUserPointer ptr, SQUserPointer classType) {
-
         if (classType != this) {
             ptr = baseClass->Cast(static_cast<B*>(static_cast<C*>(ptr)), classType);
         }
@@ -67,90 +79,175 @@ struct ClassTypeData : public ClassTypeDataBase {
     }
 };
 
+// Every Squirrel class object created by Sqrat in every VM has its own unique ClassData object stored in the registry table of the VM
 template<class C>
-struct ClassType {
+struct ClassData {
+    HSQOBJECT                           classObj;
+    HSQOBJECT                           getTable;
+    HSQOBJECT                           setTable;
+    SharedPtr<std::map<C*, HSQOBJECT> > instances;
+    SharedPtr<AbstractStaticClassData>  staticData;
+};
 
-    static std::map< HSQUIRRELVM, ClassTypeDataBase* > s_classTypeDataMap;
+// Internal helper class for managing classes
+template<class C>
+class ClassType {
+public:
 
-    static inline ClassTypeDataBase*& getClassTypeData(HSQUIRRELVM vm) {
-        //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        return s_classTypeDataMap[vm];
+    static inline ClassData<C>* getClassData(HSQUIRRELVM vm) {
+        sq_pushregistrytable(vm);
+        sq_pushstring(vm, "__classes", -1);
+#ifndef NDEBUG
+        SQRESULT r = sq_rawget(vm, -2);
+        assert(SQ_SUCCEEDED(r)); // fails if getClassData is called when the data does not exist for the given VM yet (bind the class)
+#else
+        sq_rawget(vm, -2);
+#endif
+        sq_pushstring(vm, ClassName().c_str(), -1);
+#ifndef NDEBUG
+        r = sq_rawget(vm, -2);
+        assert(SQ_SUCCEEDED(r)); // fails if getClassData is called when the data does not exist for the given VM yet (bind the class)
+#else
+        sq_rawget(vm, -2);
+#endif
+        ClassData<C>** ud;
+        sq_getuserdata(vm, -1, (SQUserPointer*)&ud, NULL);
+        sq_pop(vm, 3);
+        return *ud;
     }
 
-    static inline bool hasClassTypeData(HSQUIRRELVM vm) {
-        //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        return (s_classTypeDataMap.find(vm) != s_classTypeDataMap.end());
+    static inline WeakPtr<AbstractStaticClassData>& getStaticClassData() {
+        static WeakPtr<AbstractStaticClassData> instance;
+        return instance;
     }
 
-    static inline void deleteClassTypeData(HSQUIRRELVM vm) {
-        //TODO: use mutex to lock s_classTypeDataMap in multithreaded environment
-        std::map< HSQUIRRELVM, ClassTypeDataBase* >::iterator it = s_classTypeDataMap.find(vm);
-        if(it != s_classTypeDataMap.end()) {
-            s_classTypeDataMap.erase(it);
+        static inline bool getSharedClass(HSQUIRRELVM vm) {
+
+        sq_pushregistrytable(vm);
+        sq_pushstring(vm, "__classes", -1);
+#ifndef NDEBUG
+        SQRESULT r = sq_rawget(vm, -2);
+        if(!SQ_SUCCEEDED(r)) return false; // fails if getClassData is called when the data does not exist for the given VM yet (bind the class)
+#else
+        sq_rawget(vm, -2);
+#endif
+        Sqrat::string class_name =  Sqrat_get_class_name<C>();
+        if(class_name == Sqrat::string("sqrat_no_name"))
+            return false;
+
+        sq_pushstring(vm,class_name.c_str(), -1);
+#ifndef NDEBUG
+        r = sq_rawget(vm, -2);
+        if(!SQ_SUCCEEDED(r)) return false; // fails if getClassData is called when the data does not exist for the given VM yet (bind the class)
+#else
+        sq_rawget(vm, -2);
+#endif
+        ClassData<C>** ud;
+        sq_getuserdata(vm, -1, (SQUserPointer*)&ud, NULL);
+        sq_pop(vm, 3);
+        getStaticClassData() = (*ud)->staticData;
+        return true;
+    }
+
+    static inline bool hasClassData(HSQUIRRELVM vm) {
+        if (!getStaticClassData().Expired()) {
+            sq_pushregistrytable(vm);
+            sq_pushstring(vm, "__classes", -1);
+            if (SQ_SUCCEEDED(sq_rawget(vm, -2))) {
+                sq_pushstring(vm, ClassName().c_str(), -1);
+                if (SQ_SUCCEEDED(sq_rawget(vm, -2))) {
+                    sq_pop(vm, 3);
+                    return true;
+                }
+                sq_pop(vm, 1);
+            }
+            sq_pop(vm, 1);
         }
+        if(getSharedClass(vm))
+        {
+            return true;
+        }
+        return false;
     }
 
-    // Get the Squirrel Object for this Class
-    static inline HSQOBJECT& ClassObject(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->classObj;
+    static inline AbstractStaticClassData*& BaseClass() {
+        assert(getStaticClassData().Expired() == false); // fails because called before a Sqrat::Class for this type exists
+        return getStaticClassData().Lock()->baseClass;
     }
 
-    // Get the Get Table for this Class
-    static inline HSQOBJECT& GetTable(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->getTable;
+    static inline string& ClassName() {
+        assert(getStaticClassData().Expired() == false); // fails because called before a Sqrat::Class for this type exists
+        return getStaticClassData().Lock()->className;
     }
 
-    // Get the Set Table for this Class
-    static inline HSQOBJECT& SetTable(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->setTable;
+    static inline COPYFUNC& CopyFunc() {
+        assert(getStaticClassData().Expired() == false); // fails because called before a Sqrat::Class for this type exists
+        return getStaticClassData().Lock()->copyFunc;
     }
 
-    static inline COPYFUNC& CopyFunc(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->copyFunc;
-    }
-
-    static inline string& ClassName(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->className;
-    }
-
-    static inline ClassTypeDataBase*& BaseClass(HSQUIRRELVM vm) {
-        return getClassTypeData(vm)->baseClass;
+    static SQInteger DeleteInstance(SQUserPointer ptr, SQInteger size) {
+        SQUNUSED(size);
+        std::pair<C*, SharedPtr<std::map<C*, HSQOBJECT> > >* instance = reinterpret_cast<std::pair<C*, SharedPtr<std::map<C*, HSQOBJECT> > >*>(ptr);
+        instance->second->erase(instance->first);
+        delete instance;
+        return 0;
     }
 
     static void PushInstance(HSQUIRRELVM vm, C* ptr) {
-        if (ptr != NULL) {
-            sq_pushobject(vm, ClassObject(vm));
-            sq_createinstance(vm, -1);
-            sq_remove(vm, -2);
-            sq_setinstanceup(vm, -1, ptr);
-        }
-        else
+        if (!ptr) {
             sq_pushnull(vm);
+            return;
+        }
+
+        ClassData<C>* cd = getClassData(vm);
+
+        typename std::map<C*, HSQOBJECT>::iterator it = cd->instances->find(ptr);
+        if (it != cd->instances->end()) {
+            sq_pushobject(vm, it->second);
+            return;
+        }
+
+        sq_pushobject(vm, cd->classObj);
+        sq_createinstance(vm, -1);
+        sq_remove(vm, -2);
+        sq_setinstanceup(vm, -1, new std::pair<C*, SharedPtr<std::map<C*, HSQOBJECT> > >(ptr, cd->instances));
+        sq_setreleasehook(vm, -1, &DeleteInstance);
+        sq_getstackobj(vm, -1, &((*cd->instances)[ptr]));
     }
 
     static void PushInstanceCopy(HSQUIRRELVM vm, const C& value) {
-        sq_pushobject(vm, ClassObject(vm));
+        sq_pushobject(vm, getClassData(vm)->classObj);
         sq_createinstance(vm, -1);
         sq_remove(vm, -2);
-        CopyFunc(vm)(vm, -1, &value);
+        CopyFunc()(vm, -1, &value);
     }
 
-    static C* GetInstance(HSQUIRRELVM vm, SQInteger idx) {
-        SQUserPointer ptr = NULL;
-        ClassTypeDataBase* classType = getClassTypeData(vm);
-        if (classType != 0) /* type checking only done if the value has type data else it may be enum */
+    static C* GetInstance(HSQUIRRELVM vm, SQInteger idx, bool nullAllowed = false) {
+        AbstractStaticClassData*                             classType = NULL;
+        std::pair<C*, SharedPtr<std::map<C*, HSQOBJECT> > >* instance  = NULL;
+        if (hasClassData(vm)) /* type checking only done if the value has type data else it may be enum */
         {
-            if (SQ_FAILED(sq_getinstanceup(vm, idx, &ptr, classType))) {
-                Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, ClassName(vm)));
+            if (nullAllowed && sq_gettype(vm, idx) == OT_NULL) {
                 return NULL;
             }
+
+            classType = getStaticClassData().Lock().Get();
+
+#if !defined (SCRAT_NO_ERROR_CHECKING)
+            if (SQ_FAILED(sq_getinstanceup(vm, idx, (SQUserPointer*)&instance, classType))) {
+                SQTHROW(vm, FormatTypeError(vm, idx, ClassName()));
+                return NULL;
+            }
+#else
+            sq_getinstanceup(vm, idx, (SQUserPointer*)&instance, 0);
+#endif
         }
         else /* value is likely of integral type like enums, cannot return a pointer */
         {
-            Error::Instance().Throw(vm, Sqrat::Error::FormatTypeError(vm, idx, _SC("unknown")));
+            SQTHROW(vm, FormatTypeError(vm, idx, _SC("unknown")));
             return NULL;
         }
-        ClassTypeDataBase* actualType;
+        AbstractStaticClassData* actualType;
         sq_gettypetag(vm, idx, (SQUserPointer*)&actualType);
         if (actualType == NULL) {
             SQInteger top = sq_gettop(vm);
@@ -162,14 +259,15 @@ struct ClassType {
             sq_settop(vm, top);
         }
         if (classType != actualType) {
-            return static_cast<C*>(actualType->Cast(ptr, classType));
+            return static_cast<C*>(actualType->Cast(instance->first, classType));
         }
-        return static_cast<C*>(ptr);
+        return static_cast<C*>(instance->first);
     }
 };
 
-template<class C>
-std::map< HSQUIRRELVM, ClassTypeDataBase* > ClassType<C>::s_classTypeDataMap;
+/// @endcond
+
+
 
 }
 

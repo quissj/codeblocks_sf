@@ -411,7 +411,11 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     {
     Sqrat::Function func = Sqrat::RootTable(vm->GetVM()).GetFunction("GetFilesDir");
     if(!func.IsNull())
-        srcdir = func.Evaluate<wxString>();
+    {
+        // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+        srcdir = *func.Evaluate<wxString>().Get();
+    }
+
     if (!srcdir.IsEmpty())
     {
         // now break them up (remember: semicolon-separated list of dirs)
@@ -438,7 +442,8 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
         // safety limit to avoid infinite loops because of badly written scripts: 50 files
         while (idx < 50)
         {
-            wxString fileAndContents = func.Evaluate<wxString>(idx++);
+            // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+            wxString fileAndContents = *func.Evaluate<wxString>(idx++).Get();
             if(Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
                 Clear();
@@ -513,11 +518,11 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     {
         wxString err_msg;
         err_msg.Printf(_("Couldn't setup project options:\n%s"),prjdir.c_str());
-        if(Sqrat::Error::Instance().Occurred(vm->GetVM()))
+        if(Sqrat::Error::Occurred(vm->GetVM()))
         {
             err_msg.Append(_("\n\n Squirrel error:\n"));
-            err_msg.Append(wxString::FromUTF8(Sqrat::Error::Instance().Message(vm->GetVM()).c_str()));
-            Sqrat::Error::Instance().Clear(vm->GetVM());
+            err_msg.Append(wxString::FromUTF8(Sqrat::Error::Message(vm->GetVM()).c_str()));
+            Sqrat::Error::Clear(vm->GetVM());
         }
         cbMessageBox(err_msg,_("Error"), wxICON_ERROR);
         Clear();
@@ -639,7 +644,8 @@ CompileTargetBase* Wiz::RunFilesWizard(wxString* pFilename)
     ScriptBindings::CBsquirrelVM *vm = Manager::Get()->GetScriptingManager()->GetVM();
     Sqrat::Function func = Sqrat::RootTable(vm->GetVM()).GetFunction("CreateFiles");
 
-    wxString files = func.Evaluate<wxString>();
+    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+    wxString files = *func.Evaluate<wxString>().Get();
     if (files.IsEmpty())
         cbMessageBox(_("Wizard failed..."), _("Error"), wxICON_ERROR);
     else

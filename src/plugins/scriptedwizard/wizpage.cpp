@@ -85,7 +85,8 @@ wxWizardPage* WizPageBase::GetPrev() const
     Sqrat::Function func = Sqrat::RootTable(vm->GetVM()).GetFunction(sig.ToUTF8());
     if (func.IsNull())
         return wxWizardPageSimple::GetPrev();
-    wxString prev = func.Evaluate<wxString>();
+    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+    wxString prev = *func.Evaluate<wxString>().Get();
 
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         return wxWizardPageSimple::GetPrev();
@@ -108,7 +109,8 @@ wxWizardPage* WizPageBase::GetNext() const
 
     if (func.IsNull())
         return wxWizardPageSimple::GetNext();
-    wxString next = func.Evaluate<wxString>();
+    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+    wxString next = *func.Evaluate<wxString>().Get();
 
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         return wxWizardPageSimple::GetNext();
@@ -128,7 +130,8 @@ void WizPageBase::OnPageChanging(wxWizardEvent& event)
 
     if (func.IsNull())
         return;
-    bool allow = func.Evaluate<bool>(event.GetDirection() != 0); // !=0 forward, ==0 backward
+    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+    bool allow = *func.Evaluate<bool>(event.GetDirection() != 0).Get(); // !=0 forward, ==0 backward
 
     Manager::Get()->GetScriptingManager()->DisplayErrors();
 

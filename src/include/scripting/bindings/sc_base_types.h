@@ -37,7 +37,7 @@ template<>                                                          \
 struct Var<N> {                                                     \
     N value;                                                        \
     Var(HSQUIRRELVM v, SQInteger idx) {                             \
-        if (!Sqrat::Error::Instance().Occurred(v)) {                \
+        if (!Sqrat::Error::Occurred(v)) {                \
             SQInteger tmp = 0;                                      \
             sq_getinteger(v,idx,&tmp);                              \
             value = static_cast<N>(tmp);                            \

@@ -627,14 +627,14 @@ SQInteger wxSpinCtrl_SetValue(HSQUIRRELVM vm)
         wxSpinCtrl* inst = sa.GetInstance<wxSpinCtrl>(1);
 
         Sqrat::Var<SQInteger> int_val(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             inst->SetValue(int_val.value);
             return SC_RETURN_OK;
         }
-        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Error::Clear(vm);
         Sqrat::Var<wxString> str_val(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             inst->SetValue(str_val.value);
             return SC_RETURN_OK;

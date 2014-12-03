@@ -832,7 +832,7 @@ class GdbCmd_Watch : public DebuggerCmd
 
                 } else {
                     // TODO (bluehazzard#1#): Use reference if sqrat supports it...
-                    m_Cmd = func.Evaluate<wxString>(type, symbol, m_watch->GetArrayStart(), m_watch->GetArrayCount());
+                    m_Cmd = *func.Evaluate<wxString>(type, symbol, m_watch->GetArrayStart(), m_watch->GetArrayCount()).Get();
                 }
                 wxString error = Manager::Get()->GetScriptingManager()->GetErrorString();
                 if(!error.IsEmpty())
@@ -852,7 +852,8 @@ class GdbCmd_Watch : public DebuggerCmd
                     // A error occured
 
                 } else {
-                    w << func.Evaluate<wxString>(output, m_watch->GetArrayStart());
+                    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+                    w << *func.Evaluate<wxString>(output, m_watch->GetArrayStart()).Get();
                 }
                 wxString error = Manager::Get()->GetScriptingManager()->GetErrorString();
                 if(!error.IsEmpty())
@@ -992,7 +993,8 @@ class GdbCmd_TooltipEvaluation : public DebuggerCmd
 
                 } else {
                     // TODO (bluehazzard#1#): Use reference if sqrat supports it...
-                    m_Cmd = func.Evaluate<wxString>(w_type, what, 0, 0);
+                    // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+                    m_Cmd = *func.Evaluate<wxString>(w_type, what, 0, 0).Get();
                 }
                 wxString error = Manager::Get()->GetScriptingManager()->GetErrorString();
                 if(!error.IsEmpty())
@@ -1019,7 +1021,8 @@ class GdbCmd_TooltipEvaluation : public DebuggerCmd
 
                     } else {
                         // TODO (bluehazzard#1#): Use reference if sqrat supports it...
-                        contents << func.Evaluate<wxString>(output, 0);
+                        // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
+                        contents << *func.Evaluate<wxString>(output, 0).Get();
                     }
                     wxString error = Manager::Get()->GetScriptingManager()->GetErrorString();
                     if(!error.IsEmpty())

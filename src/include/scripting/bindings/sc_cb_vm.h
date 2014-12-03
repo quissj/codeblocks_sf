@@ -295,7 +295,7 @@ public:
     template<typename RETURN_VALUE> RETURN_VALUE GetValue(int pos)
     {
         Sqrat::Var<RETURN_VALUE> val(m_vm,pos);
-        if(Sqrat::Error::Instance().Occurred(m_vm))
+        if(Sqrat::Error::Occurred(m_vm))
             throw CBScriptException(_("Script Error: GetValue<> failed\n"));   // FIXME (bluehazzard#1#): Is this a good solution?
         return val.value;
     }
@@ -307,7 +307,7 @@ public:
     template<typename INSTANCE_TYPE> INSTANCE_TYPE* GetInstance(int pos)
     {
         INSTANCE_TYPE* ret = Sqrat::ClassType<INSTANCE_TYPE>::GetInstance(m_vm, pos);
-        if(Sqrat::Error::Instance().Occurred(m_vm))
+        if(Sqrat::Error::Occurred(m_vm))
             throw CBScriptException(_("Script Error: GetInstance<> failed\n"));   // FIXME (bluehazzard#1#): Is this a good solution?
         return ret;
     }

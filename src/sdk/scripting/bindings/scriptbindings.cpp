@@ -359,7 +359,7 @@ namespace ScriptBindings
             {
                 i = sa.GetValue<SQInteger>(6);
             }
-            if(Sqrat::Error::Instance().Occurred(vm))
+            if(Sqrat::Error::Occurred(vm))
             {
                 return sa.ThrowError(_("Invalid arguments to \"cbProject::AddFile\""));
             }

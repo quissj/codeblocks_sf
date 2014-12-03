@@ -143,8 +143,9 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
     if (sa.GetParamCount() == 1)      //Empty constructor....
     {
         wxString* instance = new wxString();
-        sq_setinstanceup(vm, 1, instance);
-        sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
+        Sqrat::DefaultAllocator<wxString>::SetInstance(vm,1,instance);
+        //sq_setinstanceup(vm, 1, instance);
+        //sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
         return SC_RETURN_OK;
     }
     else if (sa.GetParamCount() == 2)     // 1 Parameter
@@ -152,27 +153,29 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
         // Lets check which type it is
         //copy Constructor?
         Sqrat::Var<const wxString&> copy(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             wxString* instance = new wxString(copy.value);
-            sq_setinstanceup(vm, 1, instance);
-            sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
+            Sqrat::DefaultAllocator<wxString>::SetInstance(vm,1,instance);
+            //sq_setinstanceup(vm, 1, instance);
+            //sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
             return SC_RETURN_OK;
         }
         // it was not the copy ctr
         // lets test if it is a squirrel string
-        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Error::Clear(vm);
         Sqrat::Var<SQChar*> char_arr(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             wxString* instance = new wxString(wxString::FromUTF8(char_arr.value));
-            sq_setinstanceup(vm, 1, instance);
-            sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
+            Sqrat::DefaultAllocator<wxString>::SetInstance(vm,1,instance);
+            //sq_setinstanceup(vm, 1, instance);
+            //sq_setreleasehook(vm, 1, &Sqrat::DefaultAllocator<wxString>::Delete);
             return SC_RETURN_OK;
         }
         // Wrong ctr parameter
-        Sqrat::Error::Instance().Clear(vm);
-        return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*")).c_str());
+        Sqrat::Error::Clear(vm);
+        return sa.ThrowError(Sqrat::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName() + _SC("|SQChar*")).c_str());
     }
     }
     catch(CBScriptException &e)
@@ -213,34 +216,34 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
 
         // Test if we add wxString
         Sqrat::Var<wxString> copy(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             ret.Append(copy.value);
             Sqrat::Var<wxString>::push(vm, ret);
             return SC_RETURN_VALUE;
         }
         // Test if we add squirrel string
-        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Error::Clear(vm);
         Sqrat::Var<SQChar*> char_arr(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             ret.Append(wxString::FromUTF8(char_arr.value));
             Sqrat::Var<wxString>::push(vm, ret);
             return SC_RETURN_VALUE;
         }
         // Test if we add a int (this probably will never happen, because squirrel transforms it to a string?)
-        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Error::Clear(vm);
         Sqrat::Var<SQInteger> int_val(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             ret.Append(wxString::Format(wxT("%d"),int_val.value));
             Sqrat::Var<wxString>::push(vm, ret);
             return SC_RETURN_VALUE;
         }
         // Test if we add a floating point number (this probably will never happen, because squirrel transforms it to a string?)
-        Sqrat::Error::Instance().Clear(vm);
+        Sqrat::Error::Clear(vm);
         Sqrat::Var<SQFloat> float_val(vm, 2);
-        if (!Sqrat::Error::Instance().Occurred(vm))
+        if (!Sqrat::Error::Occurred(vm))
         {
             ret.Append(wxString::Format(wxT("%f"),int_val.value));
             Sqrat::Var<wxString>::push(vm, ret);
@@ -248,7 +251,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         }
         // Wrong type of parameter
         wxString error_msg;
-        return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm) + _SC("|SQChar*|int|float")).c_str());
+        return sa.ThrowError(Sqrat::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName() + _SC("|SQChar*|int|float")).c_str());
     }
     }
     catch(CBScriptException &e)
@@ -282,15 +285,15 @@ static SQInteger wxString_OpCmp(HSQUIRRELVM vm)
         sa.ThrowError(_("wxString _cmp have no base"));
     }
     Sqrat::Var<const wxString&> str_val(vm, 2);
-    if (!Sqrat::Error::Instance().Occurred(vm))
+    if (!Sqrat::Error::Occurred(vm))
     {
         ret = lhs->CompareTo(str_val.value);
         Sqrat::Var<int>::push(vm, ret);
         return SC_RETURN_VALUE;
     }
-    Sqrat::Error::Instance().Clear(vm);
+    Sqrat::Error::Clear(vm);
     Sqrat::Var<SQChar*> char_arr(vm, 2);
-    if (!Sqrat::Error::Instance().Occurred(vm))
+    if (!Sqrat::Error::Occurred(vm))
     {
         ret = lhs->CompareTo(wxString::Format(wxT("%s"),char_arr.value));
         Sqrat::Var<int>::push(vm, ret);
@@ -323,17 +326,17 @@ static SQInteger wxString_Replace(HSQUIRRELVM vm)
     bool all = true;
     Sqrat::Var<wxString> old_str(vm,2);
     Sqrat::Var<wxString> new_str(vm,3);
-    if(Sqrat::Error::Instance().Occurred(vm))
+    if(Sqrat::Error::Occurred(vm))
     {
-        return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName(vm)).c_str());
+        return sa.ThrowError(Sqrat::FormatTypeError(vm, 2, Sqrat::ClassType<wxString>::ClassName()).c_str());
     }
 
     if(sa.GetParamCount() == 4)
     {
         Sqrat::Var<bool> all_val(vm,4);
-        if(Sqrat::Error::Instance().Occurred(vm))
+        if(Sqrat::Error::Occurred(vm))
         {
-            return sa.ThrowError(Sqrat::Error::FormatTypeError(vm, 2, _SC("bool")).c_str());
+            return sa.ThrowError(Sqrat::FormatTypeError(vm, 2, _SC("bool")).c_str());
         }
 
         all = all_val.value;
