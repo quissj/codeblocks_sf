@@ -80,9 +80,9 @@ namespace ScriptBindings
              *}
              * \endcode
              */
-            int PropertyToSqratTabel(wxPGProperty* prop,Sqrat::Table& table);
+            int PropertyToSqratTabel(wxPGProperty* prop,Sqrat::Table* table);
 
-            wxPGProperty* CreateEntry(Sqrat::Table entry,wxString name, wxString label, int type);
+            wxPGProperty* CreateEntry(Sqrat::Table &entry,wxString name, wxString label, int type);
             int AddChildren(Sqrat::Table table,wxPGProperty* parent);
             wxPropertyGrid* m_grid;
             HSQUIRRELVM m_vm;
