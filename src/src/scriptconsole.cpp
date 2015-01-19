@@ -215,10 +215,10 @@ void ScriptConsole::OnbtnLoadClick(cb_unused wxCommandEvent& event)
     {
         mgr->Write(_T("/file_dialogs/file_run_script/directory"), dlg.GetDirectory());
         if (Manager::Get()->GetScriptingManager()->LoadScript(dlg.GetPath()))
-            Log(_("Script loaded successfully\n"));
+            Log(_("\n*** Script loaded successfully ***\n"));
         else
         {
-            Error(_("Loading script failed.\n"));
+            Error(_("\n*** Loading script failed. ***\n"));
             Error(Manager::Get()->GetScriptingManager()->GetErrorString());
         }
     }
