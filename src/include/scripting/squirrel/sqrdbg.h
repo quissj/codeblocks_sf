@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#ifdef _WIN32
+/*#ifdef _WIN32
 #pragma comment(lib, "WSOCK32.LIB")
-#endif // _WIN32
+#endif // _WIN32*/
 
 struct SQDbgServer;
 typedef SQDbgServer* HSQREMOTEDBG;
