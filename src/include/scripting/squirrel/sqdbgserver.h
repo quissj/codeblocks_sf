@@ -10,10 +10,9 @@
 #include <vector>
 
 #ifdef _WIN32
-    #include <winsock.h>
     #include <Winsock2.h>
-    #include <ws2tcpip.h>
     #include <windows.h>
+    #include <WS2tcpip.h>
 #else
     #include <sys/types.h>
     #include <sys/socket.h>

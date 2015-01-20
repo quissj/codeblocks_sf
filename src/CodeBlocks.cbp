@@ -163,6 +163,7 @@
 					<Add library="sqstdlib" />
 					<Add library="squirrel" />
 					<Add library="gdi32" />
+					<Add library="WSOCK32" />
 					<Add directory="devel" />
 					<Add directory="sdk/scripting/lib" />
 					<Add directory="sdk/propgrid" />
@@ -3337,9 +3338,6 @@
 		<Unit filename="sdk/scripting/squirrel/sqdbgserver.cpp">
 			<Option target="Squirrel" />
 		</Unit>
-		<Unit filename="sdk/scripting/squirrel/sqdbgserver.h">
-			<Option target="Squirrel" />
-		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqdebug.cpp">
 			<Option target="Squirrel" />
 		</Unit>
@@ -3353,6 +3351,9 @@
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqobject.cpp">
+			<Option target="Squirrel" />
+		</Unit>
+		<Unit filename="sdk/scripting/squirrel/sqrdbg.cpp">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqstate.cpp">
