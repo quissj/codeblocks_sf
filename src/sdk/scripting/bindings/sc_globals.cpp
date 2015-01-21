@@ -40,11 +40,8 @@ namespace ScriptBindings
     void gShowMessageWarn(const wxString& msg){ cbMessageBox(msg, _("Script warning"), wxICON_WARNING | wxOK); }
     void gShowMessageError(const wxString& msg){ cbMessageBox(msg, _("Script error"), wxICON_ERROR | wxOK); }
     void gShowMessageInfo(const wxString& msg){ cbMessageBox(msg, _("Script information"), wxICON_INFORMATION | wxOK); }
-    //wxString gReplaceMacros(const wxString& buffer){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
-    //wxString gReplaceMacros(const wxString& buffer,bool subrequest){ return Manager::Get()->GetMacrosManager()->ReplaceMacros(buffer); }
 
 // FIXME (bluehazzard#1#): Fix the scripts, because replace macros only use one parameter, for compatibility this is implemented
-
     SQInteger gReplaceMacros(HSQUIRRELVM v)
     {
         StackHandler sa(v);
@@ -120,10 +117,11 @@ namespace ScriptBindings
     }
     int ConfigurePlugin(const wxString& pluginName)
     {
+        cbMessageBox(_("\"ConfigurePlugin\" does nothing. Please remove from your code"),_("Squirrel API information"),wxICON_INFORMATION|wxOK);
         return 0; /* leaving script binding intact for compatibility, but this is factually not implemented at all */
     }
     // locate and call a menu from string (e.g. "/Valgrind/Run Valgrind::MemCheck")
-    void CallMenu(const wxString& menuPath)
+    int CallMenu(const wxString& menuPath)
     {
         // this code is partially based on MenuItemsManager::CreateFromString()
         wxMenuBar* mbar = Manager::Get()->GetAppFrame()->GetMenuBar();
@@ -172,6 +170,7 @@ namespace ScriptBindings
                             wxString msg;
                             msg.Printf(_("Calling the menu '%s' with ID %d failed."), menuPath.wx_str(), id);
                             cbMessageBox(msg, _("Script error"), wxICON_WARNING);
+                            return -1;
                         }
                         #endif
                         // done
@@ -182,10 +181,11 @@ namespace ScriptBindings
                 if (existing != wxNOT_FOUND)
                     menu = menu->GetMenuItems()[existing]->GetSubMenu();
                 else
-                    break; // failed
+                    return -2; // failed
             }
             pos = nextPos; // prepare for next loop
         }
+        return 0;
     }
 
     void Include(const wxString& filename)
@@ -217,6 +217,7 @@ namespace ScriptBindings
 
     bool LoadResource(wxString& res)
     {
+        // Do not use this function. Use the function cncorporated in the wxDialog class, so resources can get unloaded when they are not needed anymore
         return Manager::LoadResource(res);
     }
 
@@ -234,9 +235,6 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("ShowWarning",gShowMessageWarn);
         Sqrat::RootTable(vm).Func("ShowError",  gShowMessageError);
         Sqrat::RootTable(vm).Func("ShowInfo",   gShowMessageInfo);
-        // TODO (bluehazzard#1#): Remove this. The ReplaceMacro function uses only one parameter
-        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString&)>("ReplaceMacros",gReplaceMacros);
-        //Sqrat::RootTable(vm).Overload<wxString (*) (const wxString& ,bool)>("ReplaceMacros",gReplaceMacros);
         Sqrat::RootTable(vm).SquirrelFunc("ReplaceMacros",gReplaceMacros);
 
         Sqrat::RootTable(vm).Func("GetProjectManager",  getPM);

@@ -254,7 +254,6 @@ private:
  *
  * This is almost only needed for the Error handler and will eventually removed...
  */
- // TODO (bluehazzard#1#): Why DLLIMPORT???
 class CBsquirrelVMManager : public Mgr<CBsquirrelVMManager>
 {
         friend class Mgr<CBsquirrelVMManager>;
