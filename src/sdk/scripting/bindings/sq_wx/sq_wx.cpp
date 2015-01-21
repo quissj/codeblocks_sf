@@ -12,9 +12,11 @@
 #include <scripting/bindings/sq_wx/sq_wx.h>
 #include <scripting/bindings/sc_binding_util.h>
 #include <wx/propgrid/xh_propgrid.h>
-#if wxCHECK_VERSION(2, 9, 0)
-    #include <wx/base64.h>
-#endif // wxCHECK_VERSION
+
+//#if wxCHECK_VERSION(2, 9, 0)
+//    #include <wx/base64.h>
+//#endif // wxCHECK_VERSION
+
 namespace ScriptBindings
 {
     // Is this the best practice????

@@ -108,6 +108,7 @@
 					<Add option="-DEXPORT_LIB" />
 					<Add option="-DEXPORT_EVENTS" />
 					<Add option="-DWXMAKINGDLL_SCI" />
+					<Add option="-DSCRAT_EXPORT" />
 					<Add directory="include" />
 					<Add directory="include/tinyxml" />
 					<Add directory="include/mozilla_chardet" />
@@ -313,6 +314,7 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
+					<Add option="-DSCRAT_IMPORT" />
 					<Add directory="include" />
 					<Add directory="plugins/compilergcc/depslib/src" />
 				</Compiler>
