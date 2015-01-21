@@ -16,10 +16,10 @@
     #include <configmanager.h>
     #include <logmanager.h>
     #include <wx/string.h>
+    #include <wx/xrc/xmlres.h>
+
     #include "scrollingdialog.h"
 #endif
-
-#include <wx/xrc/xmlres.h>
 
 #include "scripting/bindings/sq_wx/sq_wx.h"
 #include "scripting/bindings/sc_base_types.h"
@@ -83,6 +83,10 @@ namespace ScriptBindings
     int ShowDialog(const wxString& xrc, const wxString& dlgName, const wxString& callback)
     {
         wxString actual = ConfigManager::LocateDataFile(xrc, sdScriptsUser | sdScriptsGlobal);
+        cbMessageBox(_("This version of Squirrel XRC dialogs should not be used anymore. There is a new class called wxDialog what handles XRC dialogs and more..."),
+                     _("Squirrel API information"),
+                     wxICON_INFORMATION|wxOK);
+
 //        Manager::Get()->GetLogManager()->DebugLog(F(_T("Original parameter is: ") + xrc));
         Manager::Get()->GetLogManager()->DebugLog(_T("Loading XRC: ") + actual);
         if (wxXmlResource::Get()->Load(actual))

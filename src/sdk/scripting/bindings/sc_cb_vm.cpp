@@ -1,17 +1,18 @@
 
-
+#include <scripting/bindings/sc_cb_vm.h>
 #include <globals.h>
 #include <cbexception.h>
 #include <logmanager.h>
 #include <wx/msgdlg.h>
-#include <scripting/squirrel/squirrel.h>
+
 #include <scripting/bindings/sq_wx/sq_wx.h>
+
 #include <scripting/squirrel/sqstdblob.h>
 #include <scripting/squirrel/sqstdio.h>
 #include <scripting/squirrel/sqstdmath.h>
 #include <scripting/squirrel/sqstdsystem.h>
 #include <scripting/squirrel/sqstdstring.h>
-#include <scripting/bindings/sc_cb_vm.h>
+
 
 
 namespace ScriptBindings

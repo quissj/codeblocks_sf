@@ -17,7 +17,7 @@ namespace ScriptBindings
 {
 
 
-template <typename U> int GetValueFromTable(Sqrat::Table table,const SQChar* name,U& output,bool exe = false)
+template <typename U> int GetValueFromTable(Sqrat::Table table,const SQChar* name,U& output,bool exc = false)
 {
     if(!table.HasKey(name))
         return -1;
@@ -25,7 +25,7 @@ template <typename U> int GetValueFromTable(Sqrat::Table table,const SQChar* nam
     Sqrat::SharedPtr<U> ptr = table.GetValue<U>(name);
     if(ptr == nullptr)
     {
-        if(exe)
+        if(exc)
         {
             CBScriptException ex(wxString::Format(_("Could not Find Value with name: %s"),name) + wxString(_(" from table "))); //+ wxString::FromUTF8(table.getName()))
             throw ex;
