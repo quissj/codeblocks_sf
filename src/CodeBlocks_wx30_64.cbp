@@ -125,6 +125,7 @@
 					<Add option="-DEXPORT_LIB" />
 					<Add option="-DEXPORT_EVENTS" />
 					<Add option="-DWXMAKINGDLL_SCI" />
+					<Add option="-DSCRAT_EXPORT" />
 					<Add directory="include" />
 					<Add directory="include/tinyxml" />
 					<Add directory="include/mozilla_chardet" />
@@ -327,6 +328,7 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
+					<Add option="-DSCRAT_IMPORT" />
 					<Add directory="include" />
 					<Add directory="plugins/compilergcc/depslib/src" />
 				</Compiler>
@@ -3281,6 +3283,9 @@
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_dialog.cpp">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_propgrid.cpp">
+			<Option target="sdk" />
+		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_string.cpp">
 			<Option target="sdk" />
 		</Unit>
@@ -3372,6 +3377,9 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/workspaceloader.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/src/xh_propgrid.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/wxscintilla/include/wx/wxscintilla.h">

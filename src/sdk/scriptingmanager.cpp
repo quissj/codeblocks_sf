@@ -24,6 +24,7 @@
     #include <wx/file.h>
     #include <wx/filename.h>
     #include <wx/regex.h>
+    #include <wx/filesys.h>
 #endif
 
 #include "crc32.h"
