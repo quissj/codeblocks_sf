@@ -21,6 +21,7 @@
     #include <globals.h>
     #include <printing_types.h>
     #include <settings.h>
+    #include <scriptingmanager.h>
 #endif
 
 #include <filefilters.h>

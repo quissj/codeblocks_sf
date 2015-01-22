@@ -22,6 +22,10 @@
 #include <scripting/sqrat/sqratUtil.h>
 #include <scripting/bindings/sc_plugin.h>
 
+#define SCRIPT_BINDING_VERSION_MAJOR 2
+#define SCRIPT_BINDING_VERSION_MINOR 0
+#define SCRIPT_BINDING_VERSION_RELEASE 0
+
 namespace ScriptBindings
 {
     class cbScriptPlugin;

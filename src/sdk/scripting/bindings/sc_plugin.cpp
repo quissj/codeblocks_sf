@@ -9,16 +9,22 @@
 
 #include <sdk_precomp.h>
 #include "scripting/bindings/sc_plugin.h"
-#include <manager.h>
-#include <scriptingmanager.h>
-#include <wx/menu.h>
-#include <scripting/bindings/sq_wx/sq_wx_dialog.h>
-#include <wx/fs_mem.h>
 
+#ifndef CB_PRECOMP
+    #include <manager.h>
+    #include <wx/menu.h>
+    #include <scriptingmanager.h>
+#endif
+
+#include <wx/fs_mem.h>
+#include <scripting/bindings/sq_wx/sq_wx_dialog.h>
 #include <map>
+
+
 
 namespace ScriptBindings
 {
+
 
 SQInteger CreateWxDialog(HSQUIRRELVM vm)
 {
