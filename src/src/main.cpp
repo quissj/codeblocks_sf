@@ -1041,6 +1041,11 @@ void MainFrame::CreateMenubar()
         }
     }
 
+    for(unsigned int i = 0; i < Manager::Get()->GetScriptingManager()->GetPluginCount();++i)
+    {
+        Manager::Get()->GetScriptingManager()->GetPlugin(i)->CreateMenus();
+    }
+
     Manager::Get()->GetToolsManager()->BuildToolsMenu(m_ToolsMenu);
 
     // Ctrl+Tab workaround for non windows platforms:

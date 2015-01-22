@@ -213,6 +213,11 @@ int cbScriptPlugin::CreateMenus()
 
     if (menu_arr.GetCount())
     {
+        // Clean up the old Menues
+        m_menu_to_idx_map.clear();
+        m_menu_manager.Clear();
+
+        // create the new one
         if(m_AttachedToMainWindow == false)
         {
             Manager::Get()->GetAppWindow()->PushEventHandler(this);
