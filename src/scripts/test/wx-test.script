@@ -14,7 +14,7 @@ class wxTest extends script_test_base
         test_wxpoint();
         test_wxsize();
         test_dialogs();
-	test_bas64();
+        test_bas64();
         print_global_test_result();
     }
 
@@ -27,6 +27,8 @@ class wxTest extends script_test_base
         test_string("test_string","hello","nope");
 
         print_test_result();
+        AddGlobalPassed(1);
+        AddGlobalFailed(-1);
         ::print("======= Test Test environment END ======= \n");
     }
 

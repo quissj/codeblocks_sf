@@ -8,6 +8,23 @@ local global_made_tests = 0;
 local global_passed_tests = 0;
 local global_failed_tests = 0;
 
+function AddGlobalPassed(count)
+{
+    global_passed_tests += count;
+}
+
+function AddGlobalFailed(count)
+{
+    global_failed_tests += count;
+}
+
+function ResetGlobalTests()
+{
+    global_made_tests = 0;
+    global_passed_tests = 0;
+    global_failed_tests = 0;
+}
+
 class script_test_base
 {
     function Run()
