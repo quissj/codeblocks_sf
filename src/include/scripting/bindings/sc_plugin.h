@@ -6,21 +6,25 @@
 #ifndef SC_PLUGIN_H
 #define SC_PLUGIN_H
 
-#include "sc_base_types.h"
-//#include
+//#include "sc_base_types.h"
+
 #include <wx/dynarray.h>
 #include <wx/event.h>
 #include <deque>
 #include <scripting/squirrel/squirrel.h>
-//#include <scripting/bindings/sq_wx/sq_wx_base_controls.h>
+#include <scripting/sqrat.h>
+#include <scripting/bindings/sc_cb_vm.h>
 
-#define SCRIPT_BINDING_VERSION_MAJOR 2
-#define SCRIPT_BINDING_VERSION_MINOR 0
-#define SCRIPT_BINDING_VERSION_RELEASE 0
+#ifndef CB_PRECOMP
+    #include "pluginmanager.h"
+    #include "menuitemsmanager.h"
+#endif // CB_PRECOMP
+
+
 
 class FileTreeData;
 class wxMenu;
-class sq_wxDialog;
+//class sq_wxDialog;
 
 namespace ScriptBindings
 {

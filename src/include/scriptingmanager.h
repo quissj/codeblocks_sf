@@ -24,6 +24,10 @@
 #include "scripting/squirrel/sqrdbg.h"
 #include "scripting/squirrel/sqdbgserver.h"
 
+#define SCRIPT_BINDING_VERSION_MAJOR 2
+#define SCRIPT_BINDING_VERSION_MINOR 0
+#define SCRIPT_BINDING_VERSION_RELEASE 0
+
 namespace ScriptBindings
 {
     class cbScriptPlugin;
