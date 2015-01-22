@@ -700,7 +700,14 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     //**************************************************************************************************************/
     // wxWindow
     //**************************************************************************************************************/
+#if wxCHECK_VERSION(2, 9, 0)
+    Sqrat::Class<wxWindowBase,Sqrat::NoConstructor<wxWindowBase> > bwxWindowBase(vm,"wxWindowBase");
+    Sqrat::RootTable(vm).Bind(_SC("wxWindowBase"),bwxWindowBase);
+
+    Sqrat::DerivedClass<wxWindow,wxWindowBase,Sqrat::NoConstructor<wxWindow> > bwxWindow(vm,"wxWindow");
+#else
     Sqrat::Class<wxWindow,Sqrat::NoConstructor<wxWindow> > bwxWindow(vm,"wxWindow");
+#endif // wxCHECK_VERSION
     bwxWindow.Func("GetLabel",&wxWindow::GetLabel)
     .Func("SetLabel",&wxWindow::SetLabel)
     .Func("SetAutoLayout",&wxWindow::SetAutoLayout)

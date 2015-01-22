@@ -52,6 +52,22 @@ namespace ScriptBindings
         }
     }
 
+    SQInteger sc_wxLongLong_tostring(HSQUIRRELVM vm)
+    {
+        StackHandler sa(vm);
+        if(sa.GetParamCount() < 1)
+            return sa.ThrowError(_("wxLongLong::_tostring() wrong number of parameter"));
+        try
+        {
+            wxLongLong* inst = sa.GetInstance<wxLongLong>(1);
+            sa.PushValue(inst->ToString().ToUTF8().data());
+            return SC_RETURN_VALUE;
+        } catch (CBScriptException &e)
+        {
+            return sa.ThrowError(_("wxLongLong::_tostring()")+ e.Message());
+        }
+    }
+
     /** \brief Bind wx Types (wxString,wxIntArray etc.) to the vm
      *
      * \param vm HSQUIRRELVM A Squirrel vm to witch wx is bound
@@ -85,6 +101,18 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).SquirrelFunc("wxBase64Decode",sc_wxBase64Decode);
 
         Sqrat::RootTable(vm).Func("wxLaunchDefaultBrowser",wxLaunchDefaultBrowser);
+
+        #if wxCHECK_VERSION(3,0,0)  // Don't know if this is needed also in 2.9
+
+        Sqrat::Class<wxLongLongNative> wx_longlong(vm,"wxLongLongNative");
+        wx_longlong.Func("ToLong",&wxLongLongNative::ToLong);
+        wx_longlong.Func("ToDouble",&wxLongLongNative::ToDouble);
+        wx_longlong.Func("GetHi",&wxLongLongNative::GetHi);
+        wx_longlong.Func("GetLo",&wxLongLongNative::GetLo);
+        wx_longlong.Func("ToString",&wxLongLongNative::ToString);
+        wx_longlong.SquirrelFunc("_tostring",&sc_wxLongLong_tostring);
+        Sqrat::RootTable(vm).Bind("wxLongLongNative",wx_longlong);
+        #endif // wxCHECK_VERSION
 
     }
 }
