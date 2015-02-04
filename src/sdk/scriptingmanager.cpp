@@ -210,7 +210,7 @@ bool ScriptingManager::LoadScript(const wxString& filename)
     wxString contents = cbReadFileContents(f);
     m_CurrentlyRunningScriptFile = fname;
     bool ret = LoadBuffer(contents, fname,true);
-    m_CurrentlyRunningScriptFile.Clear();
+    //m_CurrentlyRunningScriptFile.Clear(); // I'm not 100% sure if this is the correct approach to search for local scripts (and if we want to allow local scripts)
     return ret;
 }
 

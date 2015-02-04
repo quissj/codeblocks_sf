@@ -50,6 +50,7 @@ struct Var<N> {                                                     \
 }
 
 DEFINE_SQRAT_ENUM(TemplateOutputType);
+DEFINE_SQRAT_ENUM(FileType);
 DEFINE_SQRAT_ENUM(SearchDirs);
 DEFINE_SQRAT_ENUM(SupportedPlatforms);
 DEFINE_SQRAT_ENUM(TargetFilenameGenerationPolicy);

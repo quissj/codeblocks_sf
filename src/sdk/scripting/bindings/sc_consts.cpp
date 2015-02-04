@@ -154,6 +154,31 @@ namespace ScriptBindings
         BIND_INT_CONSTANT(mtOpenFilesList);
         BIND_INT_CONSTANT(mtUnknown);
 
+        // File Type
+        BIND_INT_CONSTANT(ftCodeBlocksProject);
+        BIND_INT_CONSTANT(ftCodeBlocksWorkspace);
+        BIND_INT_CONSTANT(ftDevCppProject);
+        BIND_INT_CONSTANT(ftMSVC6Project);
+        BIND_INT_CONSTANT(ftMSVC7Project);
+        BIND_INT_CONSTANT(ftMSVC10Project);
+        BIND_INT_CONSTANT(ftMSVC6Workspace);
+        BIND_INT_CONSTANT( ftMSVC7Workspace);
+        BIND_INT_CONSTANT(ftXcode1Project);
+        BIND_INT_CONSTANT(ftXcode2Project);
+        BIND_INT_CONSTANT(ftSource);
+        BIND_INT_CONSTANT(ftHeader);
+        BIND_INT_CONSTANT(ftObject);
+        BIND_INT_CONSTANT(ftXRCResource);
+        BIND_INT_CONSTANT(ftResource);
+        BIND_INT_CONSTANT(ftResourceBin);
+        BIND_INT_CONSTANT(ftStaticLib);
+        BIND_INT_CONSTANT(ftDynamicLib);
+        BIND_INT_CONSTANT(ftExecutable);
+        BIND_INT_CONSTANT(ftNative);
+        BIND_INT_CONSTANT(ftXMLDocument);
+        BIND_INT_CONSTANT(ftScript);
+        BIND_INT_CONSTANT(ftOther);
+
         // FileTreeDataKind
         BIND_INT_CONSTANT_NAMED(FileTreeData::ftdkUndefined, "ftdkUndefined");
         BIND_INT_CONSTANT_NAMED(FileTreeData::ftdkProject, "ftdkProject");

@@ -10,7 +10,8 @@
 
 // Script plugins must extend cbScriptPlugin
 
-Include(_("wx-test.script"));
+Include("wx-test.script");
+Include("cb-test.script");
 
 class Scripting_TestPlugin extends cbScriptPlugin
 {
@@ -68,6 +69,8 @@ class Scripting_TestPlugin extends cbScriptPlugin
         ResetGlobalTests();
         local wx = wxTest();
         wx.Run();
+        local cb = cbTest_class();
+        cb.Run();
     }
 }
 

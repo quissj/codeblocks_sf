@@ -111,10 +111,12 @@ namespace ScriptBindings
         }
         return Manager::Get()->GetPluginManager()->InstallPlugin(pluginName, allUsers, confirm);
     }
+
     int ExecutePlugin(const wxString& pluginName)
     {
         return Manager::Get()->GetPluginManager()->ExecutePlugin(pluginName);
     }
+
     int ConfigurePlugin(const wxString& pluginName)
     {
         cbMessageBox(_("\"ConfigurePlugin\" does nothing. Please remove from your code"),_("Squirrel API information"),wxICON_INFORMATION|wxOK);
@@ -235,6 +237,7 @@ namespace ScriptBindings
         Sqrat::RootTable(vm).Func("ShowWarning",gShowMessageWarn);
         Sqrat::RootTable(vm).Func("ShowError",  gShowMessageError);
         Sqrat::RootTable(vm).Func("ShowInfo",   gShowMessageInfo);
+
         Sqrat::RootTable(vm).SquirrelFunc("ReplaceMacros",gReplaceMacros);
 
         Sqrat::RootTable(vm).Func("GetProjectManager",  getPM);

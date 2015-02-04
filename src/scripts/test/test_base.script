@@ -7,10 +7,16 @@ local sa = wxStopWatch();
 local global_made_tests = 0;
 local global_passed_tests = 0;
 local global_failed_tests = 0;
+local current_teat_name = "none";
 
 function AddGlobalPassed(count)
 {
     global_passed_tests += count;
+}
+
+function GetGlobalFailedTests()
+{
+    return global_failed_tests;
 }
 
 function AddGlobalFailed(count)
@@ -32,6 +38,31 @@ class script_test_base
 
     }
 
+    function get_padded_string(text,length = 40,fill_char = "=")
+    {
+        local ret = "";
+        ret += "====== " + text + " ";
+        local fill = length - ret.len();
+        for(local i = 0; i < fill;i++)
+            ret += fill_char;
+        return ret;
+    }
+
+    function begin_test(name)
+    {
+
+        ::print(get_padded_string(name + " BEGINN") + "\n");
+        clear_test_result();
+        current_teat_name = name;
+    }
+
+    function end_test()
+    {
+        print_test_result();
+        ::print(get_padded_string(current_teat_name + " END") + "\n");
+        current_teat_name = "none";
+    }
+
     function format_output(name, result)
     {
         local name_length = name.len();
@@ -44,7 +75,7 @@ class script_test_base
         if(free_space < 0)
             free_space = 4;
 
-        needed_tabs = free_space; //% 8;
+        needed_tabs = free_space;
         local output = "Test: " + name;
         local i = 0;
         for(;i<needed_tabs;i++)
@@ -189,28 +220,17 @@ class script_test_base
         return false;
     }
 
-    /*function test_string(name,to_test,result)
-    {
-        ::print("hall");
-        made_tests++;
-        if(to_test.tostring() == result.tostring())
-        {
-            passed_tests++;
-            ::print("Test: "+name+"\t\t:PASSED\n");
-        } else {
-            failed_tests++;
-            ::error("Test: "+name+"\t\t:FAILED\n");
-        }
-    }*/
-
     function test_string(name,to_test,result)
     {
         made_tests++;
         global_made_tests++;
-        // some workaround for some wired errors, this has to be tracked down
-        local tmp_string = to_test + " ";
+
+        local tmp_string = "";
+        if(typeof to_test == "string")
+           tmp_string = to_test;
+        else
+           tmp_string = to_test.tostring();
         local i = 0;
-        result += " ";
         for(i=0; i < tmp_string.len() && i < result.len();i++)
         {
             if(tmp_string[i] != result[i])
