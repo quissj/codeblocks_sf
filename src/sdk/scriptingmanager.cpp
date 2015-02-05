@@ -248,6 +248,10 @@ bool ScriptingManager::LoadBuffer(const wxString& buffer,wxString debugName,bool
         }
     }
 
+    // Make sure that the directory has a valid name (don't mix slash and backslash)
+    wxFileName tmp_name(debugName);
+    debugName = tmp_name.GetFullPath();
+
     if(m_rdbg)
         m_rdbg->InformNewFileLoaded(m_vm->GetVM(),debugName.ToUTF8().data());
 
