@@ -52,9 +52,11 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         if (index == 0)
         {
+			print("**** Start Test Dialog *********\n");
             StartTest();
         } else if (index == 1)
         {
+			print("**** Start Test Property Grid *********\n");
             StartPropgrid(true);
         }
 
@@ -242,7 +244,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         if(load_file)
         {
-            local path_to_xrc = ::wxGetFileFromUser("Pleas select the XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
+            local path_to_xrc = ::wxGetFileFromUser("Pleas select the property grid XRC test file to be loaded ","XRC test file"," ","*.xml;*.xrc",wxFD_OPEN|wxFD_FILE_MUST_EXIST).Item(0);
 
             dialog = CreateWxDialog(this);
             local retcode = dialog.LoadFromXRCFile(path_to_xrc,"test_dialog")
@@ -276,11 +278,11 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             }
         }
 
-        if(PropgridHandler.Populate(table) < 0)
-	{
-	    print("Could not populate the property grid\nTry to throw an error...\n");
-	    throw "error";
- 	}
+		if(PropgridHandler.Populate(table) < 0)
+		{
+			print("Could not populate the property grid\nTry to throw an error...\n");
+			throw "error";
+		}
 
         if(load_file)
             dialog.Show(true);
@@ -324,7 +326,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
             dialog.RegisterEventHandler(wxEVT_COMMAND_DIRPICKER_CHANGED,XRCID("m_dirPicker1"),this,"OnFilePicker");
             dialog.RegisterEventHandler(wxEVT_COMMAND_SPINCTRL_UPDATED,XRCID("m_spinCtrl1"),this,"OnSpinCtrl");
 
-            StartPropgrid(false);
+            //StartPropgrid(false);
 
             local timer = dialog.CreateTimer();
 
@@ -334,7 +336,7 @@ class user_dialog_test_Plugin extends cbScriptPlugin
         }
 
         local retcode = dialog.Show(true);
-	dialog.Maximize(true);
+		dialog.Maximize(true);
         print("dialog exited with " + retcode);
 
     };

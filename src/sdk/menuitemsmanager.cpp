@@ -134,6 +134,7 @@ int MenuItemsManager::CreateFromString(const wxString& menuPath, int id)
 {
     wxMenuBar* mbar = Manager::Get()->GetAppFrame()->GetMenuBar();
     wxMenu* menu = nullptr;
+
     wxArrayString path = wxStringTokenize(menuPath,wxT("/"),wxTOKEN_STRTOK);
 
     if(path.IsEmpty())
@@ -144,6 +145,10 @@ int MenuItemsManager::CreateFromString(const wxString& menuPath, int id)
         wxString current = path[i];
         bool insert = false;
         unsigned long insertIndex = 0;
+
+        bool isLast = false;
+        if(i == path.GetCount() -1)
+            isLast = true;
 
         if(reInsert.Matches(current))
         {
@@ -196,14 +201,14 @@ int MenuItemsManager::CreateFromString(const wxString& menuPath, int id)
                         menu = existingMenu;
                     else
 					{
-						Manager::Get()->GetLogManager()->LogError(T("item->GetSubMenu() == nullptr"));
+						Manager::Get()->GetLogManager()->LogError(_("item->GetSubMenu() == nullptr"));
                         return 0;
 					}
                 }
                 else
 				{
 					//FIXME: Report error
-					Manager::Get()->GetLogManager()->LogError(T("MenuItemsManager::CreateFromString: menu->FindChildItem(existingID) == nullptr"));
+					Manager::Get()->GetLogManager()->LogError(_("MenuItemsManager::CreateFromString: menu->FindChildItem(existingID) == nullptr"));
                     return 0;
 				}
             }

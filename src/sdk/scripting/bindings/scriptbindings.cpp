@@ -1005,7 +1005,7 @@ namespace ScriptBindings
                 SquirrelFunc("GetCompilerIndex",        &CompilerFactory_GetCompilerIndex).
                 StaticFunc("GetDefaultCompilerID",      &CompilerFactory::GetDefaultCompilerID).
                 StaticFunc("GetCompilerVersionString",  &CompilerFactory::GetCompilerVersionString).
-                StaticFunc<CF_INHERITSFROM>("CompilerInheritsFrom",&CompilerFactory::CompilerInheritsFrom);
+                StaticFunc<CF_INHERITSFROM>("CompilerInheritsFrom",&CompilerFactory::CompilerInheritsFrom).
                 StaticFunc("GetCompilerIDByName",CompilerFactory_GetCompilerIDByName);
         Sqrat::RootTable(vm).Bind("CompilerFactory",compiler_factory);
 
