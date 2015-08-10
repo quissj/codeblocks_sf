@@ -71,7 +71,7 @@ class ScriptingTestPlugin extends cbScriptPlugin
     {
         ::ShowMessage(_T("Start the Test"));
 		dialog = CreateWxDialog(this);
-		if(LoadResource("ScriptingTestPlugin.zip") == false)
+		if(LoadResource(this,"ScriptingTestPlugin.zip") == false)
 		{
 			error("Could not load resource \"ScriptingTestPlugin.zip\" ");
 			return;
