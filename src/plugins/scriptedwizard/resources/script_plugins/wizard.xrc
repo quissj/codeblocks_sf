@@ -148,6 +148,14 @@
 						<border>8</border>
 					</object>
 					<object class="sizeritem">
+						<object class="wxCheckBox" name="chkUseDialogInstall">
+							<label>Use dialogs in install script</label>
+							<tooltip>Check if you want to use dialoges in the install script</tooltip>
+						</object>
+						<flag>wxBOTTOM|wxLEFT|wxRIGHT</flag>
+						<border>8</border>
+					</object>
+					<object class="sizeritem">
 						<object class="wxCheckBox" name="chkHasConfig">
 							<label>Provides configuration dialog</label>
 							<enabled>0</enabled>

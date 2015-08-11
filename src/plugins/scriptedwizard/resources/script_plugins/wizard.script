@@ -13,10 +13,13 @@ PluginSettings <- {
     Script_SDK_Version = _T("")
 
     HasInstallScript = false
+    UseDialogInInstallScript = false
     HasConfig = false // Not supported at the moment
     HasMenu = false
     HasModuleMenu = false
     HasToolbar = false // Not supported at the moment
+
+    InstallScriptName = _T("install_script.script")
 }
 
 
@@ -31,7 +34,7 @@ function BeginWizard()
     if (PLATFORM == PLATFORM_MSW)
     {
         intro_msg += _T("You must also have defined following global variables:\n" +
-                        "   1. $(#cb) pointing to Code::Blocks base dir (where CodeBlocks.cbp is)\n" +
+                        "   1. $(#cb) pointing to Code::Blocks base dir (where CodeBlocks.cbp is)\n"
                        );
     }
     intro_msg += _T("When you 're ready to proceed, please click \"Next\"...");
@@ -77,6 +80,7 @@ function OnLeave_PluginOptions(fwd)
         PluginSettings.HasModuleMenu = Wizard.IsCheckboxChecked(_T("chkHasModuleMenu"));
         PluginSettings.HasToolbar = Wizard.IsCheckboxChecked(_T("chkHasToolbar"));
         PluginSettings.HasInstallScript = Wizard.IsCheckboxChecked(_T("chkHasInstallScript"));
+        PluginSettings.UseDialogInInstallScript = Wizard.IsCheckboxChecked(_T("chkUseDialogInstall"));
 
         // check that essentials were filled in
         if (PluginSettings.Name.IsEmpty())
@@ -181,7 +185,7 @@ function GetGeneratedFile(file_index)
         case 3:
         {
             if(PluginSettings.HasInstallScript == true)
-                return _T("install_script") + _T(".nut") + _T(";") + GenerateInstallScript();
+                return PluginSettings.InstallScriptName + _T(";") + GenerateInstallScript();
         }
     }
     return _T(""); // no more generated files
@@ -191,29 +195,35 @@ function GetGeneratedFile(file_index)
 // setup the project options
 function SetupProject(project)
 {
-    local target = project.GetBuildTarget(_T("default"));
+    local target = project.GetBuildTarget(_T("create_plugin"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("default"));
+        target = project.AddBuildTarget(_T("create_plugin"));
+
+    SetupTarget(target, false);
+
+    target = project.GetBuildTarget(_T("test_plugin"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("test_plugin"));
+
     SetupTarget(target, true);
 
     return true;
 }
 
-function SetupTarget(target,is_debug)
+function SetupTarget(target,runable)
 {
     if (IsNull(target))
         return false;
 
     // We have only command targets, because we have nothing to build, it is a script ;-)
-
     target.SetTargetType(ttCommandsOnly);
-    target.SetOutputFilename(PluginSettings.Name);
+    target.SetOutputFilename(PluginSettings.Name + _T(".splugin"));
     target.SetCreateDefFile(false);
     target.SetCreateStaticLib(false);
 
+
     if (PLATFORM == PLATFORM_MSW)
     {
-
         target.SetHostApplication(_T("$(#cb)\\devel\\codeblocks") + DOT_EXT_EXECUTABLE);
     }
     else
@@ -224,13 +234,12 @@ function SetupTarget(target,is_debug)
     // create plugin resources
     target.AddCommandsAfterBuild(_T("zip -j9 ") +
                                 PluginSettings.Name + _T(".zip manifest") + DOT_EXT_XML);
+    target.AddCommandsAfterBuild(_T("zip -j9 ") +
+                                PluginSettings.Name + _T(".zip install") + DOT_EXT_XML);
     // create plugin distribution file
     target.AddCommandsAfterBuild(_T("zip -j9 ") + PluginSettings.Name + _T(".cbplugin ") +
                                 target.GetOutputFilename() + _T(" ") +
                                 PluginSettings.Name + _T(".zip"));
-
-    if (is_debug)
-        DebugSymbolsOn(target, Wizard.GetCompilerID());
 
     return true;
 }
@@ -243,30 +252,11 @@ function SetupTarget(target,is_debug)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
-// -----------------------------------------------------------------------------
-// return the header contents string
-function GenerateHeader()
-{
-    local path = Wizard.FindTemplateFile(GetTemplateFile(DOT_EXT_H));
-    local buffer = IO.ReadFileContents(path);
-
-    // create header guard word
-    local guard = PluginSettings.Name + DOT_EXT_H + _T("_INCLUDED");
-    guard.MakeUpper();
-    guard.Replace(_T(" "), _T("_"));
-    guard.Replace(_T("."), _T("_"));
-    buffer.Replace(_T("[GUARD_WORD]"), guard);
-
-    return SubstituteMacros(buffer);
-}
-
 // -----------------------------------------------------------------------------
 // return the implementation contents string
 function GenerateSource()
 {
-    local path = Wizard.FindTemplateFile(GetTemplateFile(DOT_EXT_CPP));
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/script_plugin_src_temp.splugin"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -283,24 +273,21 @@ function GenerateManifest()
 }
 
 // -----------------------------------------------------------------------------
-// return the template's filename, appending <dot_ext> as an extension (must include the dot)
-function GetTemplateFile(dot_ext)
+// return the install xml contents string
+function GenerateInstall()
 {
-    local template_file = _T("");
-    switch (PluginSettings.Type)
-    {
-        // generic plugin
-        case 0: template_file = _T("plugins/templates/generic_template") + dot_ext; break;
-        // tool plugin
-        case 1: template_file = _T("plugins/templates/tool_template") + dot_ext; break;
-        // mime plugin
-        case 2: template_file = _T("plugins/templates/mime_template") + dot_ext; break;
-        // wizard plugin
-        case 3: template_file = _T("plugins/templates/wizard_template") + dot_ext; break;
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_template.xml"));
+    local buffer = IO.ReadFileContents(path);
 
-        default: break; // error
-    }
-    return template_file;
+    return SubstituteMacros(buffer);
+}
+
+function GenerateInstallScript()
+{
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_script_template.script"));
+    local buffer = IO.ReadFileContents(path);
+
+    return SubstituteMacros(buffer);
 }
 
 // -----------------------------------------------------------------------------
@@ -308,13 +295,12 @@ function GetTemplateFile(dot_ext)
 function SubstituteMacros(buffer)
 {
     // handle [IF] / [ENDIF] pairs
-    buffer = HandleDirective(buffer, _T("HAS_CONFIGURE"), PluginSettings.HasConfig);
+    //buffer = HandleDirective(buffer, _T("HAS_CONFIGURE"), PluginSettings.HasConfig);
     buffer = HandleDirective(buffer, _T("HAS_MENU"), PluginSettings.HasMenu);
     buffer = HandleDirective(buffer, _T("HAS_MODULE_MENU"), PluginSettings.HasModuleMenu);
-    buffer = HandleDirective(buffer, _T("HAS_TOOLBAR"), PluginSettings.HasToolbar);
-    buffer = HandleDirective(buffer, _T("NEED_EVENTS"), PluginSettings.HasMenu ||
-                                                        PluginSettings.HasModuleMenu ||
-                                                        PluginSettings.HasToolbar);
+    //buffer = HandleDirective(buffer, _T("HAS_TOOLBAR"), PluginSettings.HasToolbar);
+    buffer = HandleDirective(buffer, _T("HAS_INSTALL_SCRIPT"), PluginSettings.HasInstallScript);
+    buffer = HandleDirective(buffer, _T("HAS_DIALOG_INSTALL_SCRIPT"), PluginSettings.UseDialogInInstallScript);
 
     // macros substitution
     buffer.Replace(_T("[PLUGIN_SDK_VERSION_MAJOR]"), _T("") + PLUGIN_SDK_VERSION_MAJOR);
@@ -331,6 +317,7 @@ function SubstituteMacros(buffer)
     buffer.Replace(_T("[THANKS_TO]"), PluginSettings.ThanksTo);
     buffer.Replace(_T("[HEADER_FILENAME]"), PluginSettings.Name + DOT_EXT_H);
     buffer.Replace(_T("[NOW]"), ReplaceMacros(_T("$(TODAY)"), false));
+    buffer.Replace(_T("[INSTALL_SCRIPT_NAME]"),PluginSettings.InstallScriptName);
 
     return buffer;
 }

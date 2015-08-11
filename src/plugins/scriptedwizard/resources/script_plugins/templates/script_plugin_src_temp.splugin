@@ -1,0 +1,73 @@
+
+/*
+ * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ *
+ * $Revision$
+ * $Id$
+ * $HeadURL$
+ */
+
+// Script plugins must extend cbScriptPlugin
+
+class [PLUGIN_NAME] extends cbScriptPlugin
+{
+    // mandatory to setup the plugin's info
+    constructor()
+    {
+        info = PluginInfo();
+
+        info.name = _T("[PLUGIN_NAME]");
+        info.title = _T("[PLUGIN_TITLE]");
+        info.version = _T("[PLUGIN_VERSION]");
+        info.license = _T("GPL");
+    }
+	
+	[IF HAS_MENU]
+    // optional to create menubar items
+    function GetMenu()
+    {
+        local entries = ::wxArrayString();
+        return entries;
+    }
+	[ENDIF HAS_MENU]
+	[IF HAS_MODULE_MENU]
+    // optional to create context menu entries
+    function GetModuleMenu(who, data)
+    {
+
+    }
+	[ENDIF HAS_MODULE_MENU]
+    // optional to support ExecutePlugin(pluginNameString)
+    function Execute()
+    {
+        
+        return 0;
+    }
+	[IF HAS_MENU]
+    // optional calback for menubar items clicking
+    function OnMenuClicked(index)
+    {
+       /* if (index == 0)
+        {
+            
+        } else if (index == 1)
+        {
+           
+        }*/
+    }
+	[ENDIF HAS_MENU]
+	[IF HAS_MODULE_MENU]
+    // optional calback for context menu items clicking
+    function OnModuleMenuClicked(index)
+    {
+
+    }
+	[ENDIF HAS_MODULE_MENU]
+}
+ 
+// this call actually registers the script plugin with Code::Blocks
+RegisterPlugin([PLUGIN_NAME]());
+
+// if you want to call this plugin's Execute() function, use this in a script:
+// ExecutePlugin(_T("[PLUGIN_NAME]"));

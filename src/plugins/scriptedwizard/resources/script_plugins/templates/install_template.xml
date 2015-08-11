@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone=no>
+<CodeBlocks_plugin_install_file>
+	<Plugin type="SCRIPT" name="[PLUGIN_NAME]" version_major=[PLUGIN_SDK_VERSION_MAJOR] version_minor=[PLUGIN_SDK_VERSION_MINOR]>
+	[IF HAS_INSTALL_SCRIPT]
+		<install_script file="[INSTALL_SCRIPT_NAME]">
+                </install_script>
+	[ENDIF HAS_INSTALL_SCRIPT]
+	</Plugin>
+</CodeBlocks_plugin_install_file>
+

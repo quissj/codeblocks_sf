@@ -1,3 +1,3 @@
 pkgdatadir = $(datadir)/@PACKAGE@/templates/wizard/plugins/templates
 
-dist_pkgdata_DATA = $(srcdir)/*.cpp $(srcdir)/*.h $(srcdir)/*.xml
+dist_pkgdata_DATA = $(srcdir)/*.splugin $(srcdir)/*.xrc $(srcdir)/*.xml
