@@ -45,6 +45,45 @@ struct Var<wxString> {
 };
 
 template<>
+struct Var<const wxString> {
+    wxString value;
+    Var(HSQUIRRELVM v, SQInteger idx) {
+        if (!Sqrat::Error::Occurred(v)) {
+            wxString* ptr = ClassType<wxString>::GetInstance(v, idx);
+            if (ptr != NULL) {
+                value = *ptr;
+            } else {
+                Sqrat::Error::Clear(v);
+                switch(sq_gettype(v,idx))
+                {
+                case OT_INTEGER:    // It is a const char ''
+                    {
+                        SQInteger val;
+                        sq_getinteger(v,idx,&val);
+                        value.Printf(wxT("%c"),static_cast<char>(val));
+                        break;
+                    }
+                default:
+                    {
+                        const SQChar* str;
+                        sq_tostring(v, idx);
+                        sq_getstring(v, -1, &str);
+                        value = wxString::FromUTF8(str);
+                        sq_pop(v, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    static void push(HSQUIRRELVM v, const wxString value) {
+        ClassType<wxString>::PushInstanceCopy(v, value);
+    }
+};
+
+
+template<>
 struct Var<wxString&> {
 
     wxString value;

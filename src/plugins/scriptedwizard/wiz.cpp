@@ -452,12 +452,17 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
         while (idx < 50)
         {
             // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
-            wxString fileAndContents = *func.Evaluate<wxString>(idx++).Get();
-            if(Manager::Get()->GetScriptingManager()->DisplayErrors())
+
+            Sqrat::SharedPtr<wxString> ret_ptr = func.Evaluate<wxString>(idx++);
+            if(!ret_ptr || Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
+                Manager::Get()->GetLogManager()->LogError(_T("Wiz::RunProjectWizard: Could not evaluate \"GetGeneratedFile\""));
                 Clear();
                 return 0;
             }
+
+            wxString fileAndContents = *ret_ptr.Get();
+
             if (fileAndContents.IsEmpty())
                 break;
             wxString tmpFile = fileAndContents.BeforeFirst(_T(';'));

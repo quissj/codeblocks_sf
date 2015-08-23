@@ -390,14 +390,14 @@ namespace ScriptBindings
             if (sa.GetType(2) == OT_INTEGER)
             {
                 bt = prj->GetBuildTarget(sa.GetValue<SQInteger>(2));
-                if(bt == nullptr)
-                    return sa.ThrowError(wxString::Format(_("Could not find build Targte Nr. %d"),sa.GetValue<SQInteger>(2)));
+                //if(bt == nullptr)
+                    //return sa.ThrowError(wxString::Format(_("Could not find build Targte Nr. %d"),sa.GetValue<SQInteger>(2)));
             }
             else
             {
                 bt = prj->GetBuildTarget(*sa.GetInstance<wxString>(2));
-                if(bt == nullptr)
-                    return sa.ThrowError(_("Could not find build Targte") + *sa.GetInstance<wxString>(2));
+                //if(bt == nullptr)
+                    //return sa.ThrowError(_("Could not find build Targte") + *sa.GetInstance<wxString>(2));
             }
 
             sa.PushInstance<ProjectBuildTarget>(bt);
