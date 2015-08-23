@@ -268,10 +268,13 @@ public:
         sq_pop(vm, 2);
         return entry.value;
         SQCATCH(vm) {
+#if defined (SCRAT_USE_EXCEPTIONS)
+            SQUNUSED(e); // avoid "unreferenced local variable" warning
+#endif
             sq_pop(vm, 2);
-            SQRETHROW(vm, SQWHAT(vm));
+            SQRETHROW(vm);
         }
-        return SharedPtr<T>();
+        return SharedPtr<T>(); // avoid "not all control paths return a value" warning
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,9 +313,13 @@ public:
         sq_pop(vm, 2);
         return entry.value;
         SQCATCH(vm) {
+#if defined (SCRAT_USE_EXCEPTIONS)
+            SQUNUSED(e); // avoid "unreferenced local variable" warning
+#endif
             sq_pop(vm, 2);
-            SQRETHROW(vm, SQWHAT(vm));
+            SQRETHROW(vm);
         }
+        return SharedPtr<T>(); // avoid "not all control paths return a value" warning
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -507,7 +514,7 @@ struct Var<Table> {
     /// \param value Value to push on to the VM's stack
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static void push(HSQUIRRELVM vm, const Table & value) {
+    static void push(HSQUIRRELVM vm, const Table& value) {
         HSQOBJECT obj;
         sq_resetobject(&obj);
         obj = value.GetObject();

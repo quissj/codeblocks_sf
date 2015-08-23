@@ -30,17 +30,16 @@
 
 #include <scripting/squirrel/squirrel.h>
 #include <sqrat.h>
-#include <map>
 
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
 
-#include <scripting/squirrel/sqstdio.h>
-#include <scripting/squirrel/sqstdblob.h>
-#include <scripting/squirrel/sqstdmath.h>
-#include <scripting/squirrel/sqstdsystem.h>
-#include <scripting/squirrel/sqstdstring.h>
+#include <sqstdio.h>
+#include <sqstdblob.h>
+#include <sqstdmath.h>
+#include <sqstdsystem.h>
+#include <sqstdstring.h>
 
 namespace Sqrat
 {
@@ -87,7 +86,7 @@ private:
 
 private:
 
-    static SQRAT_API std::map<HSQUIRRELVM, SqratVM*>& ms_sqratVMs();
+    static SQRAT_API unordered_map<HSQUIRRELVM, SqratVM*>::type& ms_sqratVMs();
 
     static void printFunc(HSQUIRRELVM /*v*/, const SQChar *s, ...)
     {
@@ -338,8 +337,8 @@ public:
 };
 
 #if !defined(SCRAT_IMPORT)
-std::map<HSQUIRRELVM, SqratVM*>& SqratVM::ms_sqratVMs() {
-    static std::map<HSQUIRRELVM, SqratVM*> ms;
+inline unordered_map<HSQUIRRELVM, SqratVM*>::type& SqratVM::ms_sqratVMs() {
+    static unordered_map<HSQUIRRELVM, SqratVM*>::type ms;
     return ms;
 }
 #endif
