@@ -189,6 +189,10 @@ public:
     ///
     /// \tparam V Type of variable (usually doesnt need to be defined explicitly)
     ///
+    /// \remarks
+    /// If V is not a pointer or reference, then it must have a default constructor.
+    /// See Sqrat::Class::Prop to work around this requirement
+    ///
     /// \return The Class itself so the call can be chained
     ///
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,12 +210,41 @@ public:
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// Binds a class variable without a setter
+    ///
+    /// \param name Name of the variable as it will appear in Squirrel
+    /// \param var  Variable to bind
+    ///
+    /// \tparam V Type of variable (usually doesnt need to be defined explicitly)
+    ///
+    /// \remarks
+    /// If V is not a pointer or reference, then it must have a default constructor.
+    /// See Sqrat::Class::Prop to work around this requirement
+    ///
+    /// \return The Class itself so the call can be chained
+    ///
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    template<class V>
+    Class& ConstVar(const SQChar* name, V C::* var) {
+        ClassData<C>* cd = ClassType<C>::getClassData(vm);
+
+        // Add the getter
+        BindAccessor(name, &var, sizeof(var), &sqDefaultGet<C, V>, cd->getTable);
+
+        return *this;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Bind a class static variable
     ///
     /// \param name Name of the variable as it will appear in Squirrel
     /// \param var  Variable to bind
     ///
     /// \tparam V Type of variable (usually doesnt need to be defined explicitly)
+    ///
+    /// \remarks
+    /// If V is not a pointer or reference, then it must have a default constructor.
+    /// See Sqrat::Class::Prop to work around this requirement
     ///
     /// \return The Class itself so the call can be chained
     ///
@@ -523,22 +556,29 @@ protected:
     }
 
     static SQInteger ClassCloned(HSQUIRRELVM vm) {
+        SQTRY()
         Sqrat::Var<const C*> other(vm, 2);
-        if (!Error::Occurred(vm)) {
-#if !defined (SCRAT_NO_ERROR_CHECKING)
-            return ClassType<C>::CopyFunc()(vm, 1, other.value);
-#else
-            ClassType<C>::CopyFunc()(vm, 1, other.value);
-            return 0;
-#endif
+        SQCATCH_NOEXCEPT(vm) {
+            SQCLEAR(vm);
+            return SQ_ERROR;
         }
-        Error::Clear(vm);
-        return SQ_ERROR;
+#if !defined (SCRAT_NO_ERROR_CHECKING)
+        return ClassType<C>::CopyFunc()(vm, 1, other.value);
+#else
+        ClassType<C>::CopyFunc()(vm, 1, other.value);
+        return 0;
+#endif
+        SQCATCH(vm) {
+#if defined (SCRAT_USE_EXCEPTIONS)
+            SQUNUSED(e); // this is to avoid a warning in MSVC
+#endif
+            return SQ_ERROR;
+        }
     }
 
     // Initialize the required data structure for the class
     void InitClass(ClassData<C>* cd) {
-        cd->instances.Init(new std::map<C*, HSQOBJECT>);
+        cd->instances.Init(new typename unordered_map<C*, HSQOBJECT>::type);
 
         // push the class
         sq_pushobject(vm, cd->classObj);
@@ -937,7 +977,7 @@ protected:
 /// @cond DEV
 
     void InitDerivedClass(HSQUIRRELVM vm, ClassData<C>* cd, ClassData<B>* bd) {
-        cd->instances.Init(new std::map<C*, HSQOBJECT>);
+        cd->instances.Init(new typename unordered_map<C*, HSQOBJECT>::type);
 
         // push the class
         sq_pushobject(vm, cd->classObj);
