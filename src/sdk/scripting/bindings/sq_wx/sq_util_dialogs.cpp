@@ -162,20 +162,6 @@ namespace ScriptBindings
         BIND_INT_CONSTANT(wxFD_CHANGE_DIR);
         BIND_INT_CONSTANT(wxFD_PREVIEW);
 
-        // dialog buttons
-        BIND_INT_CONSTANT(wxOK);
-        BIND_INT_CONSTANT(wxYES_NO);
-        BIND_INT_CONSTANT(wxCANCEL);
-        BIND_INT_CONSTANT(wxID_OK);
-        BIND_INT_CONSTANT(wxID_YES);
-        BIND_INT_CONSTANT(wxID_NO);
-        BIND_INT_CONSTANT(wxID_CANCEL);
-        BIND_INT_CONSTANT(wxICON_QUESTION);
-        BIND_INT_CONSTANT(wxICON_INFORMATION);
-        BIND_INT_CONSTANT(wxICON_WARNING);
-        BIND_INT_CONSTANT(wxICON_ERROR);
-        BIND_INT_CONSTANT(wxICON_HAND);
-
 
         Sqrat::RootTable()
         .SquirrelFunc(_SC("wxGetColourFromUser"),&wx_GetColourFromUser)

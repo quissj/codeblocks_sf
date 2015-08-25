@@ -587,6 +587,7 @@
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add option="-DBUILDING_PLUGIN" />
+					<Add option="-DSCRAT_IMPORT" />
 					<Add directory="include" />
 				</Compiler>
 				<Linker>

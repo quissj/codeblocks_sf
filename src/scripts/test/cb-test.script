@@ -457,7 +457,7 @@ class cbTest_class extends script_test_base
         made_passed("Require"); // This has to work, else we could not run this script, because it uses "include"
 
         InfoWindow("Squirrel test info window","This is used to test the squirrel binding",5000,2000);
-        test_true("InfoWindow",Message("Does a Info Window appeared?","Does the test worked?",wxID_YESNO) == wxID_YES);
+        test_true("InfoWindow",Message("Does a Info Window appeared?","Does the test worked?",wxYES_NO) == wxID_YES);
 
         made_failed("IsNull","currently we can't get an nullptr, so this test is not implemented");  // Hmmm we need a nullptr ...
 

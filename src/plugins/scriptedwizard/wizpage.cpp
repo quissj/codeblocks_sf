@@ -22,6 +22,7 @@
     #include <cbexception.h>
 #endif
 
+#include <scripting/bindings/sq_wx/sq_wx_type_handler.h>
 #include <scripting/bindings/sc_base_types.h>
 
 #include "wizpage.h"
@@ -122,7 +123,14 @@ wxWizardPage* WizPageBase::GetPrev() const
     if (func.IsNull())
         return wxWizardPageSimple::GetPrev();
     // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
-    wxString prev = *func.Evaluate<wxString>().Get();
+    Sqrat::SharedPtr<wxString> ret_ptr = func.Evaluate<wxString>();
+    if(!ret_ptr)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T(" WizPageBase::GetPrev(): could not evaluate: ") + sig );
+        return nullptr;
+    }
+    wxString prev = *ret_ptr.Get();
+
 
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         return wxWizardPageSimple::GetPrev();
@@ -146,7 +154,13 @@ wxWizardPage* WizPageBase::GetNext() const
     if (func.IsNull())
         return wxWizardPageSimple::GetNext();
     // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
-    wxString next = *func.Evaluate<wxString>().Get();
+    Sqrat::SharedPtr<wxString> ret_ptr = func.Evaluate<wxString>();
+    if(!ret_ptr)
+    {
+        Manager::Get()->GetLogManager()->LogError(_T(" WizPageBase::GetNext(): could not evaluate: ") + sig );
+        return nullptr;
+    }
+    wxString next = *ret_ptr.Get();
 
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
         return wxWizardPageSimple::GetNext();
@@ -166,8 +180,16 @@ void WizPageBase::OnPageChanging(wxWizardEvent& event)
 
     if (func.IsNull())
         return;
+
     // TODO (bluehazzard#1#): Here should be a error checking and not suddenly a crash -.-
-    bool allow = *func.Evaluate<bool>(event.GetDirection() != 0).Get(); // !=0 forward, ==0 backward
+    Sqrat::SharedPtr<bool> ret_val = func.Evaluate<bool>(event.GetDirection() != 0);
+    if(!ret_val)
+    {
+        // Function could not be evaluated
+        Manager::Get()->GetLogManager()->LogError(_T(" WizPageBase::OnPageChanging(): could not evaluate: ") + sig );
+        return;
+    }
+    bool allow = *(ret_val.Get()); // !=0 forward, ==0 backward
 
     Manager::Get()->GetScriptingManager()->DisplayErrors();
 
