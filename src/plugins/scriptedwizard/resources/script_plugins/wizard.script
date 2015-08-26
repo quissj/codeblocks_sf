@@ -60,10 +60,10 @@ function OnEnter_PluginOptions(fwd)
 function OnClick_cmbPluginType()
 {
 
-    //Wizard.EnableWindow(_T("chkHasConfig"), !isWizard);
+		//Wizard.EnableWindow(_T("chkHasConfig"), !isWizard);
     Wizard.EnableWindow(_T("chkHasMenu"), true);
     Wizard.EnableWindow(_T("chkHasModuleMenu"), true);
-    //Wizard.EnableWindow(_T("chkHasToolbar"), true);
+		//Wizard.EnableWindow(_T("chkHasToolbar"), true);
 }
 
 // -----------------------------------------------------------------------------
@@ -74,11 +74,8 @@ function OnLeave_PluginOptions(fwd)
     {
         // read text values entered
         PluginSettings.Name = Wizard.GetTextControlValue(_T("txtPluginName"));
-        PluginSettings.Type = Wizard.GetComboboxSelection(_T("cmbPluginType"));
-        PluginSettings.HasConfig = Wizard.IsCheckboxChecked(_T("chkHasConfig"));
         PluginSettings.HasMenu = Wizard.IsCheckboxChecked(_T("chkHasMenu"));
         PluginSettings.HasModuleMenu = Wizard.IsCheckboxChecked(_T("chkHasModuleMenu"));
-        PluginSettings.HasToolbar = Wizard.IsCheckboxChecked(_T("chkHasToolbar"));
         PluginSettings.HasInstallScript = Wizard.IsCheckboxChecked(_T("chkHasInstallScript"));
         PluginSettings.UseDialogInInstallScript = Wizard.IsCheckboxChecked(_T("chkUseDialogInstall"));
 
@@ -98,8 +95,9 @@ function OnEnter_PluginInfo(fwd)
 {
     if (fwd)
     {
+		print("test 1");
         // set the title same as the project title
-        if (Wizard.GetTextControlValue(_T("txtTitle")).IsEmpty())
+        if (Wizard.GetTextControlValue(_T("txtTitle").IsEmpty()))
             Wizard.SetTextControlValue(_T("txtTitle"), Wizard.GetProjectTitle());
         if (Wizard.GetTextControlValue(_T("txtVersion")).IsEmpty())
             Wizard.SetTextControlValue(_T("txtVersion"), _T("0.1"));
@@ -256,7 +254,7 @@ function SetupTarget(target,runable)
 // return the implementation contents string
 function GenerateSource()
 {
-    local path = Wizard.FindTemplateFile(_T("plugins/templates/script_plugin_src_temp.splugin"));
+    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/script_plugin_src_temp.splugin"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -266,7 +264,7 @@ function GenerateSource()
 // return the manifest contents string
 function GenerateManifest()
 {
-    local path = Wizard.FindTemplateFile(_T("plugins/templates/manifest_template.xml"));
+    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/manifest_template.xml"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -276,7 +274,7 @@ function GenerateManifest()
 // return the install xml contents string
 function GenerateInstall()
 {
-    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_template.xml"));
+    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/install_template.xml"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -284,7 +282,7 @@ function GenerateInstall()
 
 function GenerateInstallScript()
 {
-    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_script_template.script"));
+    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/install_script_template.script"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);

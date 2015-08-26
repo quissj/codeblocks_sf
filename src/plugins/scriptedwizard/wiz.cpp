@@ -510,6 +510,8 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
             theproject->EndAddFiles();
         }
     }
+// TODO (bluehazzard#1#): handle script errors
+    Manager::Get()->GetScriptingManager()->DisplayErrors();
     }
 
 
