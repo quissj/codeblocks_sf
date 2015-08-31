@@ -305,6 +305,16 @@ class wxTest extends script_test_base
         test_true("IsRelative",filename.IsRelative(wxPATH_NATIVE));
         test_false("IsDir",filename.IsDir());
 
+
+        test_string("GetPathSeparator unix",wxFileName.GetPathSeparator(wxPATH_UNIX),"/");
+        test_string("GetPathSeparator win",wxFileName.GetPathSeparator(wxPATH_WIN),"\\");
+        if(PLATFORM != PLATFORM_MSW)
+            test_string("GetPathSeparator native",wxFileName.GetPathSeparator(wxPATH_UNIX),"/");
+        else
+            test_string("GetPathSeparator native",wxFileName.GetPathSeparator(wxPATH_WIN),"\\");
+
+        made_failed("GetPathSeparators","No Test for \"GetPathSeparators\"");
+
         print_test_result();
         ::print("======= Test wxFileName END  ======= \n");
     }

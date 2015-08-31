@@ -73,6 +73,15 @@ namespace ScriptBindings
         return SC_RETURN_VALUE;
     }
 
+    SQInteger wxFileName_GetPathSeparator(HSQUIRRELVM vm)
+    {
+        StackHandler sa(vm);
+        wxPathFormat  format = sa.GetValue<wxPathFormat>(2);
+        sa.PushValue<wxString>(wxString(wxFileName::GetPathSeparator(format)));
+        return SC_RETURN_VALUE;
+    }
+
+
     /////////////
     // wxPoint //
     /////////////
@@ -250,7 +259,9 @@ namespace ScriptBindings
                 Func("SetFullName",     &wxFileName::SetFullName).
                 Func("SetName",         &wxFileName::SetName).
                 Func("SetVolume",       &wxFileName::SetVolume).
-                Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable);
+                Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable).
+                StaticFunc("GetPathSeparators", &wxFileName::GetPathSeparators).
+                SquirrelFunc("GetPathSeparator", &wxFileName_GetPathSeparator);
         Sqrat::RootTable(vm).Bind("wxFileName",wx_filename);
 
         /////////////
