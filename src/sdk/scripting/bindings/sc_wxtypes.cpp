@@ -250,7 +250,9 @@ namespace ScriptBindings
                 Func("SetFullName",     &wxFileName::SetFullName).
                 Func("SetName",         &wxFileName::SetName).
                 Func("SetVolume",       &wxFileName::SetVolume).
-                Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable);
+                Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable).
+                StaticFunc("GetPathSeparators", &wxFileName::GetPathSeparators).
+                StaticFunc("GetPathSeparator", &wxFileName::GetPathSeparator);
         Sqrat::RootTable(vm).Bind("wxFileName",wx_filename);
 
         /////////////
