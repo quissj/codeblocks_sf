@@ -387,17 +387,24 @@ namespace ScriptBindings
         {
             cbProject* prj = sa.GetInstance<cbProject>(1);
             ProjectBuildTarget* bt = nullptr;
-            if (sa.GetType(2) == OT_INTEGER)
+            try
             {
-                bt = prj->GetBuildTarget(sa.GetValue<SQInteger>(2));
-                //if(bt == nullptr)
-                    //return sa.ThrowError(wxString::Format(_("Could not find build Targte Nr. %d"),sa.GetValue<SQInteger>(2)));
-            }
-            else
+                if (sa.GetType(2) == OT_INTEGER)
+                {
+                    bt = prj->GetBuildTarget(sa.GetValue<SQInteger>(2));
+                    //if(bt == nullptr)
+                        //return sa.ThrowError(wxString::Format(_("Could not find build Targte Nr. %d"),sa.GetValue<SQInteger>(2)));
+                }
+                else
+                {
+                    bt = prj->GetBuildTarget(*sa.GetInstance<wxString>(2));
+                    //if(bt == nullptr)
+                        //return sa.ThrowError(_("Could not find build Targte") + *sa.GetInstance<wxString>(2));
+                }
+            } catch(CBScriptException &e)
             {
-                bt = prj->GetBuildTarget(*sa.GetInstance<wxString>(2));
-                //if(bt == nullptr)
-                    //return sa.ThrowError(_("Could not find build Targte") + *sa.GetInstance<wxString>(2));
+                // a error occurred, we return a null ptr
+                bt = nullptr;
             }
 
             sa.PushInstance<ProjectBuildTarget>(bt);

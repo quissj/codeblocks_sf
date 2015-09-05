@@ -171,12 +171,14 @@ private:
     typedef std::deque<cb_wxBaseManagedWindowInterface*> cb_man_window_list;
 
 
+    bool m_AttachedToMainWindow;
+
     int m_resource_counter;
     wxArrayString m_LoadedResources;
 
     cb_man_window_list m_window_list;
 
-    bool m_AttachedToMainWindow;
+
     MenuItemsManager m_menu_manager;
     Sqrat::Object m_object;
     wxString m_script_file;
