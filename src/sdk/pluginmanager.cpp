@@ -221,7 +221,10 @@ bool PluginManager::InstallScriptPlugin(const wxString& pluginName,InstallInfo* 
     {
         int ret = ReadInstallInfo(pluginName,&install_info);
         if(ret != 0)    // A error occoured during ReadInstallInfo
+        {
+            Manager::Get()->GetLogManager()->LogWarning(wxString(_T("Error at reading InstallInfo from  ")) + pluginName);
             return false;
+        }
     }
     else
     {
@@ -287,7 +290,8 @@ bool PluginManager::InstallScriptPlugin(const wxString& pluginName,InstallInfo* 
     {
 
         wxString content;
-        if(Manager::Get()->GetScriptingManager()->LoadFileFromZip(actualName,install_info.InstallScript,content) != 0)
+        wxString path = actualName + wxT("#zip:") + resourceName +  wxT("#zip:install/") + install_info.InstallScript;
+        if(Manager::Get()->GetScriptingManager()->LoadFileFromFSPath(path,content) != 0)
         {
             Manager::Get()->GetLogManager()->DebugLog(_T("Failed to load install script ")+ install_info.InstallScript + _(" from plugin") );;
             return false;
@@ -590,6 +594,19 @@ bool PluginManager::UninstallScriptPlugin(const wxString& pluginName, bool remov
 
 }
 
+
+
+/* File structure of a .cbplugin archive:
+* plugin_name.cbplugin     --
+* plugin_name.cbplugin/plugin_name.dll     -- plugin binary in a binary plugin
+* plugin_name.cbplugin/plugin_name.splugin -- plugin script in a script plugin
+* plugin_name.cbplugin/plugin_name.zip     -- plugin resources
+* plugin_name.cbplugin/plugin_name.zip/manifest.xml                            -- plugin manifest file
+* plugin_name.cbplugin/plugin_name.zip/install/install.xml                     -- plugin install information file (needed for uninstall)
+* plugin_name.cbplugin/plugin_name.zip/install/(*files needed by install.xml  )-- all resource files needed by the install process
+* plugin_name.cbplugin/plugin_name.zip(*files needed by plugin  )              -- all resource files needed by the plugin
+*/
+
 bool PluginManager::InstallPlugin(const wxString& pluginName, bool forAllUsers, bool askForConfirmation)
 {
     if (pluginName.IsEmpty())
@@ -600,6 +617,7 @@ bool PluginManager::InstallPlugin(const wxString& pluginName, bool forAllUsers, 
 
     InstallInfo install_info;
     int ret = ReadInstallInfo(pluginName,&install_info);
+    // If there is no install.xml file then it is a old plugin and for sure a binary version
     if(ret == 0)
     {
         if(install_info.type == wxT("SCRIPT"))
@@ -1117,8 +1135,12 @@ int PluginManager::ReadInstallInfo(const wxString& pluginFilename,
 
     // The pluginFilename parameter contains the path to the plugin...
     wxString contents;
+    // if we want to access the plugin resource zip file we need the actual plugin name
+    wxString basename = wxFileName(pluginFilename).GetName();
+
     wxFileSystem* fs = new wxFileSystem;
-    wxFSFile* f = fs->OpenFile(pluginFilename + _T("#zip:install.xml"));
+    // Search for the install.xml in the plugin resource zip file within the install archive
+    wxFSFile* f = fs->OpenFile(pluginFilename + _T("#zip:")+ basename + _T(".zip#zip:install/install.xml"));
     if (f)
     {
         wxInputStream* is = f->GetStream();
@@ -1244,7 +1266,8 @@ int PluginManager::ReadInstallInfo(const wxString& pluginFilename,
         if(ac_install_script)
             infoOut->InstallScript = wxString::FromUTF8(ac_install_script);
         else
-            infoOut->InstallScript.Clear();
+ // TODO (bluehazzard#1#): If no file what should we do then?
+           infoOut->InstallScript.Clear();
     }
 
 
