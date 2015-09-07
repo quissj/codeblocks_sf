@@ -609,15 +609,13 @@ ScriptBindings::CBSquirrelThread* ScriptingManager::CreateSandbox()
     return m_vm->CreateThread();
 }
 
-int ScriptingManager::LoadFileFromZip(wxString path,wxString file,wxString& contents)
+int ScriptingManager::LoadFileFromFSPath(wxString path,wxString& contents)
 {
-
-    wxString filename = path + _T("#zip:") + file;
 
     contents.Clear();
 
     wxFileSystem* fs = new wxFileSystem;
-    wxFSFile* f = fs->OpenFile(filename);
+    wxFSFile* f = fs->OpenFile(path);
     if (f)
     {
         wxInputStream* is = f->GetStream();
@@ -626,7 +624,7 @@ int ScriptingManager::LoadFileFromZip(wxString path,wxString file,wxString& cont
         {
             delete fs;
             delete f;
-            Manager::Get()->GetLogManager()->LogWarning(_("file length for ") + filename+ _("is invlaid"));
+            Manager::Get()->GetLogManager()->LogWarning(_("file length for ") + path+ _("is invlaid"));
             return -1;
         }
         char tmp[1024] = {};
@@ -641,7 +639,7 @@ int ScriptingManager::LoadFileFromZip(wxString path,wxString file,wxString& cont
     else
     {
         delete fs;
-        Manager::Get()->GetLogManager()->LogWarning(_("Could not find File ") + filename );
+        Manager::Get()->GetLogManager()->LogWarning(_("Could not find File ") + path );
         return -2;
     }
     delete fs;

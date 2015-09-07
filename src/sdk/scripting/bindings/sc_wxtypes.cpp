@@ -262,6 +262,7 @@ namespace ScriptBindings
                 Func<WXFN_ISFILEWRITEABLE>("IsFileWritable",&wxFileName::IsFileWritable).
                 StaticFunc("GetPathSeparators", &wxFileName::GetPathSeparators).
                 SquirrelFunc("GetPathSeparator", &wxFileName_GetPathSeparator);
+
         Sqrat::RootTable(vm).Bind("wxFileName",wx_filename);
 
         /////////////
