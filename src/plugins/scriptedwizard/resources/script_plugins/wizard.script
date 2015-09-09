@@ -23,11 +23,6 @@ PluginSettings <- {
 }
 
 
-function line(str)
-{
-    print(str + "\n");
-}
-
 // -----------------------------------------------------------------------------
 // init wizard
 function BeginWizard()
@@ -65,10 +60,10 @@ function OnEnter_PluginOptions(fwd)
 function OnClick_cmbPluginType()
 {
 
-		//Wizard.EnableWindow(_T("chkHasConfig"), !isWizard);
+    //Wizard.EnableWindow(_T("chkHasConfig"), !isWizard);
     Wizard.EnableWindow(_T("chkHasMenu"), true);
     Wizard.EnableWindow(_T("chkHasModuleMenu"), true);
-		//Wizard.EnableWindow(_T("chkHasToolbar"), true);
+    //Wizard.EnableWindow(_T("chkHasToolbar"), true);
 }
 
 // -----------------------------------------------------------------------------
@@ -79,8 +74,11 @@ function OnLeave_PluginOptions(fwd)
     {
         // read text values entered
         PluginSettings.Name = Wizard.GetTextControlValue(_T("txtPluginName"));
+        PluginSettings.Type = Wizard.GetComboboxSelection(_T("cmbPluginType"));
+        PluginSettings.HasConfig = Wizard.IsCheckboxChecked(_T("chkHasConfig"));
         PluginSettings.HasMenu = Wizard.IsCheckboxChecked(_T("chkHasMenu"));
         PluginSettings.HasModuleMenu = Wizard.IsCheckboxChecked(_T("chkHasModuleMenu"));
+        PluginSettings.HasToolbar = Wizard.IsCheckboxChecked(_T("chkHasToolbar"));
         PluginSettings.HasInstallScript = Wizard.IsCheckboxChecked(_T("chkHasInstallScript"));
         PluginSettings.UseDialogInInstallScript = Wizard.IsCheckboxChecked(_T("chkUseDialogInstall"));
 
@@ -100,9 +98,8 @@ function OnEnter_PluginInfo(fwd)
 {
     if (fwd)
     {
-		print("test 1");
         // set the title same as the project title
-        if (Wizard.GetTextControlValue(_T("txtTitle").IsEmpty()))
+        if (Wizard.GetTextControlValue(_T("txtTitle")).IsEmpty())
             Wizard.SetTextControlValue(_T("txtTitle"), Wizard.GetProjectTitle());
         if (Wizard.GetTextControlValue(_T("txtVersion")).IsEmpty())
             Wizard.SetTextControlValue(_T("txtVersion"), _T("0.1"));
@@ -174,23 +171,21 @@ function OnLeave_wxVersionPage(fwd)
 // return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
-
-    local separator = wxFileName.GetPathSeparator(wxPATH_NATIVE);
     switch (file_index)
     {
         // Main script file
         //case 0: return PluginSettings.Name + _T(".splugin") + _T(";") + GenerateMainFile();
         // source file
-        case 0: return  "src" + separator + PluginSettings.Name + _T(".splugin") + _T(";") + GenerateSource();
+        case 0: return PluginSettings.Name + _T(".splugin") + _T(";") + GenerateSource();
         // manifest
         case 1: return _T("manifest") + DOT_EXT_XML + _T(";") + GenerateManifest();
         // install
-        case 2: return _T("install") + separator +  _T("install") + DOT_EXT_XML + _T(";") + GenerateInstall();
+        case 2: return _T("install") + DOT_EXT_XML + _T(";") + GenerateInstall();
         // install script
         case 3:
         {
             if(PluginSettings.HasInstallScript == true)
-                return _T("install") + separator + PluginSettings.InstallScriptName + _T(";") + GenerateInstallScript();
+                return PluginSettings.InstallScriptName + _T(";") + GenerateInstallScript();
         }
     }
     return _T(""); // no more generated files
@@ -206,45 +201,72 @@ function SetupProject(project)
     project.RemoveBuildTarget(_T("Release"));
 
     // create_plugin creates the .cbplugin archive
-    local target = project.GetBuildTarget(_T("create_plugin"));
+    local target = project.GetBuildTarget(_T("create_plugin_win"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("create_plugin"));
-
-    SetupTarget(target, false);
+        target = project.AddBuildTarget(_T("create_plugin_win"));
+    SetupTarget(target, 1);
 
     // test_plugin creates the .cbplugin, copies the files to $(cb) and runs c::b
-    target = project.GetBuildTarget(_T("test_plugin"));
+    target = project.GetBuildTarget(_T("test_plugin_win"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("test_plugin"));
+        target = project.AddBuildTarget(_T("test_plugin_win"));
+    SetupTarget(target, 1);
 
-    SetupTarget(target, true);
-
-    target = project.GetBuildTarget(_T("clean"));
+    target = project.GetBuildTarget(_T("clean_win"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("clean"));
-    SetupCleanTarget(target)
+        target = project.AddBuildTarget(_T("clean_win"));
+    SetupCleanTarget(target,1);
+
+    // create_plugin creates the .cbplugin archive
+    local target = project.GetBuildTarget(_T("create_plugin_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("create_plugin_win"));
+    SetupTarget(target, 0);
+
+    // test_plugin creates the .cbplugin, copies the files to $(cb) and runs c::b
+    target = project.GetBuildTarget(_T("test_plugin_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("test_plugin_unix"));
+    SetupTarget(target, 0);
+
+    target = project.GetBuildTarget(_T("clean_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("clean_unix"));
+    SetupCleanTarget(target,0);
+
 
     return true;
 }
 
-function SetupCleanTarget(target)
+
+function SetupCleanTarget(target,platform)
 {
     target.SetTargetType(ttCommandsOnly);
     target.SetOutputFilename(PluginSettings.Name + _T(".splugin"));
     target.SetCreateDefFile(false);
     target.SetCreateStaticLib(false);
-// TODO (bluehazzard#1#): differentiate between linux and windos (again, use scripts, to simplify) ...
-    target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".cbplugin "));
-    target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".zip "));
+    // TODO (bluehazzard#1#): differentiate between linux and windos (again, use scripts, to simplify) ...
+    if(platform == 1)   // windows
+    {
+        target.AddCommandsAfterBuild(_T("del ") + PluginSettings.Name + _T(".cbplugin "));
+        target.AddCommandsAfterBuild(_T("del ") + PluginSettings.Name + _T(".zip "));
+    }
+    else
+    {
+        target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".cbplugin "));
+        target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".zip "));
+    }
+
     target.SetAlwaysRunPostBuildSteps(true);
 }
 
-function SetupTarget(target,runable)
+function SetupTarget(target,platform)
 {
     if (IsNull(target))
         return false;
 
-    local separator = wxFileName.GetPathSeparator(wxPATH_NATIVE);
+
+    local separator = "";
 
     // We have only command targets, because we have nothing to build, it is a script ;-)
     target.SetTargetType(ttCommandsOnly);
@@ -252,40 +274,28 @@ function SetupTarget(target,runable)
     target.SetCreateDefFile(false);
     target.SetCreateStaticLib(false);
 
-
-    if (PLATFORM == PLATFORM_MSW)
+    if (platform == 1)  // windows
     {
+        separator = wxFileName.GetPathSeparator(wxPATH_WIN);
         target.SetHostApplication(_T("$(#cb)\\devel\\codeblocks") + DOT_EXT_EXECUTABLE);
     }
     else
     {
+        separator = wxFileName.GetPathSeparator(wxPATH_UNIX);
         target.SetHostApplication(_T("$(#cb)/devel/codeblocks") + DOT_EXT_EXECUTABLE);
     }
-
-// TODO (bluehazzard#1#): This should all be done in a script, because we don't want a separate project for unix and windows. And a script is more flexible
 
     // create plugin resources
     target.AddCommandsAfterBuild(_T("zip -j9 ") +
                                 PluginSettings.Name + _T(".zip manifest") + DOT_EXT_XML);
-    target.AddCommandsAfterBuild(_T("zip -9 ") +
-                                PluginSettings.Name + _T(".zip install")+separator + "*");
     target.AddCommandsAfterBuild(_T("zip -j9 ") +
-                                PluginSettings.Name + ".zip " + "src" + separator + "*" );
+                                PluginSettings.Name + _T(".zip install") + DOT_EXT_XML);
     // create plugin distribution file
-
-    target.AddCommandsAfterBuild(_T("zip -j9 ") + PluginSettings.Name + _T(".cbplugin ") +
-                                PluginSettings.Name + _T(".zip manifest") + DOT_EXT_XML);
-    target.AddCommandsAfterBuild(_T("zip -j9 ") + PluginSettings.Name + _T(".cbplugin ")
-                                + "src" + separator + "*" );
-
     target.AddCommandsAfterBuild(_T("zip -j9 ") + PluginSettings.Name + _T(".cbplugin ") +
                                 target.GetOutputFilename() + _T(" ") +
                                 PluginSettings.Name + _T(".zip"));
 
-    // run the build steps always
-
     target.SetAlwaysRunPostBuildSteps(true);
-
 
     return true;
 }
@@ -302,7 +312,7 @@ function SetupTarget(target,runable)
 // return the implementation contents string
 function GenerateSource()
 {
-    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/script_plugin_src_temp.splugin"));
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/script_plugin_src_temp.splugin"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -312,7 +322,7 @@ function GenerateSource()
 // return the manifest contents string
 function GenerateManifest()
 {
-    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/manifest_template.xml"));
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/manifest_template.xml"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -322,7 +332,7 @@ function GenerateManifest()
 // return the install xml contents string
 function GenerateInstall()
 {
-    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/install_template.xml"));
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_template.xml"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -330,7 +340,7 @@ function GenerateInstall()
 
 function GenerateInstallScript()
 {
-    local path = Wizard.FindTemplateFile(_T("script_plugins/templates/install_script_template.script"));
+    local path = Wizard.FindTemplateFile(_T("plugins/templates/install_script_template.script"));
     local buffer = IO.ReadFileContents(path);
 
     return SubstituteMacros(buffer);
@@ -349,9 +359,9 @@ function SubstituteMacros(buffer)
     buffer = HandleDirective(buffer, _T("HAS_DIALOG_INSTALL_SCRIPT"), PluginSettings.UseDialogInInstallScript);
 
     // macros substitution
-    buffer.Replace(_T("[PLUGIN_SDK_VERSION_MAJOR]"), _T("") + PLUGIN_SDK_VERSION_MAJOR.tostring());
-    buffer.Replace(_T("[PLUGIN_SDK_VERSION_MINOR]"), _T("") + PLUGIN_SDK_VERSION_MINOR.tostring());
-    buffer.Replace(_T("[PLUGIN_SDK_VERSION_RELEASE]"), _T("") + PLUGIN_SDK_VERSION_RELEASE.tostring());
+    buffer.Replace(_T("[PLUGIN_SDK_VERSION_MAJOR]"), _T("") + PLUGIN_SDK_VERSION_MAJOR);
+    buffer.Replace(_T("[PLUGIN_SDK_VERSION_MINOR]"), _T("") + PLUGIN_SDK_VERSION_MINOR);
+    buffer.Replace(_T("[PLUGIN_SDK_VERSION_RELEASE]"), _T("") + PLUGIN_SDK_VERSION_RELEASE);
     buffer.Replace(_T("[PLUGIN_NAME]"), PluginSettings.Name);
     buffer.Replace(_T("[PLUGIN_TITLE]"), PluginSettings.Title);
     buffer.Replace(_T("[PLUGIN_VERSION]"), PluginSettings.Version);
@@ -378,53 +388,50 @@ function HandleDirective(buffer, directive, enabled)
     local dir_if = _T("[IF ") + directive + _T("]");
     local dir_endif = _T("[ENDIF ") + directive + _T("]");
 
-    while(1)
+    local findStart = buffer.Find(dir_if);
+    if (findStart == -1)
+        return buffer;
+
+    local findEnd = buffer.Find(dir_endif);
+    if (findEnd == -1 || findEnd <= findStart)
+        return buffer;
+
+    // look for [ELSE]
+    local block = buffer.Mid(findStart, findEnd - findStart);
+    local findElse = block.Find(_T("[ELSE]")); // findElse is in "local scope", i.e. offset from findStart
+
+    if (!enabled)
     {
-        local findStart = buffer.Find(dir_if);
-        if (findStart == -1)
-            return buffer;
-
-        local findEnd = buffer.Find(dir_endif);
-        if (findEnd == -1 || findEnd <= findStart)
-            return buffer;
-
-        // look for [ELSE]
-        local block = buffer.Mid(findStart, findEnd - findStart);
-        local findElse = block.Find(_T("[ELSE]")); // findElse is in "local scope", i.e. offset from findStart
-
-        if (!enabled)
+        if (findElse == -1)
         {
-            if (findElse == -1)
-            {
-                // remove whole section
-                buffer.Remove(findStart, (findEnd - findStart) + dir_endif.Length());
-            }
-            else
-            {
-                // remove [ENDIF]
-                buffer.Remove(findEnd, dir_endif.Length());
-                // remove from [IF] to [ELSE] (including)
-                buffer.Remove(findStart, findElse + 6); // 6 is the [ELSE] size
-            }
+            // remove whole section
+            buffer.Remove(findStart, (findEnd - findStart) + dir_endif.Length());
         }
         else
         {
-            if (findElse == -1)
-            {
-                // just remove the directives
-                // we must remove the [ENDIF] first because if we removed the [IF] it would
-                // render the findEnd index invalid!
-                buffer.Remove(findEnd, dir_endif.Length());
-                buffer.Remove(findStart, dir_if.Length());
-            }
-            else
-            {
-                // remove from [ELSE] to [ENDIF]
-                local start = findStart + findElse;
-                buffer.Remove(start, (findEnd - start) + dir_endif.Length());
-                // remove from [IF]
-                buffer.Remove(findStart, dir_if.Length());
-            }
+            // remove [ENDIF]
+            buffer.Remove(findEnd, dir_endif.Length());
+            // remove from [IF] to [ELSE] (including)
+            buffer.Remove(findStart, findElse + 6); // 6 is the [ELSE] size
+        }
+    }
+    else
+    {
+        if (findElse == -1)
+        {
+            // just remove the directives
+            // we must remove the [ENDIF] first because if we removed the [IF] it would
+            // render the findEnd index invalid!
+            buffer.Remove(findEnd, dir_endif.Length());
+            buffer.Remove(findStart, dir_if.Length());
+        }
+        else
+        {
+            // remove from [ELSE] to [ENDIF]
+            local start = findStart + findElse;
+            buffer.Remove(start, (findEnd - start) + dir_endif.Length());
+            // remove from [IF]
+            buffer.Remove(findStart, dir_if.Length());
         }
     }
 
