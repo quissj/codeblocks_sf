@@ -509,17 +509,17 @@ SQInteger IncludeScriptFromResource(HSQUIRRELVM vm)
         wxString contents;
         wxString filename = ResourceFileName + ScriptName;
 
-        wxString path = ConfigManager::LocateDataFile(ResourceFileName, sdDataGlobal | sdDataUser);
+        wxString path = ConfigManager::LocateDataFile(ResourceFileName, sdDataGlobal | sdDataUser) + wxT("#zip:") + ScriptName;
 
-        int ret = Manager::Get()->GetScriptingManager()->LoadFileFromZip(path,ScriptName,contents);
+        int ret = Manager::Get()->GetScriptingManager()->LoadFileFromFSPath(path,contents);
         if(ret != 0)
         {
             return sa.ThrowError(_("IncludeScriptFromResource: Error loading file"));
         }
 
 
-        if(!Manager::Get()->GetScriptingManager()->LoadBuffer(contents,filename))
-            return sa.ThrowError(_("Error while Loading file: ") + filename );
+        if(!Manager::Get()->GetScriptingManager()->LoadBuffer(contents,path))
+            return sa.ThrowError(_("Error while Loading file: ") + path );
 
         return SC_RETURN_OK;
     } catch(CBScriptException &e)

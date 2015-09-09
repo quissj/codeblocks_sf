@@ -195,36 +195,78 @@ function GetGeneratedFile(file_index)
 // setup the project options
 function SetupProject(project)
 {
-    local target = project.GetBuildTarget(_T("create_plugin"));
+    // remove debug and release build targets
+
+    project.RemoveBuildTarget(_T("Debug"));
+    project.RemoveBuildTarget(_T("Release"));
+
+    // create_plugin creates the .cbplugin archive
+    local target = project.GetBuildTarget(_T("create_plugin_win"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("create_plugin"));
+        target = project.AddBuildTarget(_T("create_plugin_win"));
+    SetupTarget(target, 1);
 
-    SetupTarget(target, false);
-
-    target = project.GetBuildTarget(_T("test_plugin"));
+    // test_plugin creates the .cbplugin, copies the files to $(cb) and runs c::b
+    target = project.GetBuildTarget(_T("test_plugin_win"));
     if (IsNull(target))
-        target = project.AddBuildTarget(_T("test_plugin"));
+        target = project.AddBuildTarget(_T("test_plugin_win"));
+    SetupTarget(target, 1);
 
-    target = project.GetBuildTarget("debug");
-    if(!IsNull(target))
-    {
-        project.RemoveBuildTarget("debug");
-    }
-    target = project.GetBuildTarget("release");
-    if(!IsNull(target))
-    {
-        project.RemoveBuildTarget("release");
-    }
+    target = project.GetBuildTarget(_T("clean_win"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("clean_win"));
+    SetupCleanTarget(target,1);
 
-    SetupTarget(target, true);
+    // create_plugin creates the .cbplugin archive
+    local target = project.GetBuildTarget(_T("create_plugin_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("create_plugin_win"));
+    SetupTarget(target, 0);
+
+    // test_plugin creates the .cbplugin, copies the files to $(cb) and runs c::b
+    target = project.GetBuildTarget(_T("test_plugin_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("test_plugin_unix"));
+    SetupTarget(target, 0);
+
+    target = project.GetBuildTarget(_T("clean_unix"));
+    if (IsNull(target))
+        target = project.AddBuildTarget(_T("clean_unix"));
+    SetupCleanTarget(target,0);
+
 
     return true;
 }
 
-function SetupTarget(target,runable)
+
+function SetupCleanTarget(target,platform)
+{
+    target.SetTargetType(ttCommandsOnly);
+    target.SetOutputFilename(PluginSettings.Name + _T(".splugin"));
+    target.SetCreateDefFile(false);
+    target.SetCreateStaticLib(false);
+    // TODO (bluehazzard#1#): differentiate between linux and windos (again, use scripts, to simplify) ...
+    if(platform == 1)   // windows
+    {
+        target.AddCommandsAfterBuild(_T("del ") + PluginSettings.Name + _T(".cbplugin "));
+        target.AddCommandsAfterBuild(_T("del ") + PluginSettings.Name + _T(".zip "));
+    }
+    else
+    {
+        target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".cbplugin "));
+        target.AddCommandsAfterBuild(_T("rm ") + PluginSettings.Name + _T(".zip "));
+    }
+
+    target.SetAlwaysRunPostBuildSteps(true);
+}
+
+function SetupTarget(target,platform)
 {
     if (IsNull(target))
         return false;
+
+
+    local separator = "";
 
     // We have only command targets, because we have nothing to build, it is a script ;-)
     target.SetTargetType(ttCommandsOnly);
@@ -232,12 +274,14 @@ function SetupTarget(target,runable)
     target.SetCreateDefFile(false);
     target.SetCreateStaticLib(false);
 
-    if (PLATFORM == PLATFORM_MSW)
+    if (platform == 1)  // windows
     {
+        separator = wxFileName.GetPathSeparator(wxPATH_WIN);
         target.SetHostApplication(_T("$(#cb)\\devel\\codeblocks") + DOT_EXT_EXECUTABLE);
     }
     else
     {
+        separator = wxFileName.GetPathSeparator(wxPATH_UNIX);
         target.SetHostApplication(_T("$(#cb)/devel/codeblocks") + DOT_EXT_EXECUTABLE);
     }
 

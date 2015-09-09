@@ -306,7 +306,7 @@ class DLLIMPORT ScriptingManager : public Mgr<ScriptingManager>, public wxEvtHan
         bool InstallScriptPlugin(const wxString& file);
 
 
-        int LoadFileFromZip(wxString path,wxString file,wxString& contents);
+        int LoadFileFromFSPath(wxString path,wxString& contents);
 
         void ParseDebuggerCMDLine(wxString cmd_line);
 

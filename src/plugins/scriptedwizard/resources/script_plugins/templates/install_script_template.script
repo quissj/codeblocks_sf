@@ -1,0 +1,95 @@
+
+[IF HAS_DIALOG_INSTALL_SCRIPT]
+// The dialog in Base64 encoding
+local dialog_res = @""
+
+
+class [PLUGIN_NAME]_install_plugin extends cbScriptPlugin
+{
+
+    // mandatory to setup the plugin's info
+    constructor()
+    {
+        info = ::PluginInfo();
+
+        info.name = ::_T("[PLUGIN_NAME]_install_plugin");
+        info.title = ::_T("[PLUGIN_NAME]_install_plugin");
+        info.version = ::_T("[PLUGIN_VERSION]");
+        info.license = ::_T("GPL");
+    }
+
+    function GetPluginInfo()
+    {
+        return info;
+    }
+
+	function DisplayError(message)
+	{
+		error(message);
+		::ShowMessage(message);
+	}
+
+    function ShowDialog()
+    {
+
+		if(loaded == false)
+		{
+			main_dialog = ::CreateWxDialog(this);
+			// Load the resource from string
+			// CAUTION: A loaded resource can't be unloaded (at least in wx2.8) so there can be collisions if you use this script and not restart c::b
+			if(::LoadResourceFromString(this,::wxBase64Decode(dialog_res)) == false)
+			{
+				DisplayError("Could not load resource from string");
+				return -1;
+			}
+			
+			// Load the dialog from the loaded xrc resource. Remember: a loaded resource can't be unloaded, so select a specific name
+			local ret = main_dialog.LoadFromXRCPool("");
+			if(ret != RESOURCE_LOADED_SUCCESFULLY)
+			{
+				DisplayError("Could not load \"\" from Resource pool");
+				return -1;
+			}
+			
+			loaded = true;
+		
+		}
+		
+		return main_dialog.ShowModal();
+
+    };
+
+    main_dialog = 0;
+	info = 0;
+	loaded = false;
+
+}
+[ENDIF HAS_DIALOG_INSTALL_SCRIPT]
+
+// This function gets called before the plugin is installed
+// Handle here all your install things
+// A negative return value will abort the installation
+function pre_install(status)
+{
+[IF HAS_DIALOG_INSTALL_SCRIPT]
+    local plugin = [PLUGIN_NAME]_install_plugin();
+    local ret = 0;
+    RegisterPlugin(plugin);
+    try
+    {
+        ret = plugin.ShowDialog();
+    }
+    catch(error)
+    {
+        Message("Got an error = "+ error,"Install [PLUGIN_NAME]",wxOK);
+    }
+    UnRegisterPlugin("[PLUGIN_NAME]_install_plugin");
+    return ret;
+[ENDIF HAS_DIALOG_INSTALL_SCRIPT]
+}
+
+// This function is called after the installation of the plugin was successfully 
+function post_install(status)
+{
+	return 0;
+}
