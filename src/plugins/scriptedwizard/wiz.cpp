@@ -456,6 +456,7 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
             Sqrat::SharedPtr<wxString> ret_ptr = func.Evaluate<wxString>(idx++);
             if(!ret_ptr || Manager::Get()->GetScriptingManager()->DisplayErrors())
             {
+                Manager::Get()->GetScriptingManager()->DisplayErrors();
                 Manager::Get()->GetLogManager()->LogError(_T("Wiz::RunProjectWizard: Could not evaluate \"GetGeneratedFile\""));
                 Clear();
                 return 0;
@@ -530,17 +531,21 @@ CompileTargetBase* Wiz::RunProjectWizard(wxString* pFilename)
     }
     else if (!func.Evaluate<bool>(theproject))
     {
-        wxString err_msg;
-        err_msg.Printf(_("Couldn't setup project options:\n%s"),prjdir.c_str());
-        if(Sqrat::Error::Occurred(vm->GetVM()))
-        {
-            err_msg.Append(_("\n\n Squirrel error:\n"));
-            err_msg.Append(wxString::FromUTF8(Sqrat::Error::Message(vm->GetVM()).c_str()));
-            Sqrat::Error::Clear(vm->GetVM());
-        }
-        cbMessageBox(err_msg,_("Error"), wxICON_ERROR);
+        //wxString err_msg;
+        //err_msg.Printf(_("Couldn't setup project options:\n%s"),prjdir.c_str());
+        Manager::Get()->GetScriptingManager()->DisplayErrors();
+        Manager::Get()->GetLogManager()->LogError(_T("Scriptedwizzard: Couldn't setup project options: ") +
+                                                  prjdir +
+                                                  _T("\nError in function \"SetupProject\" in your project script"));
+        //if(Sqrat::Error::Occurred(vm->GetVM()))
+        //{
+        //    err_msg.Append(_("\n\n Squirrel error:\n"));
+        //    err_msg.Append(wxString::FromUTF8(Sqrat::Error::Message(vm->GetVM()).c_str()));
+        //    Sqrat::Error::Clear(vm->GetVM());
+        //}
+        //cbMessageBox(err_msg,_("Error"), wxICON_ERROR);
         Clear();
-            return nullptr;
+        return nullptr;
     }
 
     if(Manager::Get()->GetScriptingManager()->DisplayErrors())
