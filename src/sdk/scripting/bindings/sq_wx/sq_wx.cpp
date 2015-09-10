@@ -42,6 +42,11 @@ namespace ScriptBindings
         try
         {
             wxString input = sa.GetValue<wxString>(2);
+
+            // Replace all \n and \r characters, they are not base of the base64
+            // character set. But it is easier to store the encoded string
+            input.Replace(wxT("\n"),wxEmptyString);
+            input.Replace(wxT("\r"),wxEmptyString);
             wxString output = wxBase64::Decode(input);
             sa.PushValue(output);
             return SC_RETURN_VALUE;
