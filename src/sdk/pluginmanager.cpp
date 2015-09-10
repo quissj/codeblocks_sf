@@ -543,6 +543,25 @@ bool PluginManager::UninstallScriptPlugin(const wxString& pluginName, bool remov
 
     if (!pluginFilename.IsEmpty())
     {
+        // Check if the file is in the plugins directory of c::b
+        // if not ask the user if we should delete it
+        wxString global_plugin_folder = ConfigManager::GetFolder(sdPluginsGlobal);
+        wxString local_plugin_folder = ConfigManager::GetFolder(sdPluginsUser);
+        if( !(pluginFilename.StartsWith(global_plugin_folder) ||
+            pluginFilename.StartsWith(local_plugin_folder)))
+        {
+            // The plugin is not in the specific plugins folder, so we ask the user if should remove it
+            if(wxMessageBox(_T("The plugin you want to uninstall does not seems to be in a Code::Blocks plugins folder.\nShould the file be deleted?"),
+                         _T("Should the plugin file be deleted?"),
+                         wxYES_NO|wxICON_INFORMATION) == wxNO)
+            {
+                // The user don't want that we delete the file, so we have
+                // nothing to do here
+                return true;
+            }
+        }
+
+
         if (wxRemoveFile(pluginFilename))
         {
 //            Manager::Get()->GetLogManager()->DebugLog(F(_T("Plugin file removed")));
