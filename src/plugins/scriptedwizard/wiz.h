@@ -164,6 +164,16 @@ class Wiz : public cbWizardPlugin
         void Finalize();
         void RegisterWizard();
         wxString FindTemplateFile(const wxString& filename);
+
+        enum REPORT_STYLE
+        {
+            REPORT_ERROR,
+            REPORT_WARNING,
+            REPORT_INFORMATION
+        };
+
+        void ReportScriptError(wxString error, REPORT_STYLE style = REPORT_ERROR, bool messagebox = false, wxString caption = wxEmptyString);
+
 	protected:
         void OnAttach();
         void Clear();
