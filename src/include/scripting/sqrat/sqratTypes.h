@@ -1051,10 +1051,22 @@ SCRAT_MAKE_NONREFERENCABLE(std::string)
 /// When making a custom type that is not referencable, you must use SCRAT_MAKE_NONREFERENCABLE( type )
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if __GNUC_MINOR__ > 9
 template<class T>
 inline void PushVar(HSQUIRRELVM vm, T* value) {
     Var<T*>::push(vm, value);
 }
+#else
+template<class T>
+inline void PushVar(HSQUIRRELVM vm, T value) {
+     Var<T>::push(vm, value);
+}
+#endif // __GNUC_MINOR__
+
+//template<class T>
+//inline void PushVar(HSQUIRRELVM vm, T value) {
+//     Var<T>::push(vm, value);
+// }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1071,10 +1083,12 @@ inline void PushVar(HSQUIRRELVM vm, T* value) {
 /// When making a custom type that is not referencable, you must use SCRAT_MAKE_NONREFERENCABLE( type )
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if __GNUC_MINOR__ > 9
 template<class T>
 inline void PushVar(HSQUIRRELVM vm, const T& value) {
     Var<T>::push(vm, value);
 }
+#endif // __GNUC_MINOR__
 
 
 /// @cond DEV
