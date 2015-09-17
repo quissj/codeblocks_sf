@@ -873,10 +873,22 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxComboBox
     /***************************************************************************************************************/
+#if wxCHECK_VERSION(3,0,0)
+    Sqrat::Class<wxTextEntryBase,Sqrat::NoConstructor<wxTextEntryBase> > bwxTextEntryBase(vm,"wxTextEntryBase");
+    bwxTextEntryBase
+    .Func<bool (wxTextEntryBase::*) (const wxArrayString&)>("AutoComplete",&wxTextEntryBase::AutoComplete)
+    .Func("IsEmpty",&wxTextEntryBase::IsEmpty);
+    Sqrat::RootTable(vm).Bind(_SC("wxTextEntryBase"),bwxTextEntryBase);
+
+    Sqrat::DerivedClass<wxTextEntry,wxTextEntryBase,Sqrat::NoConstructor<wxTextEntry> > bwxTextEntry(vm,"wxTextEntry");
+    Sqrat::RootTable(vm).Bind(_SC("wxTextEntry"),bwxTextEntry);
+
+#endif // wxCHECK_VERSION
+
 #if defined(__WXGTK__)
-    Sqrat::DerivedClass<wxComboBox,wxControl, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
+    Sqrat::DerivedClass<wxComboBox,wxTextEntry, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
 #else
-    Sqrat::DerivedClass<wxComboBox,wxChoice, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
+    Sqrat::DerivedClass<wxComboBox,wxTextEntry, Sqrat::NoConstructor<wxComboBox> > bwxComboBox(vm,"wxComboBox");
 #endif
 
     bwxComboBox
@@ -1068,7 +1080,7 @@ void bind_wxBaseControls(HSQUIRRELVM vm)
     /***************************************************************************************************************/
     // wxTextCtrlBase
     /***************************************************************************************************************/
-    Sqrat::DerivedClass<wxTextCtrlBase,wxControl, Sqrat::NoConstructor<wxTextCtrlBase> > bwxTextCtrlBase(vm,"wxTextCtrlBase");
+    Sqrat::DerivedClass<wxTextCtrlBase,wxTextEntry, Sqrat::NoConstructor<wxTextCtrlBase> > bwxTextCtrlBase(vm,"wxTextCtrlBase");
     Sqrat::RootTable(vm).Bind(_SC("wxTextCtrlBase"),bwxTextCtrlBase);
 
     /***************************************************************************************************************/

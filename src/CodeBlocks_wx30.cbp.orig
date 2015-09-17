@@ -117,6 +117,7 @@
 					<Add directory="include/mozilla_chardet/xpcom" />
 					<Add directory="include/mozilla_chardet/xpcom/base" />
 					<Add directory="include/mozilla_chardet/xpcom/glue" />
+					<Add directory="sdk/wxpropgrid/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,--enable-auto-image-base" />
@@ -3297,9 +3298,6 @@
 		<Unit filename="sdk/scripting/squirrel/sqcompiler.cpp">
 			<Option target="Squirrel" />
 		</Unit>
-		<Unit filename="sdk/scripting/squirrel/sqdbgserver.cpp">
-			<Option target="Squirrel" />
-		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqdebug.cpp">
 			<Option target="Squirrel" />
 		</Unit>
@@ -3313,9 +3311,6 @@
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqobject.cpp">
-			<Option target="Squirrel" />
-		</Unit>
-		<Unit filename="sdk/scripting/squirrel/sqrdbg.cpp">
 			<Option target="Squirrel" />
 		</Unit>
 		<Unit filename="sdk/scripting/squirrel/sqstate.cpp">
@@ -3355,6 +3350,33 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/workspaceloader.cpp">
+			<Option target="sdk" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/advprops.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/editors.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/extras.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/manager.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/odcombo.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/propdev.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/propgrid.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/props.h">
+			<Option target="wxpropgrid" />
+		</Unit>
+		<Unit filename="sdk/wxpropgrid/include/wx/propgrid/xh_propgrid.h">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/wxpropgrid/src/xh_propgrid.cpp">

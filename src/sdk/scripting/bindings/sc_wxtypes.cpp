@@ -62,6 +62,14 @@ namespace ScriptBindings
         return SC_RETURN_VALUE;
     }
 
+    SQInteger wxColour_IsOK(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+        wxColour& self = *sa.GetInstance<wxColour>(1);
+        sa.PushValue(self.IsOk());
+        return SC_RETURN_VALUE;
+    }
+
     ////////////////
     // wxFileName //
     ////////////////
@@ -194,12 +202,13 @@ namespace ScriptBindings
                 Ctor<unsigned char,unsigned char,unsigned char>().
                 //emptyCtor().
                 SquirrelFunc("_tostring",   &wxColour_OpToString).
+                SquirrelFunc("IsOk",   &wxColour_IsOK).
                 Func("Blue",    &wxColour::Blue).
                 Func("Green",   &wxColour::Green).
                 Func("Red",     &wxColour::Red).
-#if wxVERSION_NUMBER < 2900 || !wxCOLOUR_IS_GDIOBJECT
-                Func("IsOk",    &wxColour::IsOk).
-#endif
+//#if wxVERSION_NUMBER < 2900 || !wxCOLOUR_IS_GDIOBJECT
+//                Func("IsOk",    &wxColour::IsOk).
+//#endif
                 Func<WXC_SET>("Set",    &wxColour::Set);
         Sqrat::RootTable(vm).Bind("wxColour",wx_colour);
 

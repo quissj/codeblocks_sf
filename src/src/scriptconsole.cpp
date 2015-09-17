@@ -174,7 +174,10 @@ void ScriptConsole::Error(const wxString& msg)
     if (msg.Last() != _T('\n'))
         txtConsole->AppendText(_T('\n'));
 
-    txtConsole->SetDefaultStyle(old);
+// TODO (bluehazzard#1#): under wx3.0 this line does not work. Delete it or look into it
+    //txtConsole->SetDefaultStyle(old);
+
+    txtConsole->SetDefaultStyle(wxTextAttr());
     Manager::ProcessPendingEvents();
 }
 
