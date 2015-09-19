@@ -1,5 +1,5 @@
 
-::Include(_("test_base.script"));
+Require(_("test_base.script"));
 
 class wxTest extends script_test_base
 {

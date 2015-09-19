@@ -318,7 +318,7 @@ SC_ERROR_STATE CBsquirrelVM::doFile(const Sqrat::string& file)
 SC_ERROR_STATE CBsquirrelVM::doString(const wxString str, const wxString name)
 {
 #if wxCHECK_VERSION(2, 9, 0)
-    return doString(str.ToStdString(),name.ToStdString());
+    return doString(Sqrat::string(str.utf8_str()),Sqrat::string(name.utf8_str()));
 #else
     return doString(Sqrat::string(str.mb_str()),Sqrat::string(name.mb_str()));
 #endif // wxCHECK_VERSION
@@ -493,11 +493,13 @@ wxString StackHandler::CreateStackInfo()
     // TODO (bluehazzard#1#): Look if this can be done better (the problem is that wxString expects a wchar in printf and there are only chars, at least i think this is the problem)
     while(SQ_SUCCEEDED(sq_stackinfos(m_vm,stack,&si)))
     {
-        tmp.Printf(_("%i Function: %s Line: %i Source: %s\n")
-                   ,stack
-                   ,wxString(si.funcname,wxConvUTF8).c_str()
-                   ,si.line
-                   ,wxString(si.source,wxConvUTF8).c_str());
+        tmp.clear();
+        tmp << _T("[") << stack << _T("] ")
+            << _T("Function: ") << wxString(si.funcname,wxConvUTF8)
+            << _T(" Line: ") << si.line
+            << _T(" Source: ") << wxString(si.source,wxConvUTF8)
+            << _T("\n");
+
         stack_string += tmp;
         stack++;
     }

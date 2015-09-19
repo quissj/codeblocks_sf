@@ -11,7 +11,12 @@
 #include <wx/stopwatch.h>
 #include <scripting/bindings/sq_wx/sq_wx.h>
 #include <scripting/bindings/sc_binding_util.h>
+#if  wxCHECK_VERSION(2, 9, 0)
+#include "sdk/wxpropgrid/include/wx/propgrid/xh_propgrid.h"
+// TODO (bluehazzard#1#): if wxWidgets has the xrc handler of the property grid this can be removed
+#else
 #include <wx/propgrid/xh_propgrid.h>
+#endif // wxCHECK_VERSION
 
 //#if wxCHECK_VERSION(2, 9, 0)
 //    #include <wx/base64.h>

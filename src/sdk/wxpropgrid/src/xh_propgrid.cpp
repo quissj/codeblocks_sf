@@ -31,7 +31,15 @@
 #if wxUSE_XRC && wxCHECK_VERSION(2,8,0)
 
 #include <wx/propgrid/propgrid.h>
+
+#if  wxCHECK_VERSION(2, 9, 0)
+#include "sdk/wxpropgrid/include/wx/propgrid/xh_propgrid.h"
+// TODO (bluehazzard#1#): if wxWidgets has the xrc handler of the property grid this can be removed
+#else
 #include <wx/propgrid/xh_propgrid.h>
+#endif // wxCHECK_VERSION
+
+
 #include <wx/xml/xml.h>
 
 #ifndef WX_PRECOMP

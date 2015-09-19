@@ -109,14 +109,17 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     function OnComboBox(evt)
     {
         local sel = dialog.GetControl("controls_combobox").GetSelection();
-        local txt = dialog.GetControl("controls_combobox").GetString(sel);
+        // Why does the GetString throws an error?
+        //local txt = dialog.GetControl("controls_combobox").GetString(sel);
+        local txt = dialog.GetControl("controls_combobox").GetValue();
         print("ComboBox clicked: state:" + sel +" in text: "+ txt +"\n");
     }
 
     function OnComboBoxText(evt)
     {
         local txt = "hallo";
-        txt = dialog.GetControl("controls_combobox").GetValue();
+        local tmp = dialog.GetControl("controls_combobox")
+        txt = tmp.GetValue();
         print("ComboBox clicked state: in text" + txt + "\n");
     }
 
