@@ -203,10 +203,13 @@
 					<Add directory="exchndl/win32/lib" />
 				</Linker>
 				<ExtraCommands>
+					<Add before="cmd /c if exist devel\exchndl.dll del devel\exchndl.dll" />
 					<Add after="cmd /c if not exist devel\share\CodeBlocks mkdir devel\share\CodeBlocks" />
 					<Add after="zip -jq9 devel\share\CodeBlocks\resources.zip src\resources\*.xrc" />
 					<Add after="zip -jq9 devel\share\CodeBlocks\start_here.zip src\resources\start_here\*.html src\resources\start_here\*.png" />
 					<Add after='cmd /c &quot;cd src\resources &amp; zip -0 -q ..\..\devel\share\CodeBlocks\resources.zip images\*.png images\16x16\*.png&quot;' />
+					<Add after="cmd /c if not exist devel\exchndl.dll if exist exchndl\win32\bin\*.dll xcopy /Y exchndl\win32\bin\*.dll devel\" />
+					<Add after="cmd /c if not exist devel\symsrv.yes if exist exchndl\win32\bin\symsrv.yes xcopy /Y exchndl\win32\bin\symsrv.yes devel\" />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -2548,31 +2551,26 @@
 		<Unit filename="scripts/startup.script">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="scripts/test/event-test-plugin.script">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="scripts/test/script-test-plugin.script">
-			<Option target="Squirrel" />
-			<Option target="sdk" />
-			<Option target="src" />
-			<Option target="Scripted wizard" />
-		</Unit>
-		<Unit filename="scripts/test/test_base.script">
-			<Option target="Squirrel" />
-			<Option target="sdk" />
+		<Unit filename="scripts/tests/event_test_plugin.script">
 			<Option target="src" />
 		</Unit>
-		<Unit filename="scripts/test/user-dialog-test-plugin.script">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="scripts/test/wx-test.script">
-			<Option target="Squirrel" />
-			<Option target="sdk" />
+		<Unit filename="scripts/tests/xrc_test_plugin.script">
 			<Option target="src" />
-			<Option target="Scripted wizard" />
 		</Unit>
-		<Unit filename="scripts/test/xrc-test-plugin.script">
-			<Option target="sdk" />
+		<Unit filename="scripts/tests/menu_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/script_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/test_base.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/user_dialog_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/wx_test.script">
+			<Option target="src" />
 		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />

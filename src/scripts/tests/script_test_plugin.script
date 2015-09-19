@@ -10,8 +10,10 @@
 
 // Script plugins must extend cbScriptPlugin
 
+
 Include("wx_test.script");
 Include("cb_test.script");
+
 
 class Scripting_TestPlugin extends cbScriptPlugin
 {

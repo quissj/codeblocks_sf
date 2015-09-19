@@ -105,10 +105,11 @@ avVersionEditorDlg::avVersionEditorDlg(wxWindow* parent,wxWindowID /*id*/)
     wxBoxSizer* BoxSizer14;
 
     Create(parent, wxID_ANY, _("Auto Versioning Editor"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxRESIZE_BORDER, _T("wxID_ANY"));
+    SetClientSize(wxSize(469,364));
     wxFont thisFont(10,wxFONTFAMILY_DEFAULT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_NORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     SetFont(thisFont);
     mainSizer = new wxBoxSizer(wxVERTICAL);
-    nbAutoVersioning = new wxNotebook(this, ID_AV_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 0, _T("ID_AV_NOTEBOOK"));
+    nbAutoVersioning = new wxNotebook(this, ID_AV_NOTEBOOK, wxDefaultPosition, wxSize(456,283), 0, _T("ID_AV_NOTEBOOK"));
     nbAutoVersioning->SetMaxSize(wxSize(-1,-1));
     nbAutoVersioning->SetFocus();
     pnlVersionValues = new wxPanel(nbAutoVersioning, ID_VALUES_PANEL, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_VALUES_PANEL"));
@@ -294,7 +295,7 @@ avVersionEditorDlg::avVersionEditorDlg(wxWindow* parent,wxWindowID /*id*/)
     rbHeaderLanguage = new wxRadioBox(pnlSettings, ID_HEADERLANGUAGE_RADIOBOX, _("Header language"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 2, wxRA_VERTICAL, wxDefaultValidator, _T("ID_HEADERLANGUAGE_RADIOBOX"));
     rbHeaderLanguage->SetSelection(1);
     rbHeaderLanguage->SetToolTip(_("Sets the language output."));
-    BoxSizer8->Add(rbHeaderLanguage, 1, wxALIGN_NOT, 5);
+    BoxSizer8->Add(rbHeaderLanguage, 1, wxALIGN_LEFT, 5);
     BoxSizer5->Add(BoxSizer8, 0, wxEXPAND, 5);
     settingsSizer->Add(BoxSizer5, 0, wxALL|wxEXPAND, 5);
     StaticLine1 = new wxStaticLine(pnlSettings, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -365,8 +366,8 @@ avVersionEditorDlg::avVersionEditorDlg(wxWindow* parent,wxWindowID /*id*/)
     SetSizer(mainSizer);
     tmrValidateInput.SetOwner(this, ID_VALIDATE_TIMER);
     tmrValidateInput.Start(500, false);
-    mainSizer->Fit(this);
-    mainSizer->SetSizeHints(this);
+    SetSizer(mainSizer);
+    Layout();
     Center();
 
     Connect(ID_STATUS_COMBOBOX,wxEVT_COMMAND_COMBOBOX_SELECTED,(wxObjectEventFunction)&avVersionEditorDlg::OnCmbStatusSelect);

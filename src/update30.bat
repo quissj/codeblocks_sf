@@ -21,6 +21,7 @@ if not exist %CB_OUTPUT_RESDIR%\plugins md %CB_OUTPUT_RESDIR%\plugins\
 if not exist %CB_OUTPUT_RESDIR%\templates md %CB_OUTPUT_RESDIR%\templates\
 if not exist %CB_OUTPUT_RESDIR%\templates\wizard md %CB_OUTPUT_RESDIR%\templates\wizard\
 if not exist %CB_OUTPUT_RESDIR%\scripts md %CB_OUTPUT_RESDIR%\scripts\
+if not exist %CB_OUTPUT_RESDIR%\scripts\tests md %CB_OUTPUT_RESDIR%\scripts\tests\
 if not exist devel30 md devel30\
 if not exist devel30\share md devel30\share\
 if not exist %CB_DEVEL_RESDIR% md %CB_DEVEL_RESDIR%\
@@ -34,6 +35,7 @@ if not exist %CB_DEVEL_RESDIR%\plugins md %CB_DEVEL_RESDIR%\plugins\
 if not exist %CB_DEVEL_RESDIR%\templates md %CB_DEVEL_RESDIR%\templates\
 if not exist %CB_DEVEL_RESDIR%\templates\wizard md %CB_DEVEL_RESDIR%\templates\wizard\
 if not exist %CB_DEVEL_RESDIR%\scripts md %CB_DEVEL_RESDIR%\scripts\
+if not exist %CB_DEVEL_RESDIR%\scripts\tests md %CB_DEVEL_RESDIR%\scripts\tests\
 
 set ZIPCMD=zip
 
@@ -95,18 +97,21 @@ xcopy /D /y templates\win32\* %CB_DEVEL_RESDIR%\templates /EXCLUDE:excludes30.tx
 xcopy /D /y scripts\*.gdb %CB_OUTPUT_RESDIR% > nul
 xcopy /D /y scripts\* %CB_DEVEL_RESDIR%\scripts /EXCLUDE:excludes30.txt > nul
 xcopy /D /y scripts\* %CB_OUTPUT_RESDIR%\scripts /EXCLUDE:excludes30.txt > nul
+xcopy /D /y scripts\tests\* %CB_DEVEL_RESDIR%\scripts\tests /EXCLUDE:excludes30.txt > nul
+xcopy /D /y scripts\tests\* %CB_OUTPUT_RESDIR%\scripts\tests /EXCLUDE:excludes30.txt > nul
 del excludes30.txt
 xcopy /D /y tips.txt %CB_DEVEL_RESDIR% > nul
 xcopy /D /y tips.txt %CB_OUTPUT_RESDIR% > nul
-xcopy /D /y tools\ConsoleRunner\cb_console_runner30.exe output30 > nul
-xcopy /D /y tools\ConsoleRunner\cb_console_runner30.exe devel30 > nul
-if exist devel30\cb_console_runner.exe del devel30\cb_console_runner.exe > nul
-ren devel30\cb_console_runner30.exe cb_console_runner.exe > nul
-if exist output30\cb_console_runner.exe del output30\cb_console_runner.exe > nul
-ren output30\cb_console_runner30.exe cb_console_runner.exe > nul
+xcopy /D /y tools\ConsoleRunner\cb_console_runner.exe output30 > nul
+xcopy /D /y tools\ConsoleRunner\cb_console_runner.exe devel30 > nul
 xcopy /D /y exchndl\win32\bin\*.dll devel30 > nul
 xcopy /D /y exchndl\win32\bin\*.yes devel30 > nul
 xcopy /D /y devel30\*.exe output30 > nul
 xcopy /D /y devel30\*.dll output30 > nul
 xcopy /D /y %CB_DEVEL_RESDIR%\plugins\*.dll %CB_OUTPUT_RESDIR%\plugins > nul
+
+echo Stripping debug info from output30 tree
+strip output30\*.exe
+strip output30\*.dll
+strip %CB_OUTPUT_RESDIR%\plugins\*.dll
 

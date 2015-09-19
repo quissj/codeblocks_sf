@@ -65,28 +65,34 @@ class user_dialog_test_Plugin extends cbScriptPlugin
     {
         print("Start dialog test\n");
         print("ShowMessage\n");
-        local message_ret = ::ShowMessage("The Show Message test");
+
+        local message_ret = ::ShowMessage(_T("The Show Message test"));
         print(" -> Value returned: " + message_ret + "\n");
 
-		print("GetFilefromUser Dialog\n");
-        local files = ::wxGetFileFromUser("Pleas select the files ","Files to be converted"," ","*.*",wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
+		/*print("GetFilefromUser Dialog\n");
+        local files = ::wxGetFileFromUser(_T("Pleas select the files "),_T("Files to be converted"),_T(" "),_T("*.*"),wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE);
+
         print(" -> files returned (" + files.GetCount() + "): ");
         for(local i = 0;i < files.GetCount();i++)
         {
             print(" " + files.Item(i) + " |");
         }
-		print("\n");
+
+		print("\n");*/
 		print("wxGetColourFromUser Dialog\n");
-        local colour = ::wxGetColourFromUser(wxColour(128,128,128));
+        local dafault_colour = wxColour();
+        dafault_colour.Set(128,128,128,255);
+
+        local colour = ::wxGetColourFromUser(dafault_colour);
 		print(" -> returned color: " + colour + "\n");
 		print("wxGetPasswordFromUser Dialog\n");
-        local password = ::wxGetPasswordFromUser("please enter a password","A password please","default_password");
+        local password = ::wxGetPasswordFromUser(_T("please enter a password"),_T("A password please"),_T("default_password"));
 		print(" -> returned password: " + password + "\n");
 		print("wxGetNumberFromUser Dialog\n");
-        local number = ::wxGetNumberFromUser("please enter a number","the prompt","A number please",42);
+        local number = ::wxGetNumberFromUser(_T("please enter a number"),_T("the prompt"),_T("A number please"),42);
 		print(" -> returned number: " + number + "\n");
 		print("wxGetTextFromUser Dialog\n");
-        local text = ::wxGetTextFromUser("please enter a text","A text please","sample text");
+        local text = ::wxGetTextFromUser(_T("please enter a text"),_T("A text please"),_T("sample text"));
 		print(" -> returned text: " + text + "\n");
 
 		print("wxBell\n");
@@ -94,8 +100,9 @@ class user_dialog_test_Plugin extends cbScriptPlugin
 		print(" -> system bell ringing \n");
 
 		print("wxDirSelector Dialog\n");
-        local dir_selector = ::wxDirSelector("Directory selector","",wxDD_DEFAULT_STYLE);
+        local dir_selector = ::wxDirSelector(_T("Directory selector"),_T(""),wxDD_DEFAULT_STYLE);
 		print(" -> returned dir_selector: " + dir_selector + "\n");
+
 
     };
 }

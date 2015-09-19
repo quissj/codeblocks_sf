@@ -18,6 +18,7 @@
 #include "scripting/bindings/sc_binding_util.h"
 #include "scripting/bindings/sc_base_types.h"
 #include "scripting/bindings/sc_cb_vm.h"
+#include "scripting/bindings/sq_wx/sq_wx_type_handler.h"
 
 // FIXME (bluehazzard#1#): Error Handling has to be improved...
 
@@ -44,6 +45,31 @@ namespace ScriptBindings
             sa.PushValue<SQInteger>(self.Index(inpstr.c_str(), chkCase, frmEnd));
             return SC_RETURN_VALUE;
         } catch(CBScriptException &e)
+        {
+            sa.ThrowError(e.Message());
+            return SC_RETURN_FAILED;
+        }
+    }
+    SQInteger wxArrayString_SetItem(HSQUIRRELVM v)
+    {
+        StackHandler sa(v);
+		try
+        {
+			if (sa.GetParamCount() != 3)
+				return sa.ThrowError("wxArrayString::SetItem wrong number of parameters!");
+
+			wxArrayString& self = *sa.GetInstance<wxArrayString>(1);
+
+			int index = sa.GetValue<int>(2);
+
+			if (index < 0 || size_t(index) >= self.GetCount())
+				return  sa.ThrowError("wxArrayString::SetItem index out of bounds!");
+
+            wxString value = sa.GetValue<wxString>(3);
+            self[index] = value;
+            return 0;
+
+		} catch(CBScriptException &e)
         {
             sa.ThrowError(e.Message());
             return SC_RETURN_FAILED;
@@ -178,6 +204,12 @@ namespace ScriptBindings
 
     void Register_wxTypes(HSQUIRRELVM vm)
     {
+#if wxCHECK_VERSION(3, 0, 0)
+        typedef const wxString& (wxArrayString::*WXARRAY_STRING_ITEM)(size_t nIndex) const;
+#else
+        typedef wxString& (wxArrayString::*WXARRAY_STRING_ITEM)(size_t nIndex) const;
+#endif
+
         ///////////////////
         // wxArrayString //
         ///////////////////
@@ -190,13 +222,16 @@ namespace ScriptBindings
                 .SquirrelFunc("Index",   &wxArrayString_Index)
                 .Func("GetCount",        &wxArrayString::GetCount)
                 .SquirrelFunc("Item",    &wxArrayString_Item)
+                .SquirrelFunc("SetItem",    &wxArrayString_SetItem)
                 ;
         Sqrat::RootTable(vm).Bind("wxArrayString",array_string);
+
 
         //////////////
         // wxColour //
         //////////////
         typedef void(wxColour::*WXC_SET)(const unsigned char, const unsigned char, const unsigned char, const unsigned char);
+
         Sqrat::Class<wxColour> wx_colour(vm,"wxColour");
                 wx_colour.
                 Ctor<unsigned char,unsigned char,unsigned char>().
@@ -206,11 +241,9 @@ namespace ScriptBindings
                 Func("Blue",    &wxColour::Blue).
                 Func("Green",   &wxColour::Green).
                 Func("Red",     &wxColour::Red).
-//#if wxVERSION_NUMBER < 2900 || !wxCOLOUR_IS_GDIOBJECT
-//                Func("IsOk",    &wxColour::IsOk).
-//#endif
                 Func<WXC_SET>("Set",    &wxColour::Set);
         Sqrat::RootTable(vm).Bind("wxColour",wx_colour);
+
 
         ////////////////
         // wxFileName //

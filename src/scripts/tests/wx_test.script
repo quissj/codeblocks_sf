@@ -226,6 +226,8 @@ class wxTest extends script_test_base
         test_equal("Index(\"string2\",false,false)", array.Index("string2",false,false),1);
         test_equal("Index(\"string2\",false,true)", array.Index("string2",false,true),2);
         test_string("Item", array.Item(2),"String2");
+		array.SetItem(1,"ReSetString")
+		test_string("SetItem", array.Item(1),"ReSetString");
         array.Clear();
         test_equal("Clear",array.GetCount(),0);
 

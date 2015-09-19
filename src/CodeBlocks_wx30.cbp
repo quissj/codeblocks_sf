@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="tinyXML">
-				<Option output="base/tinyxml/txml30" prefix_auto="1" extension_auto="1" />
+				<Option output="base/tinyxml/txml" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output=".objs30" />
 				<Option type="2" />
@@ -17,7 +17,7 @@
 				</Compiler>
 			</Target>
 			<Target title="AutoRevision">
-				<Option output="build_tools/autorevision/autorevision30" prefix_auto="1" extension_auto="1" />
+				<Option output="build_tools/autorevision/autorevision" prefix_auto="1" extension_auto="1" />
 				<Option object_output=".objs30" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -27,12 +27,12 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="txml30" />
+					<Add library="txml" />
 					<Add directory="base/tinyxml" />
 				</Linker>
 			</Target>
 			<Target title="ConsoleRunner">
-				<Option output="tools/ConsoleRunner/cb_console_runner30" prefix_auto="1" extension_auto="1" />
+				<Option output="tools/ConsoleRunner/cb_console_runner" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="tools/ConsoleRunner" />
 				<Option object_output=".objs30" />
 				<Option type="1" />
@@ -43,7 +43,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Squirrel">
-				<Option output="sdk/scripting/lib/squirrel30" prefix_auto="1" extension_auto="1" />
+				<Option output="sdk/scripting/lib/squirrel" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output=".objs30" />
 				<Option type="2" />
@@ -54,16 +54,32 @@
 				</Compiler>
 			</Target>
 			<Target title="Squirrel std lib">
-				<Option output="sdk/scripting/lib/sqstdlib30" prefix_auto="1" extension_auto="1" />
+				<Option output="sdk/scripting/lib/sqstdlib" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output=".objs30" />
-				<Option external_deps="sdk/scripting/lib/libsquirrel30.a;" />
+				<Option external_deps="sdk/scripting/lib/libsquirrel.a;" />
 				<Option type="2" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fno-inline" />
 					<Add directory="include/scripting/sqstdlib" />
+<<<<<<< HEAD
 					<Add directory="include/scripting/squirrel" />
+=======
+				</Compiler>
+			</Target>
+			<Target title="SqPlus">
+				<Option output="sdk/scripting/lib/sqplus" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output=".objs30" />
+				<Option external_deps="sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fno-inline" />
+					<Add directory="include/scripting/include" />
+					<Add directory="include/scripting/sqplus" />
+>>>>>>> upstream/master
 				</Compiler>
 			</Target>
 			<Target title="scintilla">
@@ -97,7 +113,11 @@
 				<Option output="devel30/codeblocks" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="devel30" />
 				<Option object_output=".objs30" />
+<<<<<<< HEAD
 				<Option external_deps="base/tinyxml/libtxml30.a;sdk/scripting/lib/libsquirrel30.a;sdk/scripting/lib/libsqstdlib30.a;devel30/libwxscintilla_cb.a;" />
+=======
+				<Option external_deps="base/tinyxml/libtxml.a;sdk/scripting/lib/libsquirrel.a;sdk/scripting/lib/libsqstdlib.a;sdk/scripting/lib/libsqplus.a;devel30/libwxscintilla_cb.a;" />
+>>>>>>> upstream/master
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option parameters="--debug-log --no-dde --no-check-associations --multiple-instance --verbose -p debug" />
@@ -125,15 +145,25 @@
 					<Add option="-Wl,--enable-auto-import" />
 					<Add option="-Wl,--no-undefined" />
 					<Add library="shfolder" />
-					<Add library="txml30" />
+					<Add library="txml" />
 					<Add library="wxscintilla_cb" />
+<<<<<<< HEAD
 					<Add library="sqstdlib30" />
 					<Add library="squirrel30" />
+=======
+					<Add library="sqplus" />
+					<Add library="sqstdlib" />
+					<Add library="squirrel" />
+>>>>>>> upstream/master
 					<Add library="gdi32" />
 					<Add directory="devel30" />
 					<Add directory="sdk/scripting/lib" />
 				</Linker>
 				<ExtraCommands>
+<<<<<<< HEAD
+=======
+					<Add before="build_tools/autorevision/autorevision +wx +int +t . include/autorevision.h" />
+>>>>>>> upstream/master
 					<Add after="cmd /c if not exist devel30\share\CodeBlocks mkdir devel30\share\CodeBlocks" />
 					<Add after="zip -jq9 devel30\share\CodeBlocks\manager_resources.zip sdk\resources\*.xrc" />
 					<Add after='cmd /c &quot;cd sdk\resources &amp; zip -0 -q ..\..\devel30\share\CodeBlocks\manager_resources.zip images\*.png images\12x12\*.png images\16x16\*.png&quot;' />
@@ -184,10 +214,13 @@
 					<Add directory="exchndl/win32/lib" />
 				</Linker>
 				<ExtraCommands>
+					<Add before="cmd /c if exist devel30\exchndl.dll del devel30\exchndl.dll" />
 					<Add after="cmd /c if not exist devel30\share\CodeBlocks mkdir devel30\share\CodeBlocks" />
 					<Add after="zip -jq9 devel30\share\CodeBlocks\resources.zip src\resources\*.xrc" />
 					<Add after="zip -jq9 devel30\share\CodeBlocks\start_here.zip src\resources\start_here\*.html src\resources\start_here\*.png" />
 					<Add after='cmd /c &quot;cd src\resources &amp; zip -0 -q ..\..\devel30\share\CodeBlocks\resources.zip images\*.png images\16x16\*.png&quot;' />
+					<Add after="cmd /c if not exist devel30\exchndl.dll if exist exchndl\win32\bin\*.dll xcopy /Y exchndl\win32\bin\*.dll devel30\" />
+					<Add after="cmd /c if not exist devel30\symsrv.yes if exist exchndl\win32\bin\symsrv.yes xcopy /Y exchndl\win32\bin\symsrv.yes devel30\" />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -287,7 +320,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Compiler depslib">
-				<Option output="plugins/compilergcc/depslib/depslib30" prefix_auto="1" extension_auto="1" />
+				<Option output="plugins/compilergcc/depslib/depslib" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output=".objs30" />
 				<Option type="2" />
@@ -304,7 +337,7 @@
 				<Option output="devel30/share/CodeBlocks/plugins/compiler" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="devel30" />
 				<Option object_output=".objs30" />
-				<Option external_deps="devel30/libcodeblocks.a;plugins/compilergcc/depslib/libdepslib30.a;" />
+				<Option external_deps="devel30/libcodeblocks.a;plugins/compilergcc/depslib/libdepslib.a;" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option parameters="--debug-log --no-dde --no-check-associations --multiple-instance --no-splash-screen --verbose -p debug" />
@@ -325,7 +358,7 @@
 					<Add option="-mthreads" />
 					<Add library="codeblocks" />
 					<Add library="wxmsw$(WX_VERSION)$(WX_SUFFIX)" />
-					<Add library="depslib30" />
+					<Add library="depslib" />
 					<Add directory="devel30" />
 					<Add directory="plugins/compilergcc/depslib" />
 				</Linker>
@@ -2517,6 +2550,7 @@
 		<Unit filename="scripts/startup.script">
 			<Option target="sdk" />
 		</Unit>
+<<<<<<< HEAD
 		<Unit filename="scripts/test/event-test-plugin.script">
 			<Option target="sdk" />
 		</Unit>
@@ -2542,6 +2576,22 @@
 		</Unit>
 		<Unit filename="scripts/test/xrc-test-plugin.script">
 			<Option target="sdk" />
+=======
+		<Unit filename="scripts/tests/menu_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/script_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/test_base.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/user_dialog_test_plugin.script">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="scripts/tests/wx_test.script">
+			<Option target="src" />
+>>>>>>> upstream/master
 		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />
