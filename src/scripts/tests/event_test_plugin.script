@@ -10,7 +10,7 @@
 
 // Script plugins must extend cbScriptPlugin
 
-//Include(_("wx-test.script"));
+//Include(_("wx_test.script"));
 
 class CBEvent_TestPlugin extends cbScriptPlugin
 {
