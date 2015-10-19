@@ -81,12 +81,22 @@ struct InstallInfo
         InstallScript = info->InstallScript;
     }
 
-    wxString name;
+     wxString BaseName;          // The pure Name of the plugin (without version info)
+
     int version_major;
     int version_minor;
     wxString type;
     wxString InstallScript;
 
+    // All file names
+    wxFileName PluginSourcePath;  // The source path to the .splugin archive (name and path)
+    wxFileName FullInstallPath;   // The target path to the binary plugin (name and path)
+    wxFileName FullResourcePath;  // The full target path to the resource archive (name and path)
+
+    wxString PluginFileName;    // The name of the plugin file name (.lib/.dll or .splugin)
+    wxString ResourceFileName;  // The name of the resource archive
+    wxString settingsOnName;
+    wxString settingsOffName;
 };
 
 
@@ -131,7 +141,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool DetachPlugin(cbPlugin* plugin);
 
         bool InstallPlugin(const wxString& pluginName, bool forAllUsers = true, bool askForConfirmation = true);
-        bool InstallScriptPlugin(const wxString& pluginName,InstallInfo* info = nullptr, bool forAllUsers = true, bool askForConfirmation = true);
+        bool InstallScriptPlugin(const wxString& actualName,InstallInfo& info, bool forAllUsers, bool askForConfirmation);
         bool UninstallPlugin(cbPlugin* plugin, bool removeFiles = true);
         bool UninstallScriptPlugin(const wxString& pluginName, bool removeFiles);
         bool ExportPlugin(cbPlugin* plugin, const wxString& filename);
@@ -193,6 +203,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
 
         void ReadExtraFilesFromManifestFile(const wxString& pluginFilename,
                                             wxArrayString& extraFiles);
+        bool ExtractResourceFiles(wxProgressDialog& pd,InstallInfo info,bool forAllUsers);
         bool ExtractFile(const wxString& bundlename,
                         const wxString& src_filename,
                         const wxString& dst_filename,
