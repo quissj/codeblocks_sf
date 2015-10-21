@@ -2303,7 +2303,6 @@
 		<Unit filename="scripts/tests/wx_test.script">
 			<Option target="src" />
 		</Unit>
-		</Unit>
 		<Unit filename="scripts/wx_help.script">
 			<Option target="src" />
 		</Unit>
