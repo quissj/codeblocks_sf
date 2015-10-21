@@ -93,10 +93,12 @@ struct InstallInfo
     wxFileName FullInstallPath;   // The target path to the binary plugin (name and path)
     wxFileName FullResourcePath;  // The full target path to the resource archive (name and path)
 
-    wxString PluginFileName;    // The name of the plugin file name (.lib/.dll or .splugin)
+    wxString PluginFileName;    // The name of the plugin binary file name (.lib/.dll or .splugin)
     wxString ResourceFileName;  // The name of the resource archive
     wxString settingsOnName;
     wxString settingsOffName;
+    wxString ResourceDir;
+    wxString PluginDir;
 };
 
 
@@ -141,7 +143,8 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         bool DetachPlugin(cbPlugin* plugin);
 
         bool InstallPlugin(const wxString& pluginName, bool forAllUsers = true, bool askForConfirmation = true);
-        bool InstallScriptPlugin(const wxString& actualName,InstallInfo& info, bool forAllUsers, bool askForConfirmation);
+        bool InstallScriptPlugin(InstallInfo& info);
+        bool InstallBinaryPlugin(InstallInfo& info);
         bool UninstallPlugin(cbPlugin* plugin, bool removeFiles = true);
         bool UninstallScriptPlugin(const wxString& pluginName, bool removeFiles);
         bool ExportPlugin(cbPlugin* plugin, const wxString& filename);
@@ -203,7 +206,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
 
         void ReadExtraFilesFromManifestFile(const wxString& pluginFilename,
                                             wxArrayString& extraFiles);
-        bool ExtractResourceFiles(wxProgressDialog& pd,InstallInfo info,bool forAllUsers);
+        bool ExtractResourceFiles(InstallInfo info,bool forAllUsers);
         bool ExtractFile(const wxString& bundlename,
                         const wxString& src_filename,
                         const wxString& dst_filename,
@@ -214,12 +217,34 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         wxDynamicLibrary* m_pCurrentlyLoadingLib;
         TiXmlDocument* m_pCurrentlyLoadingManifestDoc;
 
+
+        enum INSTALL_STEP
+        {
+            INSTALL_START,
+            INSTALL_CHECK_OLD_PLUGIN,
+            INSTALL_UNINSTALL_OLD_PLUGIN,
+            INSTALL_LOAD_SCRIPTS,
+            INSTALL_RUN_PRE_INSTALL_SCRIPT,
+            INSTALL_EXTRACT_RESOURCES,
+            INSTALL_EXTRACT_ICONS,
+            INSTALL_EXTRACT_BINARY,
+            INSTALL_EXCRACT_ADDITIONAL_FILES,
+            INSTALL_RUN_POST_INSTALL_SCRIPT,
+            INSTALL_UPDATE_MENUBARS,
+            INSTALL_MAX_STEP
+        };
+
         enum INSTALL_STATUS
         {
-            STATUS_INSTALL  = 0,
+            STATUS_START_INSTALL  = 0,
             STATUS_ERROR    = -1,
             STATUS_USER_ABORT = -2
         };
+
+        cb::shared_ptr<wxProgressDialog>  m_progress_dialog;
+        INSTALL_STEP m_curret_install_step;
+
+        void UpdateInstallProgress(INSTALL_STEP step,wxString msg);
 
         // this struct fills the following vector each time
         // RegisterPlugin() is called.
