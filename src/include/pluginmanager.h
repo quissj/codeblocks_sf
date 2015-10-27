@@ -11,6 +11,7 @@
 #include <set>
 
 #include <wx/dynarray.h>
+#include <wx/progdlg.h>
 #include "globals.h" // PluginType
 #include "settings.h"
 #include "manager.h"
@@ -74,7 +75,7 @@ struct InstallInfo
         if(info == nullptr)
             return;
 
-        name = info->name;
+        BaseName = info->BaseName;
         version_major = info->version_major;
         version_minor = info->version_minor;
         type = info->type;
@@ -87,6 +88,7 @@ struct InstallInfo
     int version_minor;
     wxString type;
     wxString InstallScript;
+    wxString version;
 
     // All file names
     wxFileName PluginSourcePath;  // The source path to the .splugin archive (name and path)
@@ -206,7 +208,7 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
 
         void ReadExtraFilesFromManifestFile(const wxString& pluginFilename,
                                             wxArrayString& extraFiles);
-        bool ExtractResourceFiles(InstallInfo info,bool forAllUsers);
+        bool ExtractResourceFiles(InstallInfo info);
         bool ExtractFile(const wxString& bundlename,
                         const wxString& src_filename,
                         const wxString& dst_filename,
@@ -230,13 +232,14 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
             INSTALL_EXTRACT_BINARY,
             INSTALL_EXCRACT_ADDITIONAL_FILES,
             INSTALL_RUN_POST_INSTALL_SCRIPT,
+            INSTALL_LOAD_PLUGINS,
             INSTALL_UPDATE_MENUBARS,
             INSTALL_MAX_STEP
         };
 
-        enum INSTALL_STATUS
+        enum INSTALL_SCRIPT_RETURN_STATUS
         {
-            STATUS_START_INSTALL  = 0,
+            STATUS_NO_ERROR = 0,
             STATUS_ERROR    = -1,
             STATUS_USER_ABORT = -2
         };
@@ -245,6 +248,17 @@ class DLLIMPORT PluginManager : public Mgr<PluginManager>, public wxEvtHandler
         INSTALL_STEP m_curret_install_step;
 
         void UpdateInstallProgress(INSTALL_STEP step,wxString msg);
+
+        struct cbInstallException
+        {
+            cbInstallException(INSTALL_STEP st,wxString msg = wxEmptyString) : step(st),Message(msg)
+            {
+
+            };
+
+            INSTALL_STEP step;
+            wxString Message;
+        };
 
         // this struct fills the following vector each time
         // RegisterPlugin() is called.
