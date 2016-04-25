@@ -139,6 +139,10 @@ ScriptingManager::~ScriptingManager()
         myMap.insert(myMap.end(), std::make_pair(key, value));
     }
     Manager::Get()->GetConfigManager(_T("security"))->Write(_T("/trusted_scripts"), myMap);
+
+    //Delete all Sqrat::Object elements, before the vm shuts down
+    ScriptBindings::ScriptPluginWrapper::ClearPlugins();
+
     m_vm->Shutdown();
 }
 

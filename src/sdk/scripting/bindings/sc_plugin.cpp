@@ -35,6 +35,12 @@ ScriptPlugins s_ScriptPlugins;
 typedef std::map<wxString, MenuItemsManager> ScriptPluginsMenus;
 ScriptPluginsMenus s_ScriptPluginsMenus;
 
+void ClearPlugins()
+{
+    s_ScriptPlugins.clear();
+    s_MenuCallbacks.clear();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // ask the script plugin what menus to add in the menubar
 // and return an integer array of the menu IDs
