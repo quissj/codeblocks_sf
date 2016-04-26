@@ -180,10 +180,10 @@ static SQInteger wxString_constructor(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::constructor:") + e.Message());
     }
 
-    return sa.ThrowError(_("wrong number of parameters"));
+    return sa.ThrowError(_T("wxString::constructor: wrong number of parameters"));
 }
 
 /** \brief The operator+ for wxString in squirrel
@@ -199,7 +199,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
     {
     if (sa.GetParamCount() == 1)      //no parameter to add
     {
-        return sa.ThrowError(_("wrong number of parameters"));
+        return sa.ThrowError(_T("wxString operator+: wrong number of parameters"));
     }
     else if (sa.GetParamCount() == 2)     // 1 Parameter
     {
@@ -209,7 +209,7 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
         wxString* instance = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
         if(instance == NULL)
         {
-            return sa.ThrowError(_("wxString constructor have no base"));
+            return sa.ThrowError(_T("wxString operator+: no base"));
         }
 
         wxString ret(*instance); // create the return value
@@ -256,9 +256,9 @@ static SQInteger wxString_add(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString operator+:") + e.Message());
     }
-    return sa.ThrowError(_("wrong number of parameters"));
+    return sa.ThrowError(_T("wxString operator+: wrong number of parameters"));
 }
 
 /** \brief Compare to strings. This function is only used for > and <. For == you have to use a function like wxString::Compare()
@@ -275,14 +275,14 @@ static SQInteger wxString_OpCmp(HSQUIRRELVM vm)
     int ret = 0;
     if (sa.GetParamCount() < 2)
     {
-        sa.ThrowError(_("wxString cmp (<,>) wrong number of parameters"));
+        sa.ThrowError(_T("wxString operator cmp (<,>): wrong number of parameters"));
     }
     //First get the "this"
     wxString* lhs = sa.GetInstance<wxString>(1);
     wxString rhs;
     if(lhs == NULL)
     {
-        sa.ThrowError(_("wxString _cmp have no base"));
+        sa.ThrowError(_T("wxString cmp (<,>): have no base"));
     }
     Sqrat::Var<const wxString&> str_val(vm, 2);
     if (!Sqrat::Error::Occurred(vm))
@@ -302,9 +302,9 @@ static SQInteger wxString_OpCmp(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString operator cmp (<,>): ") + e.Message());
     }
-    return sa.ThrowError(_("wrong number of parameters"));
+    return sa.ThrowError(_T("wxString operator cmp (<,>): wrong number of parameters"));
 }
 
 static SQInteger wxString_Replace(HSQUIRRELVM vm)
@@ -314,13 +314,13 @@ static SQInteger wxString_Replace(HSQUIRRELVM vm)
     {
     if (sa.GetParamCount() < 3)
     {
-        sa.ThrowError(_("wxString::Replace wrong number of parameters"));
+        sa.ThrowError(_T("wxString::Replace: wrong number of parameters"));
     }
     //First get the "this"
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL)
     {
-        sa.ThrowError(_("have no base"));
+        sa.ThrowError(_T("wxString::Replace: have no base"));
     }
 
     bool all = true;
@@ -346,7 +346,7 @@ static SQInteger wxString_Replace(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::Replace: ") + e.Message());
     }
 }
 
@@ -355,7 +355,7 @@ SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
     StackHandler sa(vm);
     if (sa.GetParamCount() < 2)
     {
-        return sa.ThrowError(_("wxString::AfterFirst wrong number of parameters"));
+        return sa.ThrowError(_T("wxString::AfterFirst: wrong number of parameters"));
     }
     try
     {
@@ -363,7 +363,7 @@ SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL)
     {
-        return sa.ThrowError(_("have no base"));
+        return sa.ThrowError(_T("wxString::AfterFirst: have no base"));
     }
 
     wxString search_char= sa.GetValue<wxString>(2);
@@ -374,7 +374,7 @@ SQInteger wxString_AfterFirst(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::AfterFirst: ") + e.Message());
     }
 }
 
@@ -383,7 +383,7 @@ SQInteger wxString_AfterLast(HSQUIRRELVM vm)
     StackHandler sa(vm);
     if (sa.GetParamCount() < 2)
     {
-        return sa.ThrowError(_("wxString::AfterLast: wrong number of parameters"));
+        return sa.ThrowError(_T("wxString::AfterLast: wrong number of parameters"));
     }
     try
     {
@@ -391,7 +391,7 @@ SQInteger wxString_AfterLast(HSQUIRRELVM vm)
     wxString* self = sa.GetInstance<wxString>(1); //Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL)
     {
-        return sa.ThrowError(_("wxString::AfterLast: have no base"));
+        return sa.ThrowError(_T("wxString::AfterLast: have no base"));
     }
 
     wxString search_char = sa.GetValue<wxString>(2);
@@ -403,7 +403,7 @@ SQInteger wxString_AfterLast(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::AfterLast: ") + e.Message());
     }
 }
 
@@ -412,7 +412,7 @@ SQInteger wxString_BeforeFirst(HSQUIRRELVM vm)
     StackHandler sa(vm);
     if (sa.GetParamCount() < 2)
     {
-        return sa.ThrowError(_("wxString::BeforeFirst: wrong number of parameters"));
+        return sa.ThrowError(_T("wxString::BeforeFirst: wrong number of parameters"));
     }
     try
     {
@@ -420,7 +420,7 @@ SQInteger wxString_BeforeFirst(HSQUIRRELVM vm)
     wxString* self = Sqrat::ClassType<wxString>::GetInstance(vm, 1);
     if(self == NULL)
     {
-        return sa.ThrowError(_("wxString::BeforeFirst: have no base"));
+        return sa.ThrowError(_T("wxString::BeforeFirst: have no base"));
     }
     wxString search_char = sa.GetValue<wxString>(2);
 
@@ -431,7 +431,7 @@ SQInteger wxString_BeforeFirst(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::BeforeFirst:") + e.Message());
     }
 }
 
@@ -441,7 +441,7 @@ SQInteger wxString_BeforeLast(HSQUIRRELVM vm)
 
     if (sa.GetParamCount() < 2)
     {
-        return sa.ThrowError(_("wxString::BeforeLast: wrong number of parameters"));
+        return sa.ThrowError(_T("wxString::BeforeLast: wrong number of parameters"));
     }
     try
     {
@@ -449,7 +449,7 @@ SQInteger wxString_BeforeLast(HSQUIRRELVM vm)
     wxString* self = sa.GetInstance<wxString>(1);
     if(self == NULL)
     {
-        return sa.ThrowError(_("wxString::BeforeLast: have no base"));
+        return sa.ThrowError(_T("wxString::BeforeLast: have no base"));
     }
 
     wxString search_char = sa.GetValue<wxString>(2);
@@ -460,7 +460,7 @@ SQInteger wxString_BeforeLast(HSQUIRRELVM vm)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::BeforeLast:") + e.Message());
     }
 }
 
@@ -479,13 +479,12 @@ SQInteger wxString_Matches(HSQUIRRELVM v)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::Matches: ") + e.Message());
     }
 }
 
 SQInteger wxString_GetChar(HSQUIRRELVM v)
 {
-    // FIXME (bluehazzard#1#): This is quite a dirty workaround.... but its 3am...
     StackHandler sa(v);
     try
     {
@@ -495,13 +494,13 @@ SQInteger wxString_GetChar(HSQUIRRELVM v)
     if(pos >= self.length())
         return SC_RETURN_FAILED;
 
-    SQChar tmp = self.To8BitData()[pos];//wxString(self.GetChar(static_cast<size_t>(pos))).ToAscii();
+    SQChar tmp = self.To8BitData()[pos];
     sa.PushValue<SQInteger>(static_cast<SQInteger>(tmp));
     return SC_RETURN_VALUE;
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::GetChar: ") + e.Message());
     }
 }
 
@@ -517,7 +516,7 @@ SQInteger wxString_AddChar(HSQUIRRELVM v)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::AddChar: ") + e.Message());
     }
 }
 
@@ -533,7 +532,7 @@ SQInteger wxString_Find(HSQUIRRELVM v)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::Find: ") + e.Message());
     }
 }
 
@@ -564,7 +563,7 @@ SQInteger wxString_ToInt(HSQUIRRELVM v)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::ToInt: ") + e.Message());
     }
 }
 
@@ -592,7 +591,7 @@ SQInteger wxString_ToDouble(HSQUIRRELVM v)
     }
     catch(CBScriptException &e)
     {
-        return sa.ThrowError(e.Message());
+        return sa.ThrowError(_("wxString::ToDouble: ") + e.Message());
     }
 }
 
