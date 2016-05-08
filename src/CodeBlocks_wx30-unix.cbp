@@ -927,18 +927,6 @@
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx.h">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_base_controls.h">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_dialog.h">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_property_grid_xml_h.h">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_propgrid.h">
-			<Option target="sdk" />
-		</Unit>
 		<Unit filename="include/scripting/bindings/sq_wx/sq_wx_type_handler.h">
 			<Option target="sdk" />
 		</Unit>
@@ -2303,9 +2291,6 @@
 		<Unit filename="plugins/xpmanifest/windowsxplooknfeel.h">
 			<Option target="XP look &amp; feel" />
 		</Unit>
-		<Unit filename="scripts/ConvertOldToNewScript.script">
-			<Option target="sdk" />
-		</Unit>
 		<Unit filename="scripts/gdb_types.script">
 			<Option target="Debugger" />
 		</Unit>
@@ -2334,12 +2319,6 @@
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="scripts/tests/wx_test.script">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="scripts/tests/event_test_plugin.script">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="scripts/tests/xrc_test_plugin.script">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="scripts/wx_help.script">
@@ -3039,13 +3018,7 @@
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx.cpp">
 			<Option target="sdk" />
 		</Unit>
-		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_base_controls.cpp">
-			<Option target="sdk" />
-		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_constants.cpp">
-			<Option target="sdk" />
-		</Unit>
-		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_dialog.cpp">
 			<Option target="sdk" />
 		</Unit>
 		<Unit filename="sdk/scripting/bindings/sq_wx/sq_wx_string.cpp">

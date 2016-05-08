@@ -62,7 +62,6 @@ DEFINE_SQRAT_ENUM(OptionsRelation);
 DEFINE_SQRAT_ENUM(OptionsRelationType);
 DEFINE_SQRAT_ENUM(wxPathNormalize);
 DEFINE_SQRAT_ENUM(wxPathFormat);
-DEFINE_SQRAT_ENUM(wxAnimationType);
 DEFINE_SQRAT_ENUM(wxCheckBoxState);
 
 

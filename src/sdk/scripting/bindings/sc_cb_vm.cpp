@@ -5,6 +5,7 @@
 #include <logmanager.h>
 #include <wx/msgdlg.h>
 
+
 #include <scripting/bindings/sq_wx/sq_wx.h>
 
 #include <scripting/squirrel/sqstdblob.h>
@@ -322,11 +323,7 @@ SC_ERROR_STATE CBsquirrelVM::doFile(const Sqrat::string& file)
 
 SC_ERROR_STATE CBsquirrelVM::doString(const wxString str, const wxString name)
 {
-#if wxCHECK_VERSION(2, 9, 0)
-    return doString(str.ToStdString(),name.ToStdString());
-#else
-    return doString(Sqrat::string(str.mb_str()),Sqrat::string(name.mb_str()));
-#endif // wxCHECK_VERSION
+    return doString(Sqrat::string(str.ToUTF8()),Sqrat::string(name.ToUTF8()));
 }
 
 void CBsquirrelVM::SetMeDefault()
@@ -494,16 +491,12 @@ wxString StackHandler::CreateStackInfo()
     SQStackInfos si;
     int stack = 0;
     wxString stack_string(_("Call Stack: \n"));
-    wxString tmp;
-    // TODO (bluehazzard#1#): Look if this can be done better (the problem is that wxString expects a wchar in printf and there are only chars, at least i think this is the problem)
     while(SQ_SUCCEEDED(sq_stackinfos(m_vm,stack,&si)))
     {
-        tmp.Printf(_("%i Function: %s Line: %i Source: %s\n")
-                   ,stack
-                   ,wxString(si.funcname,wxConvUTF8).c_str()
-                   ,si.line
-                   ,wxString(si.source,wxConvUTF8).c_str());
-        stack_string += tmp;
+
+        stack_string << stack << _T("Function: ") << wxString(si.funcname,wxConvUTF8) << _T(" ")
+                    << _T("Line: ") << si.line << _T(" ")
+                    << _T("Source: ") << wxString(si.source,wxConvUTF8) << _T("\n");
         stack++;
     }
     return stack_string;
