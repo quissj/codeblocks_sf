@@ -13,6 +13,10 @@
     #include <configurationpanel.h>
     #include <cbstyledtextctrl.h>
     #include <editorcolourset.h>
+
+    #include <scripting/squirrel/squirrel.h>
+    #include <scriptingmanager.h>
+    #include <scripting/sqrat.h>
 #endif
 
 #include "abbreviations.h"
