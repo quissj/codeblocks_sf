@@ -184,9 +184,7 @@ bool ScriptingManager::LoadScript(const wxString& filename)
     }
 
     // read file
-    wxString contents; //= cbReadFileContents(f); // cbReadFileContents is not able to read UTF-8 files
-    f.ReadAll(&contents,wxConvAuto());
-    f.Close();
+    wxString contents= cbReadFileContents(f,wxFONTENCODING_UTF8); // Script files are UTF8 encoded
     m_CurrentlyRunningScriptFile = fname;
     bool ret = LoadBuffer(contents, fname,true);
     //m_CurrentlyRunningScriptFile.Clear(); // I'm not 100% sure if this is the correct approach to search for local scripts (and if we want to allow local scripts)
