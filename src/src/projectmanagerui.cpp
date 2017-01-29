@@ -31,6 +31,8 @@
     #include "logmanager.h"
 #endif
 
+#include <unordered_map>
+
 #include "cbauibook.h"
 #include "cbcolourmanager.h"
 #include "confirmreplacedlg.h"
@@ -1778,22 +1780,29 @@ struct ProjectFileRelativePathCmp
         else if (pf1->GetParentProject() != m_pActiveProject && pf2->GetParentProject() == m_pActiveProject)
             return false;
         else
-            return pf1->relativeFilename.Cmp(pf2->relativeFilename) < 0;
+        {
+            int relCmp = pf1->relativeFilename.Cmp(pf2->relativeFilename);
+
+            if (relCmp == 0)
+                return pf1 < pf2;
+            else
+                return relCmp < 0;
+        }
     }
 private:
     cbProject* m_pActiveProject;
 };
 
-struct ProjectFileAbsolutePathCmp
+struct cbStringHash
 {
-    bool operator()(ProjectFile* pf1, ProjectFile* pf2)
-    { return pf1->file.GetFullPath().Cmp(pf2->file.GetFullPath()) < 0; }
-};
-
-struct ProjectFileAbsolutePathEqual
-{
-    bool operator()(ProjectFile* pf1, ProjectFile* pf2)
-    { return pf1->file.GetFullPath() == pf2->file.GetFullPath(); }
+    size_t operator()(const wxString& s) const
+    {
+#if wxCHECK_VERSION(3, 0, 0)
+        return std::hash<std::wstring>()(s.ToStdWstring());
+#else
+        return std::hash<std::wstring>()(s.wc_str());
+#endif // wxCHECK_VERSION
+    }
 };
 
 void ProjectManagerUI::OnGotoFile(cb_unused wxCommandEvent& event)
@@ -1809,25 +1818,26 @@ void ProjectManagerUI::OnGotoFile(cb_unused wxCommandEvent& event)
 
     ProjectsArray* pa = pm->GetProjects();
 
-    typedef std::vector<ProjectFile*> VProjectFiles;
-    VProjectFiles pfiles;
+    std::unordered_map<wxString, ProjectFile*, cbStringHash> uniqueAbsPathFiles;
     for (size_t prjIdx = 0; prjIdx < pa->GetCount(); ++prjIdx)
     {
         cbProject* prj = (*pa)[prjIdx];
         if (!prj) continue;
 
         for (FilesList::iterator it = prj->GetFilesList().begin(); it != prj->GetFilesList().end(); ++it)
-            pfiles.push_back(*it);
+        {
+            ProjectFile *projectFile = *it;
+            uniqueAbsPathFiles.insert({projectFile->file.GetFullPath(), projectFile});
+        }
     }
 
-    if (!pfiles.empty())
+    typedef std::vector<ProjectFile*> VProjectFiles;
+    VProjectFiles pfiles;
+    if (!uniqueAbsPathFiles.empty())
     {
-        std::sort(pfiles.begin(), pfiles.end(), ProjectFileAbsolutePathCmp());
-        VProjectFiles::iterator last = std::unique(pfiles.begin(), pfiles.end(), ProjectFileAbsolutePathEqual());
-
-        if (last != pfiles.end())
-            pfiles.erase(last, pfiles.end());
-
+        pfiles.reserve(uniqueAbsPathFiles.size());
+        for (const auto &pf : uniqueAbsPathFiles)
+            pfiles.push_back(pf.second);
         std::sort(pfiles.begin(), pfiles.end(), ProjectFileRelativePathCmp(activePrj));
     }
 
