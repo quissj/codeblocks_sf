@@ -38,12 +38,13 @@
 #include "confirmreplacedlg.h"
 #include "filefilters.h"
 #include "filegroupsandmasks.h"
-#include "incrementalselectlistdlg.h"
 #include "multiselectdlg.h"
 #include "projectdepsdlg.h"
 #include "projectfileoptionsdlg.h"
 #include "projectoptionsdlg.h"
 #include "projectsfilemasksdlg.h"
+
+#include "goto_file.h"
 
 namespace
 {
@@ -1841,36 +1842,42 @@ void ProjectManagerUI::OnGotoFile(cb_unused wxCommandEvent& event)
         std::sort(pfiles.begin(), pfiles.end(), ProjectFileRelativePathCmp(activePrj));
     }
 
-    class Iterator : public IncrementalSelectIterator
+    struct Iterator : IncrementalSelectIteratorIndexed
     {
-        public:
-            Iterator(VProjectFiles& pfiles, bool showProject) : m_PFiles(pfiles), m_ShowProject(showProject) {}
-            virtual long GetCount() const              { return m_PFiles.size();                    }
-            virtual wxString GetItem(long index) const { return m_PFiles[index]->relativeFilename; }
-            virtual wxString GetDisplayItem(long index) const
-            {
-                if (m_ShowProject)
-                {
-                    if ( ProjectFile* pf = m_PFiles[index] )
-                        return pf->relativeFilename + wxT(" (") + pf->GetParentProject()->GetTitle() + wxT(")");
-                    return wxEmptyString;
-                }
-                else
-                    return m_PFiles[index]->relativeFilename;
-            }
-        private:
-            VProjectFiles& m_PFiles;
-            bool           m_ShowProject;
+        Iterator(VProjectFiles &pfiles, bool showProject) : m_pfiles(pfiles), m_ShowProject(showProject)
+        {
+        }
+
+        int GetTotalCount() const override
+        {
+            return m_pfiles.size();
+        }
+        const wxString& GetItemFilterString(int index) const override
+        {
+            return m_pfiles[index]->relativeFilename;
+        }
+        wxString GetDisplayText(int index, int column) const override
+        {
+            ProjectFile* pf = m_pfiles[m_indices[index]];
+            if (m_ShowProject)
+                return pf->relativeFilename + wxT(" (") + pf->GetParentProject()->GetTitle() + wxT(")");
+            else
+                return pf->relativeFilename;
+        }
+
+    private:
+        const VProjectFiles &m_pfiles;
+        wxString temp;
+        bool m_ShowProject;
     };
 
-    Iterator iterator(pfiles, pa->GetCount() > 1);
-    IncrementalSelectListDlg dlg(Manager::Get()->GetAppWindow(), iterator,
-                                 _("Select file..."), _("Please select file to open:"));
+    Iterator iterator(pfiles, (pa->GetCount() > 1));
+    GotoFile dlg(Manager::Get()->GetAppWindow(), &iterator, _("Select file..."), _("Please select file to open:"));
     PlaceWindow(&dlg);
     if (dlg.ShowModal() == wxID_OK)
     {
-        long selection = dlg.GetSelection();
-        if (selection != -1)
+        int selection = dlg.GetSelection();
+        if (selection >= 0 && selection < int(pfiles.size()))
             DoOpenFile(pfiles[selection], pfiles[selection]->file.GetFullPath());
     }
 }
@@ -1993,19 +2000,40 @@ void ProjectManagerUI::OnFindFile(cb_unused wxCommandEvent& event)
             fileNameMap[file.GetFullName()] = prj->GetTitle();
         }
     }
-    IncrementalSelectIteratorStringArray iter(files);
-    IncrementalSelectListDlg dlg(Manager::Get()->GetAppWindow(), iter, _("Find file..."),
-                                 _("Please enter the name of the file you are searching:"));
-    wxSize         sz      = dlg.GetSize();
-    wxListBox*     listBx  = XRCCTRL(dlg, "lstItems", wxListBox);
-    wxCheckBox*    chkOpen = new wxCheckBox(&dlg, wxID_ANY, _("Open file"));
-    ConfigManager* cfg     = Manager::Get()->GetConfigManager(wxT("project_manager"));
+
+    struct Iterator : IncrementalSelectIteratorIndexed
+    {
+        Iterator(const wxArrayString &files) : m_files(files)
+        {
+        }
+
+        int GetTotalCount() const override
+        {
+            return m_files.size();
+        }
+        const wxString& GetItemFilterString(int index) const override
+        {
+            return m_files[index];
+        }
+        wxString GetDisplayText(int index, int column) const override
+        {
+            return m_files[m_indices[index]];
+        }
+
+    private:
+        const wxArrayString &m_files;
+    };
+    Iterator iter(files);
+    GotoFile dlg(Manager::Get()->GetAppWindow(), &iter, _("Find file..."),
+                 _("Please enter the name of the file you are searching:"));
+
+    ConfigManager *cfg = Manager::Get()->GetConfigManager(wxT("project_manager"));
+
+    // Add a checkbox at the bottom that control if the selected file will be opened in an editor.
+    wxCheckBox *chkOpen = new wxCheckBox(&dlg, wxID_ANY, _("Open file"));
     chkOpen->SetValue(cfg->ReadBool(wxT("/find_file_open"), false));
-    // insert the check box into the dialogue
-    listBx->GetParent()->GetSizer()->Add(chkOpen, 0, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_RIGHT, 8);
-    dlg.Fit();
-    dlg.SetMinSize(dlg.GetSize());
-    dlg.SetSize(sz);
+    dlg.AddControlBelowList(chkOpen);
+
     PlaceWindow(&dlg);
     if (dlg.ShowModal() != wxID_OK)
         return;

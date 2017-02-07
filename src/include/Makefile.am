@@ -89,8 +89,7 @@ ALLHEADERS = annoyingdialog.h \
 				ibaseworkspaceloader.h \
 				id.h \
 				importers_globals.h \
-				incrementalselectlistbase.h \
-				incrementalselectlistdlg.h \
+				incremental_select_helper.h \
 				infowindow.h \
 				licenses.h \
 				logger.h \
