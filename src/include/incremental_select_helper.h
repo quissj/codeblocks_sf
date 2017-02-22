@@ -8,14 +8,17 @@
 #define INCREMENTALSELECTLISTBASE_H
 
 #include "settings.h"
+#include <wx/dialog.h>
 #include <wx/string.h>
 #include <wx/event.h>
 #include <vector>
 
+#ifndef CB_PRECOMP
+    #include <wx/listctrl.h>
+#endif // CB_PRECOMP
+
 class wxCommandEvent;
-class wxDialog;
 class wxKeyEvent;
-class wxListCtrl;
 class wxListEvent;
 class wxTextCtrl;
 
@@ -75,6 +78,58 @@ class DLLIMPORT IncrementalSelectHandler : public wxEvtHandler
         IncrementalSelectIterator *m_iterator;
 };
 
+/// Class that implements a virtual list control that uses an IncrementalSelectIterator to populate the list items.
+class DLLIMPORT IncrementalListCtrl : public wxListCtrl
+{
+    public:
+        IncrementalListCtrl(wxWindow *parent, wxWindowID winid = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
+                            const wxSize& size = wxDefaultSize, long style = wxLC_ICON,
+                            const wxValidator &validator = wxDefaultValidator,
+                            const wxString &name = wxListCtrlNameStr);
+
+        wxString OnGetItemText(long item, long column) const override;
+        void SetIterator(IncrementalSelectIterator *iterator);
+    private:
+        IncrementalSelectIterator *m_Iterator;
+};
+
+/// Simple iterator that uses wxArrayString as data source.
+class DLLIMPORT IncrementalSelectArrayIterator : public IncrementalSelectIteratorIndexed
+{
+    public:
+        IncrementalSelectArrayIterator(const wxArrayString &items);
+
+        int GetTotalCount() const;
+        const wxString& GetItemFilterString(int index) const;
+        wxString GetDisplayText(int index, int column) const;
+        int GetColumnWidth(int column) const;
+        void CalcColumnWidth(wxListCtrl &list);
+    private:
+        const wxArrayString &m_items;
+        int m_columnWidth;
+};
+
+/// Simple incremental select dialog that shows a single column and doesn't have much ui elements,
+/// except the text and list controls.
+class DLLIMPORT IncrementalSelectDialog : public wxDialog
+{
+    public:
+        IncrementalSelectDialog(wxWindow* parent, IncrementalSelectIterator *iterator, const wxString &title,
+                                const wxString &message);
+        ~IncrementalSelectDialog() override;
+
+        int GetSelection();
+    private:
+        IncrementalSelectHandler m_handler;
+    private:
+        IncrementalListCtrl* m_resultList;
+        wxTextCtrl* m_text;
+    protected:
+        void BuildContent(wxWindow* parent, IncrementalSelectIterator *iterator, const wxString &title,
+                          const wxString &message);
+
+        DECLARE_EVENT_TABLE()
+};
 
 #endif // INCREMENTALSELECTLISTBASE_H
 
