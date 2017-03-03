@@ -21,6 +21,9 @@ BEGIN_EVENT_TABLE(CPURegistersDlg,wxPanel)
 	//(*EventTable(CPURegistersDlg)
 	//*)
 	EVT_TEXT( ID_SEARCH_CTRL, CPURegistersDlg::OnSearchCtrl )
+
+    EVT_PG_CHANGED(ID_CUSTOM1, CPURegistersDlg::OnPropertyChanged)
+    EVT_PG_CHANGING(ID_CUSTOM1, CPURegistersDlg::OnPropertyChanging)
 END_EVENT_TABLE()
 
 CPURegistersDlg::CPURegistersDlg(wxWindow* parent)
@@ -126,6 +129,7 @@ void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString&
     m_cpu_register_page->SetPropertyHelpString(prop, reg_name + wxT(" = ") +  hexValue + wxT(" (") + interpreted + wxT(")"));
 
     m_cpu_register_page->SetPropertyAttribute(prop, wxT("Units"), interpreted);
+
 }
 
 void CPURegistersDlg::EnableWindow(bool en)
@@ -136,4 +140,20 @@ void CPURegistersDlg::EnableWindow(bool en)
 void CPURegistersDlg::Clear()
 {
     m_cpu_register_page->Clear();
+}
+
+void CPURegistersDlg::OnPropertyChanged(wxPropertyGridEvent &event)
+{
+    cbDebuggerPlugin *plugin = Manager::Get()->GetDebuggerManager()->GetActiveDebugger();
+
+    if (plugin)
+        plugin->SetRegisterValue(event.GetProperty()->GetLabel(), event.GetProperty()->GetValue());
+
+    event.GetProperty()->ChangeFlag(wxPG_PROP_MODIFIED, false);
+}
+
+void CPURegistersDlg::OnPropertyChanging(wxPropertyGridEvent &event)
+{
+    if (event.GetProperty()->GetChildCount() > 0)
+        event.Veto(true);
 }

@@ -27,6 +27,9 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 		void Clear();
 
 		void OnSearchCtrl(wxCommandEvent& event);
+		void OnPropertyChanged(wxPropertyGridEvent &event);
+        void OnPropertyChanging(wxPropertyGridEvent &event);
+
 
 		wxTextCtrl* m_SearchCtrl;
 
