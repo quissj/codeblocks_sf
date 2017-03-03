@@ -116,13 +116,15 @@ void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString&
     {
         prop = m_cpu_register_node->AppendChild( new wxStringProperty(reg_name, reg_name));
     }
+
     if(prop->GetValueString() != hexValue)
         m_cpu_register_page->GetGrid()->SetPropertyTextColour(prop, changedColour);
     else
         m_cpu_register_page->GetGrid()->SetPropertyColourToDefault(prop);
 
-
     prop->SetValue(hexValue);
+    m_cpu_register_page->SetPropertyHelpString(prop, reg_name + wxT(" = ") +  hexValue + wxT(" (") + interpreted + wxT(")"));
+
     m_cpu_register_page->SetPropertyAttribute(prop, wxT("Units"), interpreted);
 }
 
