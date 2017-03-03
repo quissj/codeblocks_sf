@@ -97,6 +97,8 @@ class DebuggerGDB : public cbDebuggerPlugin
         void CollapseWatch(cb::shared_ptr<cbWatch> watch);
         void UpdateWatch(cb::shared_ptr<cbWatch> watch);
 
+        void SetRegisterValue(const wxString& name, const wxString& value);
+
         void AddWatchNoUpdate(const cb::shared_ptr<GDBWatch> &watch);
 
         void OnWatchesContextMenu(wxMenu &menu, const cbWatch &watch, wxObject *property, int &disabledMenus);

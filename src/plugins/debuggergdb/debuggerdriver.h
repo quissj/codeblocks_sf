@@ -105,6 +105,7 @@ class DebuggerDriver
         virtual void CPURegisters() = 0;
         virtual void SwitchToFrame(size_t number) = 0;
         virtual void SetVarValue(const wxString& var, const wxString& value) = 0;
+        virtual void SetRegValue(const wxString& reg, const wxString& value) = 0;
         virtual void MemoryDump() = 0;
         virtual void RunningThreads() = 0;
 

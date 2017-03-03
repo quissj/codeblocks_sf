@@ -2240,3 +2240,14 @@ void DebuggerGDB::OnBuildTargetSelected(CodeBlocksEvent& event)
     if (m_pProject && event.GetProject() == m_pProject)
         m_ActiveBuildTarget = event.GetBuildTargetName();
 }
+
+void DebuggerGDB::SetRegisterValue(const wxString& name, const wxString& value)
+{
+    if (!m_State.HasDriver())
+        return;
+
+    DebuggerDriver* driver = m_State.GetDriver();
+    driver->SetRegValue(name, value);
+    RequestUpdate(CPURegisters);
+    return;
+}

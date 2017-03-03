@@ -521,6 +521,9 @@ class PLUGIN_EXPORT cbDebuggerPlugin: public cbPlugin
         virtual void CollapseWatch(cb::shared_ptr<cbWatch> watch) = 0;
         virtual void UpdateWatch(cb::shared_ptr<cbWatch> watch) = 0;
 
+        // register
+        virtual void SetRegisterValue(const wxString& name, const wxString& value) = 0;
+
         struct WatchesDisabledMenuItems
         {
             enum

@@ -214,6 +214,11 @@ void CDB_driver::SetVarValue(cb_unused const wxString& var, cb_unused const wxSt
     NOT_IMPLEMENTED();
 }
 
+void CDB_driver::SetRegValue(cb_unused const wxString& reg, cb_unused const wxString& value)
+{
+    NOT_IMPLEMENTED();
+}
+
 void CDB_driver::MemoryDump()
 {
     NOT_IMPLEMENTED();
