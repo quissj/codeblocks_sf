@@ -4031,6 +4031,9 @@
 		<Unit filename="wxsmith/CCDebugInfo.wxs">
 			<Option target="src" />
 		</Unit>
+		<Unit filename="wxsmith/CPURegistersDlg.wxs">
+			<Option target="src" />
+		</Unit>
 		<Unit filename="wxsmith/CompilerPanel.wxs">
 			<Option target="src" />
 		</Unit>
@@ -4096,6 +4099,7 @@
 					<wxPanel wxs="wxsmith/debuggersettingscommonpanel.wxs" src="src/debuggersettingscommonpanel.cpp" hdr="src/debuggersettingscommonpanel.h" fwddecl="0" i18n="1" name="DebuggerSettingsCommonPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/goto_file.wxs" src="src/goto_file.cpp" hdr="src/goto_file.h" fwddecl="1" i18n="1" name="GotoFile" language="CPP" />
 					<wxDialog wxs="plugins/codecompletion/wxsmith/goto_function.wxs" src="plugins/codecompletion/gotofunctiondlg.cpp" hdr="plugins/codecompletion/gotofunctiondlg.h" fwddecl="1" i18n="1" name="GotoFunctionDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/CPURegistersDlg.wxs" src="src/cpuregistersdlg.cpp" hdr="src/cpuregistersdlg.h" fwddecl="0" i18n="1" name="CPURegistersDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<debugger />
