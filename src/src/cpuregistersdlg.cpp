@@ -1,6 +1,8 @@
 #include "include/sdk.h"
 #include "CPURegistersDlg.h"
 
+#include "cbcolourmanager.h"
+
 #ifndef WX_PRECOMP
 	//(*InternalHeadersPCH(CPURegistersDlg)
 	#include <wx/intl.h>
@@ -51,7 +53,7 @@ CPURegistersDlg::CPURegistersDlg(wxWindow* parent)
 
 	wxToolBar* toolbar = PropGridManager->GetToolBar();
 	wxSize ToolSize = toolbar->GetToolSize();
-	int search_control_pos = ToolSize.GetWidth() * toolbar->GetToolsCount() + 10;
+	unsigned int search_control_pos = ToolSize.GetWidth() * toolbar->GetToolsCount() + 10;
 	m_SearchCtrl = new wxTextCtrl(PropGridManager->GetToolBar(), ID_SEARCH_CTRL, _(""), wxPoint(search_control_pos, 0), wxSize(150, ToolSize.GetHeight()) );
 
 	toolbar->AddControl(m_SearchCtrl);
@@ -68,7 +70,6 @@ CPURegistersDlg::~CPURegistersDlg()
 
 bool FindString(wxString a, wxString b)
 {
-    int match = 0;
     for(size_t i = 0 ; i < a.length();i++)
     {
         size_t k = 0;
@@ -105,16 +106,22 @@ void CPURegistersDlg::OnSearchCtrl(wxCommandEvent& event)
            prop->Hide( false );
    }
     m_cpu_register_page->ExpandAll();
-
 }
 
 void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted)
 {
+    const wxColour &changedColour = Manager::Get()->GetColourManager()->GetColour(wxT("dbg_watches_changed"));
     wxPGProperty* prop = m_cpu_register_node->GetPropertyByName(reg_name);
     if(prop == nullptr)
     {
         prop = m_cpu_register_node->AppendChild( new wxStringProperty(reg_name, reg_name));
     }
+    if(prop->GetValueString() != hexValue)
+        m_cpu_register_page->GetGrid()->SetPropertyTextColour(prop, changedColour);
+    else
+        m_cpu_register_page->GetGrid()->SetPropertyColourToDefault(prop);
+
+
     prop->SetValue(hexValue);
     m_cpu_register_page->SetPropertyAttribute(prop, wxT("Units"), interpreted);
 }
@@ -126,5 +133,5 @@ void CPURegistersDlg::EnableWindow(bool en)
 
 void CPURegistersDlg::Clear()
 {
-
+    m_cpu_register_page->Clear();
 }
