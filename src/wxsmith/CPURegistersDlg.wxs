@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="CPURegistersDlg">
+		<id_arg>0</id_arg>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<rows>1</rows>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="Custom" name="ID_CUSTOM1" subclass="wxPropertyGridManager" variable="PropGridManager" member="yes">
+					<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
+					<include_file>wx/propgrid/manager.h</include_file>
+					<style>wxPG__TOOLBAR| wxPG__DESCRIPTION| wxPG__BOLD__MODIFIED| wxPG__SPLITTER__AUTO__CENTER</style>
+					<size>195,85</size>
+				</object>
+				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -1,34 +1,57 @@
-/*
- * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
- * http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 #ifndef CPUREGISTERSDLG_H
 #define CPUREGISTERSDLG_H
 
-#include <wx/panel.h>
 #include <cbdebugger_interfaces.h>
 
-class wxListCtrl;
+#ifndef WX_PRECOMP
+	//(*HeadersPCH(CPURegistersDlg)
+	#include <wx/panel.h>
+	#include <wx/sizer.h>
+	//*)
+#endif
+//(*Headers(CPURegistersDlg)
+#include <wx/propgrid/manager.h>
+//*)
 
-class CPURegistersDlg : public wxPanel, public cbCPURegistersDlg
+class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 {
-    public:
-        CPURegistersDlg(wxWindow* parent);
+	public:
 
-        wxWindow* GetWindow() { return this; }
+		CPURegistersDlg(wxWindow* parent);
+		virtual ~CPURegistersDlg();
 
-        void Clear();
-        void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
-        void EnableWindow(bool enable);
-    protected:
-        int RegisterIndex(const wxString& reg_name);
-        void OnRefresh(wxCommandEvent& event);
+		wxWindow* GetWindow()       {return this;};
+		void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
+		void EnableWindow(bool en);
 
-    private:
-        DECLARE_EVENT_TABLE();
-    private:
-        wxListCtrl* m_pList;
+		void Clear();
+
+		void OnSearchCtrl(wxCommandEvent& event);
+
+		wxTextCtrl* m_SearchCtrl;
+
+		//(*Declarations(CPURegistersDlg)
+		wxPropertyGridManager* PropGridManager;
+		//*)
+
+	protected:
+
+		//(*Identifiers(CPURegistersDlg)
+		static const long ID_CUSTOM1;
+		//*)
+
+		static const long ID_SEARCH_CTRL;
+
+	private:
+
+		//(*Handlers(CPURegistersDlg)
+		//*)
+
+		wxPropertyGridPage* m_cpu_register_page;
+		wxPGProperty*       m_cpu_register_node;
+		wxPGProperty*       m_per_register_node;
+
+		DECLARE_EVENT_TABLE()
 };
 
-#endif // CPUREGISTERSDLG_H
+#endif

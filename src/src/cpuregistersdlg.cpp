@@ -1,86 +1,130 @@
-/*
- * This file is part of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
- * http://www.gnu.org/licenses/gpl-3.0.html
- *
- * $Revision$
- * $Id$
- * $HeadURL$
- */
+#include "include/sdk.h"
+#include "CPURegistersDlg.h"
 
-#include "sdk.h"
+#ifndef WX_PRECOMP
+	//(*InternalHeadersPCH(CPURegistersDlg)
+	#include <wx/intl.h>
+	#include <wx/string.h>
+	//*)
+#endif
+//(*InternalHeaders(CPURegistersDlg)
+//*)
 
-#include "cpuregistersdlg.h"
-#include <wx/intl.h>
-#include <wx/sizer.h>
-#include <wx/listctrl.h>
+//(*IdInit(CPURegistersDlg)
+const long CPURegistersDlg::ID_CUSTOM1 = wxNewId();
+//*)
+const long CPURegistersDlg::ID_SEARCH_CTRL = wxNewId();
 
-BEGIN_EVENT_TABLE(CPURegistersDlg, wxPanel)
-//    EVT_BUTTON(XRCID("btnRefresh"), CPURegistersDlg::OnRefresh)
+BEGIN_EVENT_TABLE(CPURegistersDlg,wxPanel)
+	//(*EventTable(CPURegistersDlg)
+	//*)
+	EVT_TEXT( ID_SEARCH_CTRL, CPURegistersDlg::OnSearchCtrl )
 END_EVENT_TABLE()
 
-CPURegistersDlg::CPURegistersDlg(wxWindow* parent) :
-    wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+CPURegistersDlg::CPURegistersDlg(wxWindow* parent)
 {
-    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-    m_pList = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL);
-    sizer->Add(m_pList, 1, wxGROW);
-    SetSizer(sizer);
-    Layout();
+	//(*Initialize(CPURegistersDlg)
+	wxFlexGridSizer* FlexGridSizer1;
 
-    wxFont font(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-    m_pList->SetFont(font);
+	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
+	FlexGridSizer1 = new wxFlexGridSizer(1, 1, 0, 0);
+	FlexGridSizer1->AddGrowableCol(0);
+	FlexGridSizer1->AddGrowableRow(0);
+	PropGridManager = new wxPropertyGridManager(this,ID_CUSTOM1,wxDefaultPosition,wxSize(195,85),wxPG_TOOLBAR| wxPG_DESCRIPTION| wxPG_BOLD_MODIFIED| wxPG_SPLITTER_AUTO_CENTER,_T("ID_CUSTOM1"));
+	FlexGridSizer1->Add(PropGridManager, 1, wxALL|wxEXPAND, 5);
+	SetSizer(FlexGridSizer1);
+	FlexGridSizer1->Fit(this);
+	FlexGridSizer1->SetSizeHints(this);
+	//*)
 
-    Clear();
+
+
+	#if wxCHECK_VERSION(3, 0, 0)
+        m_cpu_register_page = PropGridManager->AddPage(_("CPU register"));
+    #else
+        int page = PropGridManager->AddPage(_("CPU register"));
+        m_cpu_register_page = PropGridManager->GetPage(page);
+    #endif
+
+	m_cpu_register_node = m_cpu_register_page->Append(new wxPropertyCategory(_("CPU"), _("CPU")));
+	m_per_register_node = m_cpu_register_page->Append(new wxPropertyCategory(_("periphery"), _("periphery")));
+
+	wxToolBar* toolbar = PropGridManager->GetToolBar();
+	wxSize ToolSize = toolbar->GetToolSize();
+	int search_control_pos = ToolSize.GetWidth() * toolbar->GetToolsCount() + 10;
+	m_SearchCtrl = new wxTextCtrl(PropGridManager->GetToolBar(), ID_SEARCH_CTRL, _(""), wxPoint(search_control_pos, 0), wxSize(150, ToolSize.GetHeight()) );
+
+	toolbar->AddControl(m_SearchCtrl);
+
+	m_cpu_register_page->SetColumnCount(3);
+
 }
 
-void CPURegistersDlg::Clear()
+CPURegistersDlg::~CPURegistersDlg()
 {
-    m_pList->ClearAll();
-    m_pList->Freeze();
-    m_pList->DeleteAllItems();
-    m_pList->InsertColumn(0, _("Register"), wxLIST_FORMAT_LEFT);
-    m_pList->InsertColumn(1, _("Hex"), wxLIST_FORMAT_RIGHT);
-    m_pList->InsertColumn(2, _("Interpreted"), wxLIST_FORMAT_LEFT);
-    m_pList->Thaw();
+	//(*Destroy(CPURegistersDlg)
+	//*)
 }
 
-int CPURegistersDlg::RegisterIndex(const wxString& reg_name)
+bool FindString(wxString a, wxString b)
 {
-    for (int i = 0; i < m_pList->GetItemCount(); ++i)
+    int match = 0;
+    for(size_t i = 0 ; i < a.length();i++)
     {
-        if (m_pList->GetItemText(i).CmpNoCase(reg_name) == 0)
-            return i;
+        size_t k = 0;
+        for(k = 0; k < b.length() && i + k < a.length();k++)
+        {
+            if(a[i+k] != b[k]) break;
+        }
+        if(k == b.length())
+            return true;
     }
-    return -1;
+    return false;
+}
+
+void CPURegistersDlg::OnSearchCtrl(wxCommandEvent& event)
+{
+    size_t child_count = m_cpu_register_node->GetChildCount();
+   wxString searchStr = event.GetString();
+
+   if(searchStr == wxEmptyString)
+   {
+        for (size_t i = 0 ; i < child_count; i++)
+           m_cpu_register_node->Item(i)->Hide( false );
+
+        m_cpu_register_page->ExpandAll();
+        return;
+   }
+
+   for (size_t i = 0 ; i < child_count; i++)
+   {
+       wxPGProperty* prop = m_cpu_register_node->Item(i);
+       if (FindString(prop->GetLabel(),searchStr) == false )
+           prop->Hide( true );
+       else
+           prop->Hide( false );
+   }
+    m_cpu_register_page->ExpandAll();
+
 }
 
 void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted)
 {
-    // find existing register
-    int idx = RegisterIndex(reg_name);
-    if (idx == -1)
+    wxPGProperty* prop = m_cpu_register_node->GetPropertyByName(reg_name);
+    if(prop == nullptr)
     {
-        // if it doesn't exist, add it
-        idx = m_pList->GetItemCount();
-        m_pList->InsertItem(idx, reg_name);
+        prop = m_cpu_register_node->AppendChild( new wxStringProperty(reg_name, reg_name));
     }
-
-    m_pList->SetItem(idx, 1, hexValue);
-    m_pList->SetItem(idx, 2, interpreted);
-
-#if defined(__WXMSW__) || wxCHECK_VERSION(3, 1, 0)
-    const int autoSizeMode = wxLIST_AUTOSIZE_USEHEADER;
-#else
-    const int autoSizeMode = wxLIST_AUTOSIZE;
-#endif
-
-    for (int i = 0; i < 3; ++i)
-    {
-        m_pList->SetColumnWidth(i, autoSizeMode);
-    }
+    prop->SetValue(hexValue);
+    m_cpu_register_page->SetPropertyAttribute(prop, wxT("Units"), interpreted);
 }
 
-void CPURegistersDlg::EnableWindow(bool enable)
+void CPURegistersDlg::EnableWindow(bool en)
 {
-    m_pList->Enable(enable);
+
+}
+
+void CPURegistersDlg::Clear()
+{
+
 }
