@@ -491,6 +491,7 @@ void ProjectLoader::DoBuild(TiXmlElement* parentNode)
 
         DoBuildTarget(node);
         DoEnvironment(node, m_pProject);
+        DoDebugger(node,m_pProject);
         node = node->NextSiblingElement("Build");
     }
 }
@@ -892,6 +893,23 @@ void ProjectLoader::DoEnvironment(TiXmlElement* parentNode, CompileOptionsBase* 
     }
 }
 
+void ProjectLoader::DoDebugger(TiXmlElement* parentNode, cbProject* base)
+{
+    TiXmlElement* node = parentNode->FirstChildElement("Debugger");
+    if (node)
+    {
+        TiXmlElement* child = node->FirstChildElement("SVD");
+        if (child)
+        {
+            bool enable = cbC2U(child->Attribute("enable"));
+            base->SetSVDEnable(enable);
+            wxString path = cbC2U(child->Attribute("path"));
+            if  (!path.IsEmpty())
+                base->SetSVDPath(path);
+        }
+    }
+}
+
 namespace
 {
 wxString makePathAbsoluteIfNeeded(const wxString& path, const wxString& basePath)
@@ -1201,6 +1219,15 @@ void ProjectLoader::SaveEnvironment(TiXmlElement* parent, CompileOptionsBase* ba
     }
 }
 
+void ProjectLoader::SaveDebugger(TiXmlElement* parent, cbProject* base)
+{
+    if (!base)
+        return;
+    TiXmlElement* node = AddElement(parent, "Debugger");
+    TiXmlElement* elem = AddElement(node, "SVD", "enable", base->IsSVDEnable());
+    elem->SetAttribute("path", cbU2C(base->GetSVDPath()));
+}
+
 bool ProjectLoader::Save(const wxString& filename)
 {
     return Save(filename, nullptr);
@@ -1469,6 +1496,7 @@ bool ProjectLoader::ExportTargetAsProject(const wxString& filename, const wxStri
     }
 
     SaveEnvironment(buildnode, m_pProject);
+    SaveDebugger(buildnode, m_pProject);
 
     TiXmlElement* node = AddElement(prjnode, "Compiler");
     AddArrayOfElements(node, "Add", "option",    m_pProject->GetCompilerOptions());

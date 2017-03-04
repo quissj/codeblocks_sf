@@ -84,6 +84,7 @@ class DLLIMPORT ProjectLoader : public IBaseLoader
         void DoBuildTargetOptions(TiXmlElement* parentNode, ProjectBuildTarget* target);
 
         void DoEnvironment(TiXmlElement* parentNode, CompileOptionsBase* base);
+        void DoDebugger(TiXmlElement* parentNode, cbProject* base);
 
         void DoUnits(const TiXmlElement* parentNode);
         void DoUnitOptions(const TiXmlElement* parentNode, ProjectFile* file);
@@ -96,6 +97,7 @@ class DLLIMPORT ProjectLoader : public IBaseLoader
         TiXmlElement* AddElement(TiXmlElement* parent, const char* name, const char* attr, int attribute);
         void AddArrayOfElements(TiXmlElement* parent, const char* name, const char* attr, const wxArrayString& array, bool isPath = false);
         void SaveEnvironment(TiXmlElement* parent, CompileOptionsBase* base);
+        void SaveDebugger(TiXmlElement* parent, cbProject* base);
 
         // accepts a questionable compiler index and returns a valid compiler index
         // (popping up a selection dialog if needed)
