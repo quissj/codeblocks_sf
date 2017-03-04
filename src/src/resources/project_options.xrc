@@ -818,6 +818,63 @@
 						</object>
 						<label>Notes</label>
 					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL1">
+							<object class="wxFlexGridSizer">
+								<cols>1</cols>
+								<growablecols>0</growablecols>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer">
+										<label>SVD</label>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer">
+												<cols>5</cols>
+												<growablecols>2</growablecols>
+												<object class="sizeritem">
+													<object class="wxCheckBox" name="chkDebuggerUseSVD">
+														<label>Use SVD File</label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT24">
+														<label>Path:</label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxTextCtrl" name="txtDebuggerSVDPath" />
+													<flag>wxALL|wxEXPAND</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxButton" name="btnDebuggerSVDPathBrowse">
+														<label>...</label>
+														<size>29,23</size>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Debugger (general)</label>
+					</object>
 				</object>
 				<flag>wxALL|wxEXPAND</flag>
 				<border>8</border>

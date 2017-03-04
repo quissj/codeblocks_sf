@@ -88,6 +88,9 @@ BEGIN_EVENT_TABLE(ProjectOptionsDlg, wxScrollingDialog)
     EVT_CHECKBOX(  XRCID("chkCreateStaticLib"),                 ProjectOptionsDlg::OnCreateImportFileClick)
     EVT_CHECKBOX(  XRCID("chkCreateDefFile"),                   ProjectOptionsDlg::OnCreateDefFileClick)
 
+    EVT_CHECKBOX(  XRCID("chkDebuggerUseSVD"),                  ProjectOptionsDlg::OnDebuggerUseSVD)
+    EVT_BUTTON(    XRCID("btnDebuggerSVDPathBrowse"),           ProjectOptionsDlg::OnDebuggerSVDPath)
+
     EVT_TREE_SEL_CHANGED(XRCID("tcOverview"),                   ProjectOptionsDlg::OnScriptsOverviewSelChanged)
     EVT_BUTTON(XRCID("btnCheckScripts"),                        ProjectOptionsDlg::OnCheckScripts)
     EVT_BUTTON(XRCID("btnAddPreScripts"),                       ProjectOptionsDlg::OnAddScript)
@@ -133,6 +136,14 @@ ProjectOptionsDlg::ProjectOptionsDlg(wxWindow* parent, cbProject* project)
     XRCCTRL(*this, "txtNotes", wxTextCtrl)->SetValue(m_Project->GetNotes());
 
     XRCCTRL(*this, "chkCheckFiles", wxCheckBox)->SetValue(m_Project->GetCheckForExternallyModifiedFiles());
+
+    XRCCTRL(*this, "chkDebuggerUseSVD", wxCheckBox)->SetValue(m_Project->IsSVDEnable());
+    XRCCTRL(*this, "txtDebuggerSVDPath", wxTextCtrl)->SetValue(m_Project->GetSVDPath());
+    if (!m_Project->IsSVDEnable())
+    {
+        XRCCTRL(*this, "txtDebuggerSVDPath", wxTextCtrl)->Enable(false);
+        XRCCTRL(*this, "btnDebuggerSVDPathBrowse", wxButton)->Enable(false);
+    }
 
     FillBuildTargets();
 
@@ -1184,6 +1195,29 @@ void ProjectOptionsDlg::OnScriptMoveDown(cb_unused wxSpinEvent& event)
     base->SetBuildScripts(scripts);
 }
 
+void ProjectOptionsDlg::OnDebuggerSVDPath(wxCommandEvent& event)
+{
+        EditPathDlg dlg(this,
+                    m_Project->GetBasePath(),
+                    m_Project->GetBasePath(),
+                    _("Select SVD file"),
+                    wxEmptyString,
+                    false,
+                    false,
+                    wxT("*.svd"));
+    PlaceWindow(&dlg);
+    if (dlg.ShowModal() == wxID_OK)
+        XRCCTRL(*this, "txtDebuggerSVDPath", wxTextCtrl)->SetValue(dlg.GetPath());
+}
+
+void ProjectOptionsDlg::OnDebuggerUseSVD(wxCommandEvent& event)
+{
+    bool enable = event.IsChecked();
+
+    XRCCTRL(*this, "txtDebuggerSVDPath", wxTextCtrl)->Enable(enable);
+    XRCCTRL(*this, "btnDebuggerSVDPathBrowse", wxButton)->Enable(enable);
+}
+
 void ProjectOptionsDlg::OnUpdateUI(cb_unused wxUpdateUIEvent& event)
 {
     wxListBox* lstTargets = XRCCTRL(*this, "lstBuildTarget", wxListBox);
@@ -1328,6 +1362,8 @@ void ProjectOptionsDlg::EndModal(int retCode)
         m_Project->SetShowNotesOnLoad(XRCCTRL(*this, "chkShowNotes", wxCheckBox)->GetValue());
         m_Project->SetCheckForExternallyModifiedFiles(XRCCTRL(*this, "chkCheckFiles", wxCheckBox)->GetValue());
         m_Project->SetNotes(XRCCTRL(*this, "txtNotes", wxTextCtrl)->GetValue());
+        m_Project->SetSVDEnable(XRCCTRL(*this, "chkDebuggerUseSVD", wxCheckBox)->GetValue());
+        m_Project->SetSVDPath(XRCCTRL(*this, "txtDebuggerSVDPath", wxTextCtrl)->GetValue());
 
         if (m_Current_Sel == -1)
             m_Current_Sel = 0; // force update of global options
@@ -1353,4 +1389,7 @@ void ProjectOptionsDlg::EndModal(int retCode)
 
     wxScrollingDialog::EndModal(retCode);
 }
+
+
+
 
