@@ -58,6 +58,8 @@ cbProject::cbProject(const wxString& filename) :
     m_FileArray(ProjectFile::CompareProjectFiles),
     m_Loaded(false),
     m_CurrentlyLoading(false),
+    m_SVDEnable(false),
+    m_SVDPath(wxEmptyString),
     m_PCHMode(pchSourceFile),
     m_CurrentlyCompilingTarget(nullptr),
     m_ExtendedObjectNamesGeneration(false),
@@ -898,6 +900,28 @@ bool cbProject::RemoveFile(ProjectFile* pf)
 
     SetModified(true);
     return true;
+}
+
+void cbProject::SetSVDEnable(bool enable)
+{
+    m_SVDEnable = enable;
+}
+
+
+bool cbProject::IsSVDEnable() const
+{
+    return m_SVDEnable;
+}
+
+void cbProject::SetSVDPath(const wxString& svdPath)
+{
+    m_SVDPath = svdPath;
+}
+
+
+wxString cbProject::GetSVDPath() const
+{
+    return m_SVDPath;
 }
 
 const wxArrayString& cbProject::GetVirtualFolders() const

@@ -421,6 +421,26 @@ class DLLIMPORT cbProject : public CompileTargetBase
           */
         bool RemoveFile(ProjectFile* pf);
 
+        /** Enable SVD files to use by the debugger
+          * @param enable True if SVD File should be used by the debugger
+          */
+        void SetSVDEnable(bool enable = true);
+
+        /** Return true if SVD files should be used by the debugger
+          * @return True if the svd files should be used
+          */
+        bool IsSVDEnable() const;
+
+        /** Set path to the svd file.
+          * @param svdPath Path to the svd file used by the debugger
+          */
+        void SetSVDPath(const wxString& svdPath);
+
+        /** Get path to the svd file.
+          * @return Return the SVD path. May can contain macros
+          */
+        wxString GetSVDPath() const;
+
         struct Glob
         {
             wxString m_Path;
@@ -715,6 +735,9 @@ class DLLIMPORT cbProject : public CompileTargetBase
         bool     m_CurrentlyLoading;
         wxString m_CommonTopLevelPath;
         wxString m_BasePath;
+
+        bool     m_SVDEnable;
+        wxString m_SVDPath;
 
         PCHMode m_PCHMode;
 
