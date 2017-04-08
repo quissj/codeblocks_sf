@@ -603,6 +603,11 @@ void GDB_driver::CPURegisters()
         QueueCommand(new GdbCmd_InfoRegisters(this));
 }
 
+void GDB_driver::Peripherals()
+{
+    QueueCommand(new GdbCmd_PeripheralRegisters(this));
+}
+
 void GDB_driver::SwitchToFrame(size_t number)
 {
     ResetCursor();

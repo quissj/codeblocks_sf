@@ -95,6 +95,7 @@ enum DebugCommandConst
     CMD_BACKTRACE,
     CMD_DISASSEMBLE,
     CMD_REGISTERS,
+    CMD_PERIPHERALS,
     CMD_MEMORYDUMP,
     CMD_RUNNINGTHREADS
 };
@@ -242,6 +243,7 @@ bool DebuggerGDB::SupportsFeature(cbDebuggerFeature::Flags flag)
         case cbDebuggerFeature::Breakpoints:
         case cbDebuggerFeature::Callstack:
         case cbDebuggerFeature::CPURegisters:
+        case cbDebuggerFeature::Peripherals:
         case cbDebuggerFeature::Disassembly:
         case cbDebuggerFeature::Watches:
         case cbDebuggerFeature::ValueTooltips:
@@ -261,6 +263,7 @@ bool DebuggerGDB::SupportsFeature(cbDebuggerFeature::Flags flag)
         case cbDebuggerFeature::Breakpoints:
         case cbDebuggerFeature::Callstack:
         case cbDebuggerFeature::CPURegisters:
+        case cbDebuggerFeature::Peripherals:
         case cbDebuggerFeature::Disassembly:
         case cbDebuggerFeature::Watches:
         case cbDebuggerFeature::ValueTooltips:
@@ -1111,6 +1114,9 @@ void DebuggerGDB::RequestUpdate(DebugWindows window)
         case CPURegisters:
             RunCommand(CMD_REGISTERS);
             break;
+        case Peripherals:
+            RunCommand(CMD_PERIPHERALS);
+            break;
         case Disassembly:
             RunCommand(CMD_DISASSEMBLE);
             break;
@@ -1246,6 +1252,13 @@ void DebuggerGDB::RunCommand(int cmd)
         {
             if (m_State.HasDriver())
                 m_State.GetDriver()->CPURegisters();
+            break;
+        }
+
+        case CMD_PERIPHERALS:
+        {
+            if (m_State.HasDriver())
+                m_State.GetDriver()->Peripherals();
             break;
         }
 
@@ -2029,6 +2042,10 @@ void DebuggerGDB::OnCursorChanged(wxCommandEvent& WXUNUSED(event))
             // update CPU registers
             if (dbg_manager->UpdateCPURegisters())
                 RunCommand(CMD_REGISTERS);
+
+            // update peripheral registers
+            if (dbg_manager->UpdatePeripherals())
+                RunCommand(CMD_PERIPHERALS);
 
             // update callstack
             if (dbg_manager->UpdateBacktrace())

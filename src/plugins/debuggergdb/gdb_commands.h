@@ -1460,6 +1460,117 @@ class GdbCmd_InfoRegisters : public DebuggerCmd
 };
 
 /**
+  * Command to examine peripheral registers.
+  */
+class GdbCmd_PeripheralRegisters : public DebuggerCmd
+{
+    public:
+        /** @param dlg Peripherals dialog. */
+        GdbCmd_PeripheralRegisters(DebuggerDriver* driver)
+            : DebuggerCmd(driver)
+        {
+            cbCPURegistersDlg *dialog = Manager::Get()->GetDebuggerManager()->GetCPURegistersDialog();
+            wxArrayString addressList = dialog->GetBaseAddressList();
+
+            if (!addressList.IsEmpty())
+            {
+                m_Cmd << _T("if 1\n");
+
+                for (int i = 0; i < addressList.GetCount(); i++)
+                {
+                    m_Cmd << _T("x/1xw"); //"x/32xb 0x46d000"
+                    m_Cmd << addressList.Item(i);
+                    m_Cmd << wxT("\n");
+                }
+
+                m_Cmd << _T("end");
+            }
+
+//            m_Cmd << _T("if 1\n");
+//            m_Cmd << _T("x/1xw 0x46d000");
+//            m_Cmd << wxT("\n");
+//            m_Cmd << _T("x/1xw 0x401070\n");
+//            m_Cmd << _T("x/1xw 0x401080\n");
+//            m_Cmd << _T("end");
+//            m_Cmd.Printf(_T("x/1xw %s"), address.c_str());
+        }
+        void ParseOutput(const wxString& output)
+        {
+//            [debug]>>>>>>cb_gdb:
+//            [debug]> if 1
+//            x/1xw0x48000400
+//            x/1xw0x48000404
+//            end
+//            [debug] > > >0x48000400:	0x00000000
+//            [debug]0x48000404:	0x00000000
+//            [debug]>>>>>>cb_gdb:
+
+            // output is a series of:
+            //
+            // 0x22ffc0:       0xf0    0xff    0x22    0x00    0x4f    0x6d    0x81    0x7c
+            // or
+            // 0x85267a0 <RS485TxTask::taskProc()::rcptBuf>:   0x00   0x00   0x00   0x00   0x00   0x00   0x00   0x00
+
+//            wxArrayString lines = GetArrayFromString(output, _T('\n'));
+//            for (unsigned int i = 0; i < lines.GetCount(); ++i)
+//            {
+//                if (reRegisters.Matches(lines[i]))
+//                {
+//                    const wxString &addr = reRegisters.GetMatch(lines[i], 1);
+//                    const wxString &hex = reRegisters.GetMatch(lines[i], 2);
+//                    const wxString &interpreted = reRegisters.GetMatch(lines[i], 3);
+//                    dialog->SetRegisterValue(addr, hex, interpreted);
+//                }
+//            }
+
+            cbCPURegistersDlg *dialog = Manager::Get()->GetDebuggerManager()->GetCPURegistersDialog();
+
+//            dialog->Begin();
+//            dialog->Clear();
+
+            wxArrayString lines = GetArrayFromString(output, _T('\n'));
+            wxString addr, memory;
+
+            for (unsigned int i = 0; i < lines.GetCount(); ++i)
+            {
+                if (lines[i].First(_T(':')) == -1)
+                {
+//                        dialog->AddError(lines[i]);
+                    continue;
+                }
+                addr = lines[i].BeforeFirst(_T(':'));
+                memory = lines[i].AfterFirst(_T(':'));
+
+                size_t pos = addr.find(_T('x'));
+                wxString addrword=wxT("0x");
+                if (pos != wxString::npos)
+                {
+                    for( int index = 1; index < 9; index++ ) //0x46d000 icin 7
+                        addrword << addr[pos + index]; //Endian ok.
+
+//                    addrword=(wxT("0x")+wxString::Format( wxT( "%X" ), test ));
+
+//                    dialog->AddHexWord(addr, hexword);
+//                    pos = memory.find(_T('x'), pos + 1); // skip current 'x'
+                }
+
+                pos = memory.find(_T('x'));
+                while (pos != wxString::npos)
+                {
+                    wxString hexword;
+
+                    for( int index = 1; index < 9; index++ )
+                        hexword << memory[pos + index]; //Endian ok.
+
+                    dialog->AddHexWord(addrword, hexword);
+                    pos = memory.find(_T('x'), pos + 1); // skip current 'x'
+                }
+            }
+            dialog->End();
+        }
+};
+
+/**
   * Command to run a disassembly.
   */
 class GdbCmd_Disassembly : public DebuggerCmd

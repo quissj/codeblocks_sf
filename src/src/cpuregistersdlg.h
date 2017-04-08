@@ -22,6 +22,7 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 
 		wxWindow* GetWindow()       {return this;};
 		void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
+		void AddHexWord(const wxString& addr, const wxString& hexword);
 		void EnableWindow(bool en);
 
 		void Clear();
