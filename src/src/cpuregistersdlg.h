@@ -2,6 +2,8 @@
 #define CPUREGISTERSDLG_H
 
 #include <cbdebugger_interfaces.h>
+#include <tinyxml/tinyxml.h>
+#include <tinywxuni.h>
 
 #ifndef WX_PRECOMP
 	//(*HeadersPCH(CPURegistersDlg)
@@ -23,6 +25,10 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 		wxWindow* GetWindow()       {return this;};
 		void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
 		void AddHexWord(const wxString& addr, const wxString& hexword);
+		void SvdParser();
+		wxString CalcOffset( const wxString & baseAddress, const wxString & offset );
+        TiXmlElement* GetDerivedPeriphal(TiXmlElement *peripheral, const char* derivedName);
+        TiXmlElement* GetFirstPeripheral(const wxString& m_SvdPath);
 		void EnableWindow(bool en);
 
 		void Clear();
@@ -30,6 +36,8 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 		void OnSearchCtrl(wxCommandEvent& event);
 		void OnPropertyChanged(wxPropertyGridEvent &event);
         void OnPropertyChanging(wxPropertyGridEvent &event);
+        void OnProjectActivated(CodeBlocksEvent& event);
+        void OnProjectClosed(CodeBlocksEvent& event);
 
 
 		wxTextCtrl* m_SearchCtrl;
