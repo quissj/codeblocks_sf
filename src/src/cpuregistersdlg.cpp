@@ -143,30 +143,22 @@ void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString&
 
 }
 
-void CPURegistersDlg::AddHexWord(const wxString& addr, const wxString& hexword)
+void CPURegistersDlg::SetPeripheralValue(const wxString& reg_name, const wxString& hexValue)
 {
-//    for (int index = 0; index < m_pList->GetItemCount(); index++)
-//    {
-//        if (addr == GetTextByColumn(index, 3))
-//        {
-//            m_pList->SetItem(index, 1, hexword);
-//
-//            wxString bin[16] = {wxT("0000"), wxT("0001"), wxT("0010"), wxT("0011"), wxT("0100"), wxT("0101"), wxT("0110"), wxT("0111"), wxT("1000"), wxT("1001"), wxT("1010"), wxT("1011"), wxT("1100"), wxT("1101"), wxT("1110"), wxT("1111")};
-//            long hexValue = 0;
-//            wxString sHex = wxEmptyString;
-//
-//            hexword.ToLong(&hexValue, 16);
-//
-//            for (int i = 0; i < 8; i++, hexValue >>= 4)
-//            {
-//                sHex.Prepend(wxT(" ") + bin[hexValue & 0xf]);
-//            }
-//
-//            m_pList->SetItem(index, 2, sHex);
-//
-//            break;
-//        }
-//    }
+    const wxColour &changedColour = Manager::Get()->GetColourManager()->GetColour(wxT("dbg_watches_changed"));
+    wxPGProperty* prop = m_per_register_node->GetPropertyByName(reg_name);
+    if(prop == nullptr)
+    {
+        prop = m_cpu_register_node->AppendChild( new wxStringProperty(reg_name, reg_name));
+    }
+
+    if(prop->GetValueString() != hexValue)
+        m_cpu_register_page->GetGrid()->SetPropertyTextColour(prop, changedColour);
+    else
+        m_cpu_register_page->GetGrid()->SetPropertyColourToDefault(prop);
+
+    prop->SetValue(hexValue);
+    m_cpu_register_page->SetPropertyHelpString(prop, reg_name + wxT(" = ") +  hexValue);
 }
 
 void CPURegistersDlg::SvdParser()
@@ -246,7 +238,7 @@ void CPURegistersDlg::SvdParser()
 
 //                size_t child_count = m_cpu_register_node->GetChildCount();
 
-                    wxPGProperty* prop = m_per_register_node->AppendChild(new wxStringProperty(peripheralName, peripheralName));
+                    wxPGProperty* prop = m_per_register_node->AppendChild(new wxStringProperty(peripheralName, peripheralbaseAddress));
 
 
                     TiXmlHandle peripheralHandle(peripheral);
@@ -305,7 +297,7 @@ void CPURegistersDlg::SvdParser()
 
 //                    m_pTree->AppendItem(peripheralNodeId,registerName);
 //                    prop = prop->AppendChild(new wxStringProperty(registerName, registerName));
-                        prop->AppendChild(new wxStringProperty(registerName, registerName));
+                        prop->AppendChild(new wxStringProperty(registerName, registerAddressOffset));
                     }
 
                     peripheral = tempPeripheral; // In case of derivedFrom, continue from the untouched peripheral
