@@ -40,6 +40,7 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
         void OnPropertyChanging(wxPropertyGridEvent &event);
         void OnProjectActivated(CodeBlocksEvent& event);
         void OnProjectClosed(CodeBlocksEvent& event);
+        void OnExpand(wxPropertyGridEvent &event);
 
 
 		wxTextCtrl* m_SearchCtrl;

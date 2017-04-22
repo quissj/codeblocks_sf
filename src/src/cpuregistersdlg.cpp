@@ -32,6 +32,7 @@ BEGIN_EVENT_TABLE(CPURegistersDlg,wxPanel)
 
     EVT_PG_CHANGED(ID_CUSTOM1, CPURegistersDlg::OnPropertyChanged)
     EVT_PG_CHANGING(ID_CUSTOM1, CPURegistersDlg::OnPropertyChanging)
+    EVT_PG_ITEM_EXPANDED(ID_CUSTOM1, CPURegistersDlg::OnExpand)
 END_EVENT_TABLE()
 
 CPURegistersDlg::CPURegistersDlg(wxWindow* parent)
@@ -448,4 +449,12 @@ void CPURegistersDlg::OnProjectActivated(CodeBlocksEvent& event)
 void CPURegistersDlg::OnProjectClosed(CodeBlocksEvent& event)
 {
     Clear();
+}
+
+void CPURegistersDlg::OnExpand(wxPropertyGridEvent &event)
+{
+    cbDebuggerPlugin* plugin = Manager::Get()->GetDebuggerManager()->GetActiveDebugger();
+
+    if (plugin)
+        plugin->RequestUpdate(cbDebuggerPlugin::CPURegisters);
 }
