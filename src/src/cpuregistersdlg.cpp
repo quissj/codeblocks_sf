@@ -145,14 +145,16 @@ void CPURegistersDlg::SetRegisterValue(const wxString& reg_name, const wxString&
 
 void CPURegistersDlg::SetPeripheralValue(const wxString& reg_name, const wxString& hexValue)
 {
-    const wxColour &changedColour = Manager::Get()->GetColourManager()->GetColour(wxT("dbg_watches_changed"));
-    wxPGProperty* prop = m_per_register_node->GetPropertyByName(reg_name);
-    if(prop == nullptr)
+    const wxColour& changedColour = Manager::Get()->GetColourManager()->GetColour(wxT("dbg_watches_changed"));
+//    wxPGProperty* prop = m_per_register_node->GetPropertyByName(reg_name);
+    wxPGProperty* prop = GetChildPropertyByName(reg_name);
+
+    if (prop == nullptr)
     {
-        prop = m_cpu_register_node->AppendChild( new wxStringProperty(reg_name, reg_name));
+        prop = m_cpu_register_node->AppendChild(new wxStringProperty(reg_name, reg_name));  //unnecessary? SvdParser() did it
     }
 
-    if(prop->GetValueString() != hexValue)
+    if (prop->GetValueString() != hexValue)
         m_cpu_register_page->GetGrid()->SetPropertyTextColour(prop, changedColour);
     else
         m_cpu_register_page->GetGrid()->SetPropertyColourToDefault(prop);
@@ -372,11 +374,43 @@ wxArrayString CPURegistersDlg::GetBaseAddressList()
 {
     wxArrayString addressList;
 
-    addressList.Add(_("0x48000800"));
-    addressList.Add(_("0x48000400"));
-    addressList.Add(_("0x48000000"));
+    size_t peripheral_count = m_per_register_node->GetChildCount();
+
+    for (size_t i = 0; i < peripheral_count; i++)
+    {
+        wxPGProperty* perReg = m_per_register_node->Item(i);
+
+        if (perReg->IsExpanded())
+        {
+            for (size_t j = 0; j < perReg->GetChildCount(); j++)
+            {
+                wxString perRegNameWithParent = perReg->Item(j)->GetName(); //GetName() adds parent name with dot before child name, new GetName()?
+                addressList.Add(perRegNameWithParent.AfterFirst(wxT('.'))); //only child name
+            }
+        }
+    }
 
     return addressList;
+}
+
+wxPGProperty* CPURegistersDlg::GetChildPropertyByName(const wxString& name) const
+{
+    size_t peripheral_count = m_per_register_node->GetChildCount();
+
+    for (size_t i = 0; i < peripheral_count; i++)
+    {
+        wxPGProperty* perGroup = m_per_register_node->Item(i);
+
+        for (size_t j = 0; j < perGroup->GetChildCount(); j++)
+        {
+            wxPGProperty* perReg = perGroup->Item(j);
+
+            if (perReg->GetName().AfterFirst(wxT('.')) == name)
+                return perReg;
+        }
+    }
+
+    return NULL;
 }
 
 void CPURegistersDlg::EnableWindow(bool en)

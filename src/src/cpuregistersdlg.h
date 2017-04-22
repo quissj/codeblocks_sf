@@ -30,6 +30,7 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
         TiXmlElement* GetDerivedPeriphal(TiXmlElement *peripheral, const char* derivedName);
         TiXmlElement* GetFirstPeripheral(const wxString& m_SvdPath);
         wxArrayString GetBaseAddressList();
+        wxPGProperty* GetChildPropertyByName( const wxString& name ) const;
 		void EnableWindow(bool en);
 
 		void Clear();
