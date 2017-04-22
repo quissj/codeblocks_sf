@@ -368,6 +368,17 @@ TiXmlElement* CPURegistersDlg::GetFirstPeripheral(const wxString& m_SvdPath)
     return 0;
 }
 
+wxArrayString CPURegistersDlg::GetBaseAddressList()
+{
+    wxArrayString addressList;
+
+    addressList.Add(_("0x48000800"));
+    addressList.Add(_("0x48000400"));
+    addressList.Add(_("0x48000000"));
+
+    return addressList;
+}
+
 void CPURegistersDlg::EnableWindow(bool en)
 {
 

@@ -379,7 +379,7 @@ struct cbDebuggerFeature
         Breakpoints,
         Callstack,
         CPURegisters,
-        Peripherals,
+//        Peripherals,
         Disassembly,
         ExamineMemory,
         Threads,
@@ -585,7 +585,7 @@ class PLUGIN_EXPORT cbDebuggerPlugin: public cbPlugin
         {
             Backtrace,
             CPURegisters,
-            Peripherals,
+//            Peripherals,
             Disassembly,
             ExamineMemory,
             Threads,

@@ -554,6 +554,74 @@ class CdbCmd_InfoRegisters : public DebuggerCmd
 };
 
 /**
+  * Command to examine peripheral registers.
+  */
+class CdbCmd_PeripheralRegisters : public DebuggerCmd
+{
+    public:
+        /** @param dlg Peripherals dialog. */
+        CdbCmd_PeripheralRegisters(DebuggerDriver* driver)
+            : DebuggerCmd(driver)
+        {
+//            cbCPURegistersDlg *dialog = Manager::Get()->GetDebuggerManager()->GetCPURegistersDialog();
+//            wxArrayString addressList = dialog->GetBaseAddressList();
+//
+//            if (!addressList.IsEmpty())
+//            {
+//                m_Cmd << _T("if 1\n");
+//
+//                for (int i = 0; i < addressList.GetCount(); i++)
+//                {
+//                    m_Cmd << _T("x/1xw"); //"x/32xb 0x46d000"
+//                    m_Cmd << addressList.Item(i);
+//                    m_Cmd << wxT("\n");
+//                }
+//
+//                m_Cmd << _T("end");
+//            }
+
+//            m_Cmd << _T("if 1\n");
+//            m_Cmd << _T("x/1xw 0x46d000");
+//            m_Cmd << wxT("\n");
+//            m_Cmd << _T("x/1xw 0x401070\n");
+//            m_Cmd << _T("x/1xw 0x401080\n");
+//            m_Cmd << _T("end");
+//            m_Cmd.Printf(_T("x/1xw %s"), address.c_str());
+        }
+        void ParseOutput(const wxString& output)
+        {
+//            [debug]>>>>>>cb_gdb:
+//            [debug]> if 1
+//            x/1xw0x48000400
+//            x/1xw0x48000404
+//            end
+//            [debug] > > >0x48000400:	0x00000000
+//            [debug]0x48000404:	0x00000000
+//            [debug]>>>>>>cb_gdb:
+
+//            cbCPURegistersDlg *dialog = Manager::Get()->GetDebuggerManager()->GetCPURegistersDialog();
+
+//            dialog->Begin();
+//            dialog->Clear();
+
+//            wxArrayString lines = GetArrayFromString(output, _T('\n'));
+//            for (unsigned int i = 0; i < lines.GetCount(); ++i)
+//            {
+//                if (rePeripheral.Matches(lines[i]))
+//                {
+//                    const wxString& addr = rePeripheral.GetMatch(lines[i], 1);
+//                    const wxString& hex = rePeripheral.GetMatch(lines[i], 2);
+//
+//                    dialog->SetPeripheralValue(addr, hex);
+//                }
+//            }
+
+//            dialog->End();
+        }
+};
+
+
+/**
   * Command to run a disassembly.
   */
 class CdbCmd_Disassembly : public DebuggerCmd

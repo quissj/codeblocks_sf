@@ -203,6 +203,11 @@ void CDB_driver::CPURegisters()
     QueueCommand(new CdbCmd_InfoRegisters(this));
 }
 
+void CDB_driver::Peripherals()
+{
+    QueueCommand(new CdbCmd_PeripheralRegisters(this));
+}
+
 void CDB_driver::SwitchToFrame(size_t number)
 {
     ResetCursor();

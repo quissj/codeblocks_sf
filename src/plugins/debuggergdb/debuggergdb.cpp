@@ -243,7 +243,7 @@ bool DebuggerGDB::SupportsFeature(cbDebuggerFeature::Flags flag)
         case cbDebuggerFeature::Breakpoints:
         case cbDebuggerFeature::Callstack:
         case cbDebuggerFeature::CPURegisters:
-        case cbDebuggerFeature::Peripherals:
+//        case cbDebuggerFeature::Peripherals:
         case cbDebuggerFeature::Disassembly:
         case cbDebuggerFeature::Watches:
         case cbDebuggerFeature::ValueTooltips:
@@ -263,7 +263,7 @@ bool DebuggerGDB::SupportsFeature(cbDebuggerFeature::Flags flag)
         case cbDebuggerFeature::Breakpoints:
         case cbDebuggerFeature::Callstack:
         case cbDebuggerFeature::CPURegisters:
-        case cbDebuggerFeature::Peripherals:
+//        case cbDebuggerFeature::Peripherals:
         case cbDebuggerFeature::Disassembly:
         case cbDebuggerFeature::Watches:
         case cbDebuggerFeature::ValueTooltips:
@@ -1113,8 +1113,6 @@ void DebuggerGDB::RequestUpdate(DebugWindows window)
             break;
         case CPURegisters:
             RunCommand(CMD_REGISTERS);
-            break;
-        case Peripherals:
             RunCommand(CMD_PERIPHERALS);
             break;
         case Disassembly:
@@ -1257,8 +1255,15 @@ void DebuggerGDB::RunCommand(int cmd)
 
         case CMD_PERIPHERALS:
         {
-            if (m_State.HasDriver())
-                m_State.GetDriver()->Peripherals();
+            if (m_pProject)
+            {
+                if (m_pProject->IsSVDEnable())
+                {
+                    if (m_State.HasDriver())
+                        m_State.GetDriver()->Peripherals();
+                }
+            }
+
             break;
         }
 
@@ -2041,11 +2046,10 @@ void DebuggerGDB::OnCursorChanged(wxCommandEvent& WXUNUSED(event))
 
             // update CPU registers
             if (dbg_manager->UpdateCPURegisters())
+            {
                 RunCommand(CMD_REGISTERS);
-
-            // update peripheral registers
-            if (dbg_manager->UpdatePeripherals())
                 RunCommand(CMD_PERIPHERALS);
+            }
 
             // update callstack
             if (dbg_manager->UpdateBacktrace())

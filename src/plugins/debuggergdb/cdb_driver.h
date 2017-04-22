@@ -33,6 +33,7 @@ class CDB_driver : public DebuggerDriver
         virtual void Backtrace();
         virtual void Disassemble();
         virtual void CPURegisters();
+        virtual void Peripherals();
         virtual void SwitchToFrame(size_t number);
         virtual void SetVarValue(const wxString& var, const wxString& value);
         virtual void SetRegValue(const wxString& reg, const wxString& value);

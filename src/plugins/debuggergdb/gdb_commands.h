@@ -149,6 +149,10 @@ static wxRegEx reRegisters(_T("([A-z0-9]+)[ \t]+(0x[0-9A-Fa-f]+)[ \t]+(.*)"));
 // wayne registers
 //static wxRegEx reRegisters(_T("(R[0-9]+)[ \t]+(0x[0-9A-Fa-f]+)"));
 // 0x00401390 <main+0>:    push   ebp
+
+// > > >0x48000400:	0x00000000
+//0x48000404:	0x00000000
+static wxRegEx rePeripheral(_T("[ >]*(0x[0-9A-Fa-f]+):[ \t]+(0x[0-9A-Fa-f]+)"));
 static wxRegEx reDisassembly(_T("(0x[0-9A-Za-z]+)[ \t]+<.*>:[ \t]+(.*)"));
 // 9           if(argc > 1)
 // 10              strcpy(filename, argv[1]) ;
@@ -1476,7 +1480,7 @@ class GdbCmd_PeripheralRegisters : public DebuggerCmd
             {
                 m_Cmd << _T("if 1\n");
 
-                for (int i = 0; i < addressList.GetCount(); i++)
+                for (size_t i = 0; i < addressList.GetCount(); i++)
                 {
                     m_Cmd << _T("x/1xw"); //"x/32xb 0x46d000"
                     m_Cmd << addressList.Item(i);
@@ -1505,68 +1509,24 @@ class GdbCmd_PeripheralRegisters : public DebuggerCmd
 //            [debug]0x48000404:	0x00000000
 //            [debug]>>>>>>cb_gdb:
 
-            // output is a series of:
-            //
-            // 0x22ffc0:       0xf0    0xff    0x22    0x00    0x4f    0x6d    0x81    0x7c
-            // or
-            // 0x85267a0 <RS485TxTask::taskProc()::rcptBuf>:   0x00   0x00   0x00   0x00   0x00   0x00   0x00   0x00
-
-//            wxArrayString lines = GetArrayFromString(output, _T('\n'));
-//            for (unsigned int i = 0; i < lines.GetCount(); ++i)
-//            {
-//                if (reRegisters.Matches(lines[i]))
-//                {
-//                    const wxString &addr = reRegisters.GetMatch(lines[i], 1);
-//                    const wxString &hex = reRegisters.GetMatch(lines[i], 2);
-//                    const wxString &interpreted = reRegisters.GetMatch(lines[i], 3);
-//                    dialog->SetRegisterValue(addr, hex, interpreted);
-//                }
-//            }
-
             cbCPURegistersDlg *dialog = Manager::Get()->GetDebuggerManager()->GetCPURegistersDialog();
 
 //            dialog->Begin();
 //            dialog->Clear();
 
             wxArrayString lines = GetArrayFromString(output, _T('\n'));
-            wxString addr, memory;
-
             for (unsigned int i = 0; i < lines.GetCount(); ++i)
             {
-                if (lines[i].First(_T(':')) == -1)
+                if (rePeripheral.Matches(lines[i]))
                 {
-//                        dialog->AddError(lines[i]);
-                    continue;
-                }
-                addr = lines[i].BeforeFirst(_T(':'));
-                memory = lines[i].AfterFirst(_T(':'));
+                    const wxString& addr = rePeripheral.GetMatch(lines[i], 1);
+                    const wxString& hex = rePeripheral.GetMatch(lines[i], 2);
 
-                size_t pos = addr.find(_T('x'));
-                wxString addrword=wxT("0x");
-                if (pos != wxString::npos)
-                {
-                    for( int index = 1; index < 9; index++ ) //0x46d000 icin 7
-                        addrword << addr[pos + index]; //Endian ok.
-
-//                    addrword=(wxT("0x")+wxString::Format( wxT( "%X" ), test ));
-
-//                    dialog->AddHexWord(addr, hexword);
-//                    pos = memory.find(_T('x'), pos + 1); // skip current 'x'
-                }
-
-                pos = memory.find(_T('x'));
-                while (pos != wxString::npos)
-                {
-                    wxString hexword;
-
-                    for( int index = 1; index < 9; index++ )
-                        hexword << memory[pos + index]; //Endian ok.
-
-                    dialog->AddHexWord(addrword, hexword);
-                    pos = memory.find(_T('x'), pos + 1); // skip current 'x'
+                    dialog->SetPeripheralValue(addr, hex);
                 }
             }
-            dialog->End();
+
+//            dialog->End();
         }
 };
 

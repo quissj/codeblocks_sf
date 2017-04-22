@@ -29,6 +29,7 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 		wxString CalcOffset( const wxString & baseAddress, const wxString & offset );
         TiXmlElement* GetDerivedPeriphal(TiXmlElement *peripheral, const char* derivedName);
         TiXmlElement* GetFirstPeripheral(const wxString& m_SvdPath);
+        wxArrayString GetBaseAddressList();
 		void EnableWindow(bool en);
 
 		void Clear();

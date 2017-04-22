@@ -51,6 +51,8 @@ class DLLIMPORT cbCPURegistersDlg
 
         virtual void Clear() = 0;
         virtual void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted) = 0;
+        virtual void SetPeripheralValue(const wxString& reg_name, const wxString& hexValue) = 0;
+        virtual wxArrayString GetBaseAddressList() = 0;
         virtual void EnableWindow(bool enable) = 0;
 };
 
