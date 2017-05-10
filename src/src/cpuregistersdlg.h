@@ -25,10 +25,6 @@ class CPURegistersDlg: public wxPanel, public cbCPURegistersDlg
 		wxWindow* GetWindow()       {return this;};
 		void SetRegisterValue(const wxString& reg_name, const wxString& hexValue, const wxString& interpreted);
 		void SetPeripheralValue(const wxString& reg_name, const wxString& hexValue);
-		void SvdParser();
-		wxString CalcOffset( const wxString & baseAddress, const wxString & offset );
-        TiXmlElement* GetDerivedPeriphal(TiXmlElement *peripheral, const char* derivedName);
-        TiXmlElement* GetFirstPeripheral(const wxString& m_SvdPath);
         wxArrayString GetBaseAddressList();
         wxPGProperty* GetChildPropertyByName( const wxString& name ) const;
 		void EnableWindow(bool en);

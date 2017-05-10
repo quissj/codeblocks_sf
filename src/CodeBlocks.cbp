@@ -1288,6 +1288,9 @@
 		<Unit filename="include/settings.h">
 			<Option target="sdk" />
 		</Unit>
+		<Unit filename="include/svdparser.h">
+			<Option target="src" />
+		</Unit>
 		<Unit filename="include/templatemanager.h">
 			<Option target="sdk" />
 		</Unit>
@@ -4228,6 +4231,9 @@
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/startherepage.h">
+			<Option target="src" />
+		</Unit>
+		<Unit filename="src/svdparser.cpp">
 			<Option target="src" />
 		</Unit>
 		<Unit filename="src/switcherdlg.cpp">
